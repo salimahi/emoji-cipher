@@ -12,7 +12,7 @@
     body {
       font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
       margin: 2rem auto;
-      max-width: 640px;
+      max-width: 680px;
       line-height: 1.5;
       color: #222;
       background: #fdfdfd;
@@ -46,25 +46,35 @@
       box-shadow:0 1px 2px rgb(0 0 0 / .05);
       display:flex;
       flex-wrap:wrap;
-      gap:1rem 1rem; /* gap between words */
+      row-gap:1rem;
+      column-gap:1rem;
+      font-size:1.1rem;
     }
 
     .word-block {
       display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+    }
+
+    .word-top-row,
+    .word-bottom-row {
+      display:flex;
+      align-items:flex-start;
+      gap:.6rem;
       flex-wrap:nowrap;
-      gap:.75rem; /* gap between letters in same word */
     }
 
     .char-stack {
       display:flex;
       flex-direction:column;
       align-items:center;
-      min-width:2.2rem;
+      min-width:2.4rem;
     }
 
     .char-input {
-      width:2.2rem;
-      height:2.2rem;
+      width:2.4rem;
+      height:2.4rem;
       font-size:1.1rem;
       text-align:center;
       font-weight:600;
@@ -73,6 +83,10 @@
       background:#fff;
       box-shadow:0 1px 2px rgb(0 0 0 / 0.05);
       font-family:inherit;
+    }
+    .char-input::placeholder {
+      color:#999;
+      font-weight:400;
     }
     .char-input:focus{
       outline:none;
@@ -91,13 +105,21 @@
       margin-top:.25rem;
     }
 
+    .word-separator {
+      font-weight:600;
+      font-size:1rem;
+      line-height:1;
+      color:#666;
+      margin-left:.5rem;
+    }
+
     /* Equations block */
     .equations-wrapper{
       border:1px solid #ddd;
       border-radius:.5rem;
       background:#fff;
       box-shadow:0 1px 2px rgb(0 0 0 / .05);
-      padding:.5rem .75rem;
+      padding:.75rem 1rem;
       font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
       font-size:.9rem;
     }
@@ -106,7 +128,7 @@
       display:flex;
       flex-wrap:wrap;
       align-items:center;
-      gap:.5rem .75rem;
+      gap:.75rem 1rem;
       padding:.75rem 0;
       border-bottom:1px solid #eee;
     }
@@ -115,19 +137,20 @@
     .eq-left {
       display:flex;
       flex-wrap:wrap;
-      gap:.5rem .75rem;
-      align-items:center;
+      gap:.75rem;
+      align-items:flex-end;
     }
 
     .eq-stack {
       display:flex;
       flex-direction:column;
       align-items:center;
-      min-width:2.2rem;
+      min-width:2.4rem;
     }
+
     .num-input {
-      width:2.2rem;
-      height:2.2rem;
+      width:2.4rem;
+      height:2.4rem;
       font-size:1rem;
       text-align:center;
       font-weight:600;
@@ -136,6 +159,10 @@
       background:#fff;
       box-shadow:0 1px 2px rgb(0 0 0 / 0.05);
       font-family:inherit;
+    }
+    .num-input::placeholder{
+      color:#999;
+      font-weight:400;
     }
     .num-input:focus{
       outline:none;
@@ -146,6 +173,13 @@
       border-color:#108a00;
       color:#0a4f00;
       font-weight:600;
+    }
+
+    .eq-op {
+      font-size:1.1rem;
+      font-weight:600;
+      line-height:1;
+      align-self:center;
     }
 
     .eq-target {
@@ -160,41 +194,32 @@
     .status-ok{color:#108a00;}
     .status-bad{color:#b00020;}
 
-    /* Mapping grid */
-    .mapping-row {
-      display:grid;
-      grid-template-columns:2rem 1fr 1fr;
-      align-items:center;
-      gap:.5rem;
-      padding:.5rem .75rem;
+    /* Solution key */
+    .solution-box {
       border:1px solid #ddd;
       border-radius:.5rem;
-      background:#fafafa;
-      margin-bottom:.5rem;
+      background:#fff;
       box-shadow:0 1px 2px rgb(0 0 0 / .05);
-      transition: background-color .15s ease, box-shadow .15s ease;
+      padding:1rem;
+      font-size:.95rem;
+      line-height:1.4;
+      color:#222;
+      white-space:pre-line;
     }
-    .mapping-row.solved {
+    .solution-line-solved {
       background:#e6ffe6;
-      box-shadow:0 0 0 2px #108a0044 inset;
-    }
-    .emoji-cell{font-size:1.5rem;text-align:center;}
-    label{display:block;font-size:.7rem;font-weight:500;color:#555;margin-bottom:.25rem;}
-    input[type="text"],input[type="number"]{
-      width:100%;
-      font-size:1rem;
-      padding:.4rem .5rem;
-      border:1px solid #bbb;
-      border-radius:.4rem;
-      font-family:inherit;
-      background:white;
-    }
-    input:focus{border-color:#000;outline:none;}
-    input[disabled]{
-      background:#e6ffe6;
-      border-color:#108a00;
-      color:#0a4f00;
+      border-left:3px solid #108a00;
+      padding:.25rem .5rem;
+      border-radius:.25rem;
+      margin-bottom:.5rem;
       font-weight:600;
+      color:#0a4f00;
+      box-shadow:0 1px 2px rgb(0 0 0 / .06) inset;
+    }
+    .solution-hint {
+      font-size:.8rem;
+      color:#666;
+      margin-bottom:.5rem;
     }
 
     .win-box{
@@ -228,9 +253,9 @@
   <h2>Puzzle</h2>
 
   <div class="note-box">
-    Each emoji stands for <strong>one letter</strong> AND <strong>one number</strong>.<br>
-    Type directly into the boxes above each emoji.<br>
-    If you solve either the letter OR the number for an emoji, we'll fill in the rest and lock it.
+    Each emoji is secretly one LETTER and one NUMBER.<br>
+    Type your guess in the box above the emoji.<br>
+    If you crack it anywhere, we'll fill it in everywhere.
   </div>
 
   <div class="section-title">Your Decoded Phrase</div>
@@ -239,8 +264,11 @@
   <div class="section-title">Check the Math</div>
   <div class="equations-wrapper" id="equationsArea"></div>
 
-  <div class="section-title">Assign Letters and Numbers</div>
-  <div id="mappingInputs"></div>
+  <div class="section-title">Solution Key (auto-fills as you solve)</div>
+  <div class="solution-box" id="solutionBox">
+    <div class="solution-hint">Solve any letter or number to unlock its pair:</div>
+    <div id="solutionLines"></div>
+  </div>
 
   <div class="win-box" id="winBox">
     ✅ You solved it!
@@ -254,16 +282,14 @@
   <script>
   (function(){
 
-    // We'll start with just one puzzle: "COOL GAME BRO"
+    // Single test puzzle: COOL GAME BRO
     const currentPuzzle = {
       phrase: "COOL GAME BRO",
-      // words broken into arrays of emojis
       phraseWords: [
         ["🦊","🪐","🪐","🐸"],        // COOL
         ["🚀","🌵","🎲","🔮"],        // GAME
         ["🧊","🌵","🪐"]             // BRO
       ],
-      // correct solution for each emoji
       mapping: {
         "🦊": { letter:"C", number:3 },
         "🪐": { letter:"O", number:8 },
@@ -276,230 +302,198 @@
       },
       uniqueEmojis: ["🦊","🪐","🐸","🚀","🌵","🎲","🔮","🧊"],
       equations: [
-        { left:["🦊","+","🪐"], target:11 },              // 3 + 8
-        { left:["🪐","+","🐸"], target:12 },              // 8 + 4
-        { left:["🚀","+","🌵","+","🎲"], target:14 },     // 7 + 1 + 6
-        { left:["🎲","+","🔮"], target:8 },              // 6 + 2
-        { left:["🧊","+","🌵"], target:6 }               // 5 + 1
+        { left:["🦊","+","🪐"], target:11 },              //3+8
+        { left:["🪐","+","🐸"], target:12 },              //8+4
+        { left:["🚀","+","🌵","+","🎲"], target:14 },     //7+1+6
+        { left:["🎲","+","🔮"], target:8 },              //6+2
+        { left:["🧊","+","🌵"], target:6 }               //5+1
       ]
     };
 
-    // State for each emoji: did we solve it yet?
-    // { [emoji]: {letter:"", number:"", solved:false} }
+    // Track solve state
     const playerState = {};
     currentPuzzle.uniqueEmojis.forEach(em=>{
       playerState[em] = { letter:"", number:"", solved:false };
     });
 
-    // DOM elements
-    const phraseArea      = document.getElementById("phraseArea");
-    const equationsArea   = document.getElementById("equationsArea");
-    const mappingContainer= document.getElementById("mappingInputs");
-    const winBox          = document.getElementById("winBox");
+    const phraseArea    = document.getElementById("phraseArea");
+    const equationsArea = document.getElementById("equationsArea");
+    const solutionBox   = document.getElementById("solutionBox");
+    const solutionLines = document.getElementById("solutionLines");
+    const winBox        = document.getElementById("winBox");
 
-    // --- Rendering the PHRASE -------------------------------------------------
-    // We'll render each word as .word-block
-    // each character slot as:
-    // <div class="char-stack" data-emoji="🦊">
-    //    <input class="char-input" ... />
-    //    <div class="char-emoji">🦊</div>
-    // </div>
-    function renderPhraseArea(){
+    // RENDER PHRASE
+    // Each word renders:
+    //  top row: inputs per emoji
+    //  bottom row: emojis in same order
+    //  separator "/" after the word (except last word)
+    function renderPhrase(){
       phraseArea.innerHTML = "";
-      currentPuzzle.phraseWords.forEach((wordArr, wordIndex)=>{
-        const wordBlock=document.createElement("div");
-        wordBlock.className="word-block";
 
-        wordArr.forEach((em, charIndex)=>{
-          const stack=document.createElement("div");
-          stack.className="char-stack";
-          stack.dataset.emoji=em;
-          stack.dataset.wordIndex=wordIndex;
-          stack.dataset.charIndex=charIndex;
+      currentPuzzle.phraseWords.forEach((wordArr, wordIdx)=>{
+        const wordBlock = document.createElement("div");
+        wordBlock.className = "word-block";
 
-          const inp=document.createElement("input");
-          inp.className="char-input";
-          inp.maxLength=1;
-          inp.dataset.emoji=em;
-          inp.dataset.kind="letter"; // indicates letter-guess zone
-          inp.addEventListener("input",handleGuessInput);
+        const topRow = document.createElement("div");
+        topRow.className = "word-top-row";
 
-          // initial placeholder
-          inp.value = "_";
+        const bottomRow = document.createElement("div");
+        bottomRow.className = "word-bottom-row";
 
-          const emojiDiv=document.createElement("div");
-          emojiDiv.className="char-emoji";
-          emojiDiv.textContent=em;
+        wordArr.forEach((em, charIdx)=>{
+          const stack = document.createElement("div");
+          stack.className = "char-stack";
+          stack.dataset.emoji = em;
+          stack.dataset.wordIndex = wordIdx;
+          stack.dataset.charIndex = charIdx;
+
+          const inp = document.createElement("input");
+          inp.className = "char-input";
+          inp.maxLength = 1;
+          inp.placeholder = "_";
+          inp.dataset.emoji = em;
+          inp.dataset.kind = "letter";
+          inp.addEventListener("input", handleGuessInput);
+
+          const emDiv = document.createElement("div");
+          emDiv.className = "char-emoji";
+          emDiv.textContent = em;
 
           stack.appendChild(inp);
-          stack.appendChild(emojiDiv);
-          wordBlock.appendChild(stack);
+          stack.appendChild(emDiv);
+          topRow.appendChild(stack);
         });
 
+        // bottom row is just the emojis again in a flat row
+        wordArr.forEach(em=>{
+          const emSpan = document.createElement("div");
+          emSpan.className = "char-emoji";
+          emSpan.textContent = em;
+          bottomRow.appendChild(emSpan);
+        });
+
+        wordBlock.appendChild(topRow);
+        wordBlock.appendChild(bottomRow);
+
+        // Add the wordBlock
         phraseArea.appendChild(wordBlock);
+
+        // After each word except last, show "/"
+        if (wordIdx < currentPuzzle.phraseWords.length - 1){
+          const slash = document.createElement("div");
+          slash.className = "word-separator";
+          slash.textContent = "/";
+          phraseArea.appendChild(slash);
+        }
       });
     }
 
-    // --- Rendering the EQUATIONS --------------------------------------------
-    // Each equation row:
-    //
-    // [num-slot over emoji] + [num-slot over emoji] = target ✅/❌
-    //
-    // num-slot is basically the same idea as char-stack but for numbers
-
+    // RENDER EQUATIONS
+    // Each operand is num-input stacked over emoji, with placeholders
     function renderEquations(){
       equationsArea.innerHTML = "";
 
       currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
-        const row=document.createElement("div");
-        row.className="equation-row";
+        const row = document.createElement("div");
+        row.className = "equation-row";
 
-        // left side: inputs and plus signs
-        const leftWrap=document.createElement("div");
-        leftWrap.className="eq-left";
+        const leftWrap = document.createElement("div");
+        leftWrap.className = "eq-left";
 
         eqObj.left.forEach(token=>{
           if(token === "+"){
-            const plusSpan=document.createElement("div");
-            plusSpan.textContent="+";
-            leftWrap.appendChild(plusSpan);
+            const plus = document.createElement("div");
+            plus.className = "eq-op";
+            plus.textContent = "+";
+            leftWrap.appendChild(plus);
           } else {
-            // emoji operand
-            const stack=document.createElement("div");
-            stack.className="eq-stack";
-            stack.dataset.emoji=token;
-            stack.dataset.eqIndex=eqIndex;
+            const stack = document.createElement("div");
+            stack.className = "eq-stack";
+            stack.dataset.emoji = token;
+            stack.dataset.eqIndex = eqIndex;
 
-            const inp=document.createElement("input");
-            inp.className="num-input";
-            inp.maxLength=1;
-            inp.dataset.emoji=token;
-            inp.dataset.kind="number"; // indicates number-guess zone
-            inp.addEventListener("input",handleGuessInput);
+            const numInp = document.createElement("input");
+            numInp.className = "num-input";
+            numInp.maxLength = 1;
+            numInp.placeholder = "_";
+            numInp.dataset.emoji = token;
+            numInp.dataset.kind = "number";
+            numInp.addEventListener("input", handleGuessInput);
 
-            inp.value = "_";
+            const emDiv = document.createElement("div");
+            emDiv.className = "char-emoji";
+            emDiv.textContent = token;
 
-            const emDiv=document.createElement("div");
-            emDiv.className="char-emoji";
-            emDiv.textContent=token;
-
-            stack.appendChild(inp);
+            stack.appendChild(numInp);
             stack.appendChild(emDiv);
             leftWrap.appendChild(stack);
           }
         });
 
-        // target number
-        const targetDiv=document.createElement("div");
-        targetDiv.className="eq-target";
-        targetDiv.textContent="= "+eqObj.target;
+        const eqTarget = document.createElement("div");
+        eqTarget.className = "eq-target";
+        eqTarget.textContent = "= " + eqObj.target;
 
-        // result check
-        const resultDiv=document.createElement("div");
-        resultDiv.className="eq-result status-bad";
-        resultDiv.dataset.eqIndex=eqIndex;
-        resultDiv.textContent="❌";
+        const eqRes = document.createElement("div");
+        eqRes.className = "eq-result status-bad";
+        eqRes.dataset.eqIndex = eqIndex;
+        eqRes.textContent = "❌";
 
         row.appendChild(leftWrap);
-        row.appendChild(targetDiv);
-        row.appendChild(resultDiv);
-
+        row.appendChild(eqTarget);
+        row.appendChild(eqRes);
         equationsArea.appendChild(row);
       });
 
-      // After render, validate equations once (everything will be ❌ at first)
-      updateEquationsStatus();
+      updateEquationsStatus(); // initial
     }
 
-    // --- Rendering the MAPPING PANEL ----------------------------------------
-    // One row per emoji, with Letter and Number inputs. These autofill + lock
-    // when solved from anywhere else.
-
-    function renderMappingInputs(){
-      mappingContainer.innerHTML = "";
+    // RENDER SOLUTION KEY
+    // We'll re-render the list every time something new is solved.
+    function renderSolutionBox(){
+      solutionLines.innerHTML = "";
       currentPuzzle.uniqueEmojis.forEach(em=>{
-        const row=document.createElement("div");
-        row.className="mapping-row";
-        row.setAttribute("data-row-emoji", em);
-
-        const emojiCell=document.createElement("div");
-        emojiCell.className="emoji-cell";
-        emojiCell.textContent=em;
-        row.appendChild(emojiCell);
-
-        // Letter input
-        const letterWrap=document.createElement("div");
-        const letterLabel=document.createElement("label");
-        letterLabel.textContent="Letter";
-        const letterInput=document.createElement("input");
-        letterInput.type="text";
-        letterInput.maxLength=1;
-        letterInput.dataset.emoji=em;
-        letterInput.dataset.kind="letter";
-        letterInput.addEventListener("input",handleGuessInput);
-        letterWrap.appendChild(letterLabel);
-        letterWrap.appendChild(letterInput);
-
-        // Number input
-        const numberWrap=document.createElement("div");
-        const numberLabel=document.createElement("label");
-        numberLabel.textContent="Number (0-9)";
-        const numberInput=document.createElement("input");
-        numberInput.type="number";
-        numberInput.min="0";
-        numberInput.max="9";
-        numberInput.dataset.emoji=em;
-        numberInput.dataset.kind="number";
-        numberInput.addEventListener("input",handleGuessInput);
-        numberWrap.appendChild(numberLabel);
-        numberWrap.appendChild(numberInput);
-
-        row.appendChild(letterWrap);
-        row.appendChild(numberWrap);
-
-        mappingContainer.appendChild(row);
+        const st = playerState[em];
+        if(st.solved){
+          const line = document.createElement("div");
+          line.className = "solution-line-solved";
+          line.textContent = `${em} = ${st.letter} = ${st.number}`;
+          solutionLines.appendChild(line);
+        }
       });
     }
 
-    // --- HANDLE GUESSES ------------------------------------------------------
-    // This single handler is used for:
-    // - Letter guesses in phrase inputs
-    // - Number guesses in equations
-    // - Letter/Number guesses in mapping panel
-    //
-    // We'll:
-    // 1. Normalize guess (upper-case letter or 0-9 digit).
-    // 2. Check against correct mapping for this emoji.
-    // 3. If correct, lock that emoji everywhere.
-    // 4. Re-check equations and win state.
+    // HANDLE INPUTS (letters in phrase, numbers in math)
     function handleGuessInput(e){
-      const em = e.target.dataset.emoji;
+      const em   = e.target.dataset.emoji;
       const kind = e.target.dataset.kind; // "letter" or "number"
+
+      // if solved already, just force sync and stop
       if(playerState[em].solved){
-        // Already solved -> force correct values and bail
-        applySolutionToEmoji(em);
+        syncSolvedEmojiEverywhere(em);
+        updateEquationsStatus();
+        checkWin();
         return;
       }
 
       let val = e.target.value;
 
-      if(kind==="letter"){
-        // normalize: only A-Z, uppercase
+      if(kind === "letter"){
+        // normalize to one A-Z uppercase
         val = val.toUpperCase().replace(/[^A-Z]/g,"").slice(0,1);
-        e.target.value = val || "_";
-      } else if(kind==="number"){
-        // normalize: digit 0-9
-        if(val!==""){
-          let n=parseInt(val,10);
-          if(isNaN(n)) n="";
-          if(n<0) n=0;
-          if(n>9) n=9;
-          e.target.value = n || "_";
+        e.target.value = val; // we do NOT put "_" anymore
+      } else {
+        // kind === "number"
+        if(val !== ""){
+          let n = parseInt(val,10);
+          if(isNaN(n)) n = "";
+          if(n < 0) n = 0;
+          if(n > 9) n = 9;
+          e.target.value = n === "" ? "" : String(n);
           val = e.target.value;
         }
       }
 
-      // Compare guess to truth
       const correctLetter = currentPuzzle.mapping[em].letter;
       const correctNumber = String(currentPuzzle.mapping[em].number);
 
@@ -507,144 +501,124 @@
       const solvedByNumber = (kind==="number" && val === correctNumber);
 
       if(solvedByLetter || solvedByNumber){
-        // mark emoji as solved globally
-        playerState[em].solved = true;
-        playerState[em].letter = correctLetter;
-        playerState[em].number = correctNumber;
+        // Mark global solved
+        playerState[em].solved  = true;
+        playerState[em].letter  = correctLetter;
+        playerState[em].number  = correctNumber;
 
-        applySolutionToEmoji(em);
-        updateEquationsStatus();
-        checkWin();
+        syncSolvedEmojiEverywhere(em);
       } else {
-        // not solved yet -> just update partial guess to state
-        if(kind==="letter"){
+        // Partial guess; not solved yet
+        if(kind === "letter"){
           playerState[em].letter = val;
         } else {
           playerState[em].number = val;
         }
-        updateEquationsStatus();
-        checkWin();
       }
+
+      updateEquationsStatus();
+      renderSolutionBox();
+      checkWin();
     }
 
-    // applySolutionToEmoji:
-    // - fill + disable all phrase char-inputs for this emoji
-    // - fill + disable all equation num-inputs for this emoji
-    // - fill + disable both inputs in the mapping row for this emoji
-    // - visually mark solved rows
-    function applySolutionToEmoji(em){
-      const finalLetter = currentPuzzle.mapping[em].letter;
-      const finalNumber = String(currentPuzzle.mapping[em].number);
+    // syncSolvedEmojiEverywhere:
+    // - fills and disables all char-inputs for that emoji with correct letter
+    // - fills and disables all num-inputs for that emoji with correct number
+    // - updates the solution box
+    function syncSolvedEmojiEverywhere(em){
+      const correctLetter = currentPuzzle.mapping[em].letter;
+      const correctNumber = String(currentPuzzle.mapping[em].number);
+      playerState[em].solved  = true;
+      playerState[em].letter  = correctLetter;
+      playerState[em].number  = correctNumber;
 
-      // phrase char-inputs
+      // phrase inputs
       const phraseInputs = phraseArea.querySelectorAll(`.char-input[data-emoji="${em}"]`);
       phraseInputs.forEach(inp=>{
-        inp.value = finalLetter;
+        inp.value = correctLetter;
         inp.disabled = true;
       });
 
-      // equation num-inputs
+      // equation inputs
       const eqInputs = equationsArea.querySelectorAll(`.num-input[data-emoji="${em}"]`);
       eqInputs.forEach(inp=>{
-        inp.value = finalNumber;
+        inp.value = correctNumber;
         inp.disabled = true;
       });
 
-      // mapping row
-      const row = mappingContainer.querySelector(`[data-row-emoji="${em}"]`);
-      if(row){
-        row.classList.add("solved");
-        const rowInputs = row.querySelectorAll("input");
-        rowInputs.forEach(rinp=>{
-          if(rinp.dataset.kind==="letter"){
-            rinp.value = finalLetter;
-          }
-          if(rinp.dataset.kind==="number"){
-            rinp.value = finalNumber;
-          }
-          rinp.disabled = true;
-        });
-      }
+      // refresh the solution box
+      renderSolutionBox();
     }
 
-    // --- EQUATION CHECKING ---------------------------------------------------
+    // Equation checking
     function updateEquationsStatus(){
-      // For each equation row, compute sum of its operands (if known)
-      // If all operands have digits and sum === target -> ✅ else ❌
       currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
-        let allKnown=true;
-        let total=0;
+        let allKnown = true;
+        let total = 0;
+
         eqObj.left.forEach(token=>{
-          if(token==="+") return;
+          if(token === "+") return;
           if(playerState[token].solved){
             total += currentPuzzle.mapping[token].number;
           } else {
-            allKnown=false;
+            allKnown = false;
           }
         });
 
-        const resultDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
-        if(!resultDiv) return;
-        if(allKnown && total===eqObj.target){
-          resultDiv.textContent="✅";
-          resultDiv.classList.remove("status-bad");
-          resultDiv.classList.add("status-ok");
+        const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
+        if(!resDiv) return;
+        if(allKnown && total === eqObj.target){
+          resDiv.textContent = "✅";
+          resDiv.classList.remove("status-bad");
+          resDiv.classList.add("status-ok");
         } else {
-          resultDiv.textContent="❌";
-          resultDiv.classList.remove("status-ok");
-          resultDiv.classList.add("status-bad");
+          resDiv.textContent = "❌";
+          resDiv.classList.remove("status-ok");
+          resDiv.classList.add("status-bad");
         }
       });
     }
 
-    // --- WIN CHECK -----------------------------------------------------------
-    // We read the phrase from the UI: all .char-inputs in order.
-    function getCurrentPhraseGuess(){
-      // join all words with space
-      const wordsGuesses = [];
-      // phraseArea children are .word-blocks
-      const wordBlocks = phraseArea.querySelectorAll(".word-block");
-      wordBlocks.forEach(block=>{
-        let wordGuess="";
-        const inputs=block.querySelectorAll(".char-input");
-        inputs.forEach(inp=>{
-          // if it's still "_", treat as blank
-          const v = inp.value.trim();
-          if(v==="_" || v==="") {
-            wordGuess += "_";
+    // Build the user's solved phrase at any moment
+    // We ONLY use solved emojis for final answer. Unsolved = "_".
+    function getCurrentSolvedPhrase(){
+      const wordsSolved = currentPuzzle.phraseWords.map(wordArr => {
+        return wordArr.map(em => {
+          if(playerState[em].solved){
+            return currentPuzzle.mapping[em].letter;
           } else {
-            wordGuess += v;
+            return "_";
           }
-        });
-        wordsGuesses.push(wordGuess);
+        }).join("");
       });
-      return wordsGuesses.join(" ");
+      return wordsSolved.join(" ");
     }
 
+    // Check win
     function checkWin(){
-      const solvedPhrase = getCurrentPhraseGuess() === currentPuzzle.phrase;
-      // all equations must pass AND solvedPhrase true
-      let allEqCorrect=true;
+      const finalPhrase = getCurrentSolvedPhrase();
+      const phraseDone = (finalPhrase === currentPuzzle.phrase);
+
+      let allEqCorrect = true;
       currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
         const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
         if(!resDiv || !resDiv.classList.contains("status-ok")){
-          allEqCorrect=false;
+          allEqCorrect = false;
         }
       });
 
-      if(solvedPhrase && allEqCorrect){
+      if(phraseDone && allEqCorrect){
         winBox.style.display = "block";
       } else {
         winBox.style.display = "none";
       }
     }
 
-    // --- INIT ---------------------------------------------------------------
+    // Initial render
     function init(){
-      renderPhraseArea();
+      renderPhrase();
       renderEquations();
-      renderMappingInputs();
-      // nothing is solved by default, so no autofill
+      renderSolutionBox(); // initially empty
     }
 
     init();

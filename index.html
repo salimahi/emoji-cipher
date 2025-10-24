@@ -232,3 +232,369 @@
         phrase: "ADDICTED TO RAGEAHOL",
         phraseEmojis: [
           "🌵","🎲","🎲","🍄","🦊","🧊","🔮","🎲","⬜",
+          "🧊","🎲","⬜",
+          "🌊","🌵","🚀","🔮","🌵","🐸","🎲","🐙"
+        ],
+        uniqueEmojis: ["🌵","🎲","🍄","🦊","🧊","🔮","🌊","🚀","🐸","🐙"],
+        // 🌵 A=1, 🎲 D=7, 🍄 I=4, 🦊 C=8,
+        // 🧊 T=9, 🔮 E=3, 🌊 R=5, 🚀 G=2,
+        // 🐸 H=4, 🐙 L=8 (reuse nums allowed)
+        equations: [
+          { left:["🌵","+","🎲"], target:8 },        //1+7
+          { left:["🎲","+","🍄"], target:11 },       //7+4
+          { left:["🦊","+","🧊"], target:17 },       //8+9
+          { left:["🔮","+","🎲"], target:10 },       //3+7
+          { left:["🌊","+","🌵","+","🚀"], target:8 },//5+1+2
+          { left:["🐸","+","🎲"], target:11 },       //4+7
+          { left:["🎲","+","🐙"], target:15 }        //7+8
+        ]
+      },
+
+      // 5. I BARELY EVEN KNOW HER
+      {
+        phrase: "I BARELY EVEN KNOW HER",
+        phraseEmojis: [
+          "🍄","⬜",
+          "🚀","🌵","🌊","🔮","🐙","🧊","⬜",
+          "🔮","🎲","🔮","🐙","⬜",
+          "🧊","🐙","🎲","🪐","⬜",
+          "🐸","🔮","🌊"
+        ],
+        uniqueEmojis: ["🍄","🚀","🌵","🌊","🔮","🐙","🧊","🎲","🪐","🐸"],
+        // 🍄 I=4, 🚀 B=6, 🌵 A=1, 🌊 R=9,
+        // 🔮 E=2, 🐙 L=7, 🧊 Y=8,
+        // 🎲 V=5, 🪐 N=3, 🐸 K=4
+        equations: [
+          { left:["🍄","+","🚀"], target:10 },       //4+6
+          { left:["🌵","+","🌊"], target:10 },       //1+9
+          { left:["🔮","+","🐙","+","🧊"], target:17 }, //2+7+8
+          { left:["🔮","+","🎲"], target:7 },        //2+5
+          { left:["🎲","+","🪐"], target:8 },        //5+3
+          { left:["🐸","+","🔮"], target:6 }         //4+2
+        ]
+      },
+
+      // 6. SEND MORE KITTENS
+      {
+        phrase: "SEND MORE KITTENS",
+        phraseEmojis: [
+          "🦊","🐸","🪐","🎲","⬜",
+          "🚀","🔮","🌵","🐸","⬜",
+          "🧊","🐙","🦴","🦴","🐸","🪼","🐍"
+        ],
+        uniqueEmojis: ["🦊","🐸","🪐","🎲","🚀","🔮","🌵","🧊","🐙","🦴","🪼","🐍"],
+        // 🦊 S=6, 🐸 E=2, 🪐 N=5, 🎲 D=4,
+        // 🚀 M=7, 🔮 O=8, 🌵 R=3,
+        // 🧊 K=9, 🐙 I=1, 🦴 T=4,
+        // 🪼 N=5, 🐍 S=6
+        equations: [
+          { left:["🦊","+","🐸"], target:8 },             //6+2
+          { left:["🐸","+","🪐","+","🎲"], target:11 },   //2+5+4
+          { left:["🚀","+","🔮"], target:15 },           //7+8
+          { left:["🌵","+","🐸"], target:5 },            //3+2
+          { left:["🧊","+","🐙"], target:10 },           //9+1
+          { left:["🦴","+","🦴"], target:8 },            //4+4
+          { left:["🐸","+","🪼","+","🐍"], target:13 }    //2+5+6
+        ]
+      },
+
+      // 7. CAUGHT A VIBE
+      {
+        phrase: "CAUGHT A VIBE",
+        phraseEmojis: [
+          "🌵","🐙","🚀","🦊","🐸","🧊","⬜",
+          "🐙","⬜",
+          "🎲","🔮","🪐","🦴"
+        ],
+        uniqueEmojis: ["🌵","🐙","🚀","🦊","🐸","🧊","🎲","🔮","🪐","🦴"],
+        // 🌵 C=2, 🐙 A=1, 🚀 U=6, 🦊 G=7,
+        // 🐸 H=4, 🧊 T=9,
+        // 🎲 V=8, 🔮 I=3, 🪐 B=5, 🦴 E=2
+        equations: [
+          { left:["🌵","+","🐙"], target:3 },      //2+1
+          { left:["🚀","+","🦊"], target:13 },     //6+7
+          { left:["🐸","+","🧊"], target:13 },     //4+9
+          { left:["🎲","+","🔮"], target:11 },     //8+3
+          { left:["🪐","+","🦴"], target:7 },      //5+2
+          { left:["🐙","+","🎲"], target:9 }       //1+8
+        ]
+      },
+
+      // 8. A CENTER FOR ANTS
+      {
+        phrase: "A CENTER FOR ANTS",
+        phraseEmojis: [
+          "🐙","⬜",
+          "🧊","🌵","🦴","🔮","🌵","🎲","⬜",
+          "🪐","🐸","🎲","⬜",
+          "🐙","🦴","🔮","🚀"
+        ],
+        uniqueEmojis: ["🐙","🧊","🌵","🦴","🔮","🎲","🪐","🐸","🚀"],
+        // 🐙 A=1, 🧊 C=6, 🌵 E=2, 🦴 N=5,
+        // 🔮 T=9, 🎲 R=4, 🪐 F=7,
+        // 🐸 O=8, 🚀 S=3
+        equations: [
+          { left:["🧊","+","🌵"], target:8 },           //6+2
+          { left:["🦴","+","🔮"], target:14 },         //5+9
+          { left:["🌵","+","🎲"], target:6 },          //2+4
+          { left:["🪐","+","🐸"], target:15 },         //7+8
+          { left:["🎲","+","🐙"], target:5 },          //4+1
+          { left:["🐙","+","🦴","+","🔮","+","🚀"], target:18 } //1+5+9+3
+        ]
+      },
+
+      // 9. BY DOG I MEAN SON
+      {
+        phrase: "BY DOG I MEAN SON",
+        phraseEmojis: [
+          "🧊","🎲","⬜",
+          "🐸","🪐","🦊","⬜",
+          "🍄","⬜",
+          "🚀","🌵","🪼","🔮","⬜",
+          "🐙","🪐","🔮"
+        ],
+        uniqueEmojis: ["🧊","🎲","🐸","🪐","🦊","🍄","🚀","🌵","🪼","🔮","🐙"],
+        // 🧊 B=4, 🎲 Y=7, 🐸 D=8, 🪐 O=6,
+        // 🦊 G=5, 🍄 I=3, 🚀 M=9, 🌵 E=2,
+        // 🪼 A=1, 🔮 N=4, 🐙 S=6
+        equations: [
+          { left:["🧊","+","🎲"], target:11 },        //4+7
+          { left:["🐸","+","🪐"], target:14 },        //8+6
+          { left:["🦊","+","🍄"], target:8 },         //5+3
+          { left:["🚀","+","🌵"], target:11 },        //9+2
+          { left:["🪼","+","🔮"], target:5 },         //1+4
+          { left:["🐙","+","🪐","+","🔮"], target:16 } //6+6+4
+        ]
+      },
+
+      // 10. GREAT WORK SO FAR
+      {
+        phrase: "GREAT WORK SO FAR",
+        phraseEmojis: [
+          "🦊","🌵","🧊","🎲","🔮","⬜",
+          "🚀","🐸","🌵","🦴","⬜",
+          "🐙","🐸","⬜",
+          "🍄","🎲","🌵"
+        ],
+        uniqueEmojis: ["🦊","🌵","🧊","🎲","🔮","🚀","🐸","🦴","🐙","🍄"],
+        // 🦊 G=8, 🌵 R=4, 🧊 E=2, 🎲 A=1,
+        // 🔮 T=9, 🚀 W=6, 🐸 O=7,
+        // 🦴 K=5, 🐙 S=3, 🍄 F=4
+        equations: [
+          { left:["🦊","+","🌵"], target:12 },        //8+4
+          { left:["🧊","+","🎲"], target:3 },         //2+1
+          { left:["🔮","+","🚀"], target:15 },        //9+6
+          { left:["🐸","+","🌵"], target:11 },        //7+4
+          { left:["🦴","+","🐙"], target:8 },         //5+3
+          { left:["🍄","+","🎲","+","🌵"], target:9 }  //4+1+4
+        ]
+      }
+    ];
+
+    // Pick a random puzzle from all 10
+    const currentPuzzle = PUZZLES[Math.floor(Math.random() * PUZZLES.length)];
+
+    // Track player's guesses
+    const playerState = {};
+    currentPuzzle.uniqueEmojis.forEach(e=>{
+      playerState[e] = { letter:"", number:"" };
+    });
+
+    // DOM references
+    const phraseDisplay   = document.getElementById("emojiPhraseDisplay");
+    const equationsArea   = document.getElementById("equationsArea");
+    const previewBox      = document.getElementById("decodedPreview");
+    const mappingContainer= document.getElementById("mappingInputs");
+    const winBox          = document.getElementById("winBox");
+
+    function renderEmojiPhrase(){
+      phraseDisplay.innerHTML = "";
+      currentPuzzle.phraseEmojis.forEach(em=>{
+        const span=document.createElement("span");
+        span.textContent=em;
+        phraseDisplay.appendChild(span);
+      });
+    }
+
+    function renderMappingInputs(){
+      mappingContainer.innerHTML = "";
+      currentPuzzle.uniqueEmojis.forEach(em=>{
+        const row=document.createElement("div");
+        row.className="mapping-row";
+
+        const emojiCell=document.createElement("div");
+        emojiCell.className="emoji-cell";
+        emojiCell.textContent=em;
+        row.appendChild(emojiCell);
+
+        const letterWrap=document.createElement("div");
+        const letterLabel=document.createElement("label");
+        letterLabel.textContent="Letter";
+        const letterInput=document.createElement("input");
+        letterInput.type="text";
+        letterInput.maxLength=1;
+        letterInput.dataset.emoji=em;
+        letterInput.dataset.field="letter";
+        letterInput.addEventListener("input",handleInputChange);
+        letterWrap.appendChild(letterLabel);
+        letterWrap.appendChild(letterInput);
+
+        const numWrap=document.createElement("div");
+        const numLabel=document.createElement("label");
+        numLabel.textContent="Number (0-9)";
+        const numInput=document.createElement("input");
+        numInput.type="number";
+        numInput.min="0";
+        numInput.max="9";
+        numInput.dataset.emoji=em;
+        numInput.dataset.field="number";
+        numInput.addEventListener("input",handleInputChange);
+        numWrap.appendChild(numLabel);
+        numWrap.appendChild(numInput);
+
+        row.appendChild(letterWrap);
+        row.appendChild(numWrap);
+
+        mappingContainer.appendChild(row);
+      });
+    }
+
+    function handleInputChange(e){
+      const em = e.target.dataset.emoji;
+      const field = e.target.dataset.field;
+      let val = e.target.value;
+
+      if(field==="letter"){
+        val = val.toUpperCase().replace(/[^A-Z ]/g,"").slice(0,1);
+        e.target.value = val;
+      }
+
+      if(field==="number"){
+        if(val!==""){
+          let n=parseInt(val,10);
+          if(isNaN(n)) n="";
+          if(n<0) n=0;
+          if(n>9) n=9;
+          e.target.value = n;
+          val = e.target.value;
+        }
+      }
+
+      playerState[em][field] = val;
+      update();
+    }
+
+    function buildPreviewString(){
+      let out = "";
+      currentPuzzle.phraseEmojis.forEach(em=>{
+        if(em==="⬜"){
+          out += " ";
+        } else {
+          const guess = playerState[em]?.letter || "";
+          out += guess ? guess : "_";
+        }
+      });
+      return out;
+    }
+
+    function renderPreview(){
+      previewBox.textContent = buildPreviewString();
+    }
+
+    function evaluateEquation(eqObj){
+      let pieces = [];
+      let valid  = true;
+
+      eqObj.left.forEach(token=>{
+        if(token==="+"){
+          pieces.push("+");
+        } else {
+          const guessNum = playerState[token]?.number;
+          if(!guessNum && guessNum!==0){
+            pieces.push("?");
+            valid = false;
+          } else {
+            pieces.push(String(guessNum));
+          }
+        }
+      });
+
+      let computed = null;
+      if(valid){
+        computed = 0;
+        pieces.forEach(p=>{
+          if(p!=="+"){
+            const n = parseInt(p,10);
+            if(isNaN(n)){
+              valid=false;
+            } else {
+              computed += n;
+            }
+          }
+        });
+        if(computed !== eqObj.target){
+          valid = false;
+        }
+      }
+
+      const displayStr = pieces.join(" ")+" = "+eqObj.target+" "+(valid?"✅":"❌");
+      return {
+        html: "<span class='"+(valid?"status-ok":"status-bad")+"'>"+displayStr+"</span>",
+        ok: valid
+      };
+    }
+
+    function renderEquations(){
+      equationsArea.innerHTML = "";
+      currentPuzzle.equations.forEach(eq=>{
+        const row=document.createElement("div");
+        row.className="equation-row";
+
+        const left=document.createElement("div");
+        left.textContent = eq.left.join(" ")+" = "+eq.target;
+
+        const right=document.createElement("div");
+        right.className="eq-right";
+        const res=evaluateEquation(eq);
+        right.innerHTML = res.html;
+
+        row.appendChild(left);
+        row.appendChild(right);
+        equationsArea.appendChild(row);
+      });
+    }
+
+    function checkWin(){
+      const solvedPhrase = buildPreviewString() === currentPuzzle.phrase;
+      let allEqOk = true;
+      for(const eq of currentPuzzle.equations){
+        if(!evaluateEquation(eq).ok){
+          allEqOk = false;
+          break;
+        }
+      }
+      if(solvedPhrase && allEqOk){
+        winBox.style.display = "block";
+      } else {
+        winBox.style.display = "none";
+      }
+    }
+
+    function update(){
+      renderPreview();
+      renderEquations();
+      checkWin();
+    }
+
+    function init(){
+      renderEmojiPhrase();
+      renderMappingInputs();
+      update();
+    }
+
+    init();
+
+  })();
+  </script>
+</body>
+</html>

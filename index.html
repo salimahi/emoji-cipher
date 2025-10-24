@@ -428,46 +428,42 @@
         ]
       },
 
-      // 5. I BARELY EVEN KNOW HER
-      {
-        phrase: "I BARELY EVEN KNOW HER",
-        phraseWords: [
-          ["🍄"],                                         // I
-          ["🚀","🌵","🌊","🔮","🐙","🧊"],                 // BARELY
-          ["🔮","🎲","🔮","🐙"],                           // EVEN
-          ["🧊","🐙","🎲","🪐"],                           // KNOW
-          ["🐸","🔮","🌊"]                                // HER
-        ],
-        // We need I / B A R E L Y / E V E N / K N O W / H E R
-        mapping: {
-          "🍄": { letter:"I", number:4 },
-          "🚀": { letter:"B", number:6 },
-          "🌵": { letter:"A", number:1 },
-          "🌊": { letter:"R", number:9 },
-          "🔮": { letter:"E", number:2 },
-          "🐙": { letter:"L", number:7 },
-          "🧊": { letter:"Y", number:8 },
-          "🎲": { letter:"V", number:5 },
-          "🪐": { letter:"N", number:3 },
-          "🐸": { letter:"H", number:4 }
-          // O and W appear in "KNOW" and "KNOW" includes O and W.
-          // We haven't explicitly assigned O and W yet.
-          // We need O and W emojis here or we can't solve them.
-          // Let's fix KNOW:
-          // "KNOW" = K N O W
-          // Our word array was ["🧊","🐙","🎲","🪐"] but that's Y L V N.
-          // We need new emojis for K,O,W that are consistent AND show in mapping.
-        },
-        uniqueEmojis: ["🍄","🚀","🌵","🌊","🔮","🐙","🧊","🎲","🪐","🐸"],
-        equations: [
-          { left:["🍄","+","🚀"], target:10 },             //4+6
-          { left:["🌵","+","🌊"], target:10 },             //1+9
-          { left:["🔮","+","🐙","+","🧊"], target:17 },     //2+7+8
-          { left:["🔮","+","🎲"], target:7 },              //2+5
-          { left:["🎲","+","🪐"], target:8 },              //5+3
-          { left:["🐸","+","🔮"], target:6 }               //4+2
-        ]
-      },
+      // 5. I BARELY EVEN KNOW HER  (FIXED)
+{
+  phrase: "I BARELY EVEN KNOW HER",
+  phraseWords: [
+    ["🍄"],                                         // I
+    ["🚀","🌵","🌊","🔮","🐙","🧊"],                 // BARELY
+    ["🔮","🎲","🔮","🪐"],                           // EVEN
+    ["🦊","🪐","🐸","🦴"],                           // KNOW
+    ["🐢","🔮","🌊"]                                // HER
+  ],
+  mapping: {
+    "🍄": { letter:"I", number:4 },
+    "🚀": { letter:"B", number:6 },
+    "🌵": { letter:"A", number:1 },
+    "🌊": { letter:"R", number:9 },
+    "🔮": { letter:"E", number:2 },
+    "🐙": { letter:"L", number:7 },
+    "🧊": { letter:"Y", number:8 },
+    "🎲": { letter:"V", number:5 },
+    "🪐": { letter:"N", number:3 },
+    "🦊": { letter:"K", number:4 },
+    "🐸": { letter:"O", number:6 },
+    "🦴": { letter:"W", number:2 },
+    "🐢": { letter:"H", number:5 }
+  },
+  uniqueEmojis: ["🍄","🚀","🌵","🌊","🔮","🐙","🧊","🎲","🪐","🦊","🐸","🦴","🐢"],
+  equations: [
+    { left:["🍄","+","🚀"], target:10 },                 // 4+6
+    { left:["🌵","+","🌊"], target:10 },                 // 1+9
+    { left:["🔮","+","🐙","+","🧊"], target:17 },        // 2+7+8
+    { left:["🔮","+","🎲"], target:7 },                  // 2+5
+    { left:["🦊","+","🪐","+","🐸","+","🦴"], target:15 },// 4+3+6+2
+    { left:["🐢","+","🔮"], target:7 }                   // 5+2
+  ]
+},
+
 
       // 6. SEND MORE KITTENS
       {
@@ -681,9 +677,6 @@
         const topRow = document.createElement("div");
         topRow.className = "word-top-row";
 
-        const bottomRow = document.createElement("div");
-        bottomRow.className = "word-bottom-row";
-
         wordArr.forEach((em, charIdx)=>{
           const stack = document.createElement("div");
           stack.className = "char-stack";
@@ -713,11 +706,9 @@
           const emSpan = document.createElement("div");
           emSpan.className = "char-emoji";
           emSpan.textContent = em;
-          bottomRow.appendChild(emSpan);
         });
 
         wordBlock.appendChild(topRow);
-        wordBlock.appendChild(bottomRow);
         phraseArea.appendChild(wordBlock);
 
         if (wordIdx < currentPuzzle.phraseWords.length - 1){

@@ -284,31 +284,33 @@
 
     // Single test puzzle: COOL GAME BRO
     const currentPuzzle = {
-      phrase: "COOL GAME BRO",
-      phraseWords: [
-        ["🦊","🪐","🪐","🐸"],        // COOL
-        ["🚀","🌵","🎲","🔮"],        // GAME
-        ["🧊","🌵","🪐"]             // BRO
-      ],
-      mapping: {
-        "🦊": { letter:"C", number:3 },
-        "🪐": { letter:"O", number:8 },
-        "🐸": { letter:"L", number:4 },
-        "🚀": { letter:"G", number:7 },
-        "🌵": { letter:"A", number:1 },
-        "🎲": { letter:"M", number:6 },
-        "🔮": { letter:"E", number:2 },
-        "🧊": { letter:"B", number:5 }
-      },
-      uniqueEmojis: ["🦊","🪐","🐸","🚀","🌵","🎲","🔮","🧊"],
-      equations: [
-        { left:["🦊","+","🪐"], target:11 },              //3+8
-        { left:["🪐","+","🐸"], target:12 },              //8+4
-        { left:["🚀","+","🌵","+","🎲"], target:14 },     //7+1+6
-        { left:["🎲","+","🔮"], target:8 },              //6+2
-        { left:["🧊","+","🌵"], target:6 }               //5+1
-      ]
-    };
+  phrase: "COOL GAME BRO",
+  phraseWords: [
+    ["🦊","🪐","🪐","🐸"],        // COOL
+    ["🚀","🌵","🎲","🔮"],        // GAME
+    ["🧊","🐙","🪐"]             // BRO  <-- updated: 🐙 is R
+  ],
+  mapping: {
+    "🦊": { letter:"C", number:3 }, // C
+    "🪐": { letter:"O", number:8 }, // O
+    "🐸": { letter:"L", number:4 }, // L
+    "🚀": { letter:"G", number:7 }, // G
+    "🌵": { letter:"A", number:1 }, // A
+    "🎲": { letter:"M", number:6 }, // M
+    "🔮": { letter:"E", number:2 }, // E
+    "🧊": { letter:"B", number:5 }, // B
+    "🐙": { letter:"R", number:9 }  // R (new)
+  },
+  uniqueEmojis: ["🦊","🪐","🐸","🚀","🌵","🎲","🔮","🧊","🐙"],
+  equations: [
+    { left:["🦊","+","🪐"], target:11 },              //3+8
+    { left:["🪐","+","🐸"], target:12 },              //8+4
+    { left:["🚀","+","🌵","+","🎲"], target:14 },     //7+1+6
+    { left:["🎲","+","🔮"], target:8 },              //6+2
+    { left:["🧊","+","🌵"], target:6 },              //5+1
+    { left:["🐙","+","🌵"], target:10 }              //9+1  <-- new to include R
+  ]
+};
 
     // Track solve state
     const playerState = {};

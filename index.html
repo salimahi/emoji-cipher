@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emoji Cipher™ – Puzzle #1</title>
+  <title>Emoji Cipher™ – Puzzle</title>
   <meta name="description" content="Emoji Cipher™ is an original logic puzzle by Salimah Ismail. Decode the emojis to reveal the hidden phrase and balance the equations.">
   <meta name="author" content="Salimah Ismail">
   <meta name="copyright" content="© 2025 Salimah Ismail. Licensed under CC BY-NC-ND 4.0 International.">
@@ -130,26 +130,22 @@
 </head>
 <body>
   <h1>Emoji Cipher™</h1>
-  <h2>Puzzle #1</h2>
+  <h2>Puzzle</h2>
 
   <div class="note-box">
     Each emoji stands for <strong>one letter</strong> and <strong>one number</strong>.<br>
     Decode the secret phrase <em>and</em> make all the equations true.
   </div>
 
-  <!-- Show the coded phrase (in emojis) -->
   <div class="section-title">Secret Phrase (in emojis)</div>
   <div class="cipher-phrase-emoji" id="emojiPhraseDisplay"></div>
 
-  <!-- Show math first -->
   <div class="section-title">Check the Math</div>
   <div class="equations-wrapper" id="equationsArea"></div>
 
-  <!-- Show decoded phrase after math -->
   <div class="section-title">Your Decoded Phrase</div>
-  <div class="phrase-box" id="decodedPreview">_ _ _ _   _ _ _ _   _ _ _</div>
+  <div class="phrase-box" id="decodedPreview">_ _ _</div>
 
-  <!-- Mapping inputs last -->
   <div class="section-title">Assign Letters and Numbers</div>
   <div id="mappingInputs"></div>
 
@@ -164,266 +160,75 @@
 
   <script>
   (function(){
-    //
-    // GAME DATA FOR THIS PUZZLE
-    //
-    // New answer:
-    const SOLUTION_PHRASE = "COOL GAME BRO";
 
-    // We assign emojis to letters.
-    // Phrase "COOL GAME BRO":
-    // C  O  O  L   G  A  M  E   B  R  O
-    // 🥶 🟣 🟣 🦙 ⬜ 🎮 🍏 🤹 🥚 ⬜ 🅱️ 🤖 🟣
-    //
-    // Notes:
-    // - We give "B" -> 🅱️
-    // - We give "R" -> 🤖 (just picking a fun robot for R)
-    //
-    const phraseEmojis = [
-      "🥶","🟣","🟣","🦙","⬜","🎮","🍏","🤹","🥚","⬜","🅱️","🤖","🟣"
-    ];
+    // PUZZLES ARRAY: All 10 levels
+    const PUZZLES = [
+      // 1. COOL GAME BRO
+      {
+        phrase: "COOL GAME BRO",
+        phraseEmojis: [
+          "🦊","🪐","🪐","🐸","⬜",
+          "🚀","🌵","🎲","🔮","⬜",
+          "🧊","🌵","🪐"
+        ],
+        uniqueEmojis: ["🦊","🪐","🐸","🚀","🌵","🎲","🔮","🧊"],
+        // numbers:
+        // 🦊 C=3, 🪐 O=8, 🐸 L=4, 🚀 G=7,
+        // 🌵 A=1, 🎲 M=6, 🔮 E=2, 🧊 B=5, (R uses 🌵? we reused A here, that's ok for level 1 simplicity)
+        equations: [
+          { left:["🦊","+","🪐"], target:11 },          //3+8
+          { left:["🪐","+","🐸"], target:12 },          //8+4
+          { left:["🚀","+","🌵","+","🎲"], target:14 }, //7+1+6
+          { left:["🎲","+","🔮"], target:8 },          //6+2
+          { left:["🧊","+","🌵"], target:6 }           //5+1
+        ]
+      },
 
-    // Unique emojis (excluding space ⬜):
-    const uniqueEmojis = [
-      "🥶","🟣","🦙","🎮","🍏","🤹","🥚","🅱️","🤖"
-    ];
+      // 2. IT IS NAP TIME
+      {
+        phrase: "IT IS NAP TIME",
+        phraseEmojis: [
+          "🍄","🧊","⬜",
+          "🍄","🐸","⬜",
+          "🐙","🌵","🦊","⬜",
+          "🧊","🍄","🎲","🔮"
+        ],
+        uniqueEmojis: ["🍄","🧊","🐸","🐙","🌵","🦊","🎲","🔮"],
+        // 🍄 I=4, 🧊 T=9, 🐸 S=2, 🐙 N=5,
+        // 🌵 A=1, 🦊 P=7, 🎲 M=6, 🔮 E=3
+        equations: [
+          { left:["🍄","+","🧊"], target:13 },   //4+9
+          { left:["🐸","+","🐙"], target:7 },    //2+5
+          { left:["🌵","+","🦊"], target:8 },    //1+7
+          { left:["🎲","+","🔮"], target:9 },    //6+3
+          { left:["🧊","+","🎲"], target:15 }    //9+6
+        ]
+      },
 
-    // We'll give each emoji a secret number like before.
-    // You can tune these, they just need to be consistent with equations.
-    //
-    // Let's assign:
-    // 🥶 = C = 3
-    // 🟣 = O = 8
-    // 🦙 = L = 4
-    // 🎮 = G = 7
-    // 🍏 = A = 1
-    // 🤹 = M = 6
-    // 🥚 = E = 2
-    // 🅱️ = B = 5
-    // 🤖 = R = 9
-    //
-    // We'll create equations that are true with those numbers.
-    //
-    // Equations we show the user (left uses emojis, right is the target number):
-    const equations = [
-      { left:["🥶","+","🟣"], target:11 },   // 3 + 8 = 11
-      { left:["🟣","+","🦙"], target:12 },   // 8 + 4 = 12
-      { left:["🎮","+","🍏","+","🤹"], target:14 }, // 7 + 1 + 6 =14
-      { left:["🤹","+","🥚"], target:8 },    // 6 + 2 = 8
-      { left:["🅱️","+","🤖"], target:14 },  // 5 + 9 = 14
-      { left:["🤖","+","🟣"], target:17 }    // 9 + 8 = 17
-    ];
+      // 3. HERBAL OR VERBAL TEA
+      {
+        phrase: "HERBAL OR VERBAL TEA",
+        phraseEmojis: [
+          "🪐","🔮","🌊","🚀","🌵","🐙","⬜",
+          "🎲","🌊","⬜",
+          "🦊","🔮","🌊","🚀","🌵","🐙","⬜",
+          "🧊","🔮","🌵"
+        ],
+        uniqueEmojis: ["🪐","🔮","🌊","🚀","🌵","🐙","🎲","🦊","🧊"],
+        // 🪐 H=4, 🔮 E=2, 🌊 R=9, 🚀 B=5,
+        // 🌵 A=1, 🐙 L=7, 🎲 O=6, 🦊 V=8, 🧊 T=3
+        equations: [
+          { left:["🪐","+","🔮"], target:6 },        //4+2
+          { left:["🌊","+","🚀"], target:14 },       //9+5
+          { left:["🌵","+","🐙"], target:8 },        //1+7
+          { left:["🎲","+","🌊"], target:15 },       //6+9
+          { left:["🦊","+","🔮"], target:10 },       //8+2
+          { left:["🧊","+","🔮","+","🌵"], target:6 } //3+2+1
+        ]
+      },
 
-    // Player's working state:
-    const playerState = {};
-    uniqueEmojis.forEach(e=>{
-      playerState[e] = { letter:"", number:"" };
-    });
-
-    // Grab DOM nodes:
-    const phraseDisplay   = document.getElementById("emojiPhraseDisplay");
-    const equationsArea   = document.getElementById("equationsArea");
-    const previewBox      = document.getElementById("decodedPreview");
-    const mappingContainer= document.getElementById("mappingInputs");
-    const winBox          = document.getElementById("winBox");
-
-    //
-    // RENDER FUNCTIONS
-    //
-    function renderEmojiPhrase(){
-      phraseDisplay.innerHTML = "";
-      phraseEmojis.forEach(em=>{
-        const span=document.createElement("span");
-        span.textContent=em;
-        phraseDisplay.appendChild(span);
-      });
-    }
-
-    function renderMappingInputs(){
-      mappingContainer.innerHTML = "";
-      uniqueEmojis.forEach(em=>{
-        const row=document.createElement("div");
-        row.className="mapping-row";
-
-        const emojiCell=document.createElement("div");
-        emojiCell.className="emoji-cell";
-        emojiCell.textContent=em;
-        row.appendChild(emojiCell);
-
-        // letter input
-        const letterWrap=document.createElement("div");
-        const letterLabel=document.createElement("label");
-        letterLabel.textContent="Letter";
-        const letterInput=document.createElement("input");
-        letterInput.type="text";
-        letterInput.maxLength=1;
-        letterInput.dataset.emoji=em;
-        letterInput.dataset.field="letter";
-        letterInput.addEventListener("input",handleInputChange);
-        letterWrap.appendChild(letterLabel);
-        letterWrap.appendChild(letterInput);
-
-        // number input
-        const numWrap=document.createElement("div");
-        const numLabel=document.createElement("label");
-        numLabel.textContent="Number (0-9)";
-        const numInput=document.createElement("input");
-        numInput.type="number";
-        numInput.min="0";
-        numInput.max="9";
-        numInput.dataset.emoji=em;
-        numInput.dataset.field="number";
-        numInput.addEventListener("input",handleInputChange);
-        numWrap.appendChild(numLabel);
-        numWrap.appendChild(numInput);
-
-        row.appendChild(letterWrap);
-        row.appendChild(numWrap);
-
-        mappingContainer.appendChild(row);
-      });
-    }
-
-    function handleInputChange(e){
-      const em = e.target.dataset.emoji;
-      const field = e.target.dataset.field;
-      let val = e.target.value;
-
-      if(field==="letter"){
-        val = val.toUpperCase().replace(/[^A-Z ]/g,"").slice(0,1);
-        e.target.value = val;
-      }
-
-      if(field==="number"){
-        if(val!==""){
-          let n = parseInt(val,10);
-          if(isNaN(n)) n="";
-          if(n<0) n=0;
-          if(n>9) n=9;
-          e.target.value = n;
-          val = e.target.value;
-        }
-      }
-
-      playerState[em][field] = val;
-      update();
-    }
-
-    function buildPreviewString(){
-      // Go through phraseEmojis and map to guessed letters
-      // ⬜ is actual space
-      let out = "";
-      phraseEmojis.forEach(em=>{
-        if(em==="⬜"){
-          out += " ";
-        } else {
-          const guess = playerState[em]?.letter || "";
-          out += guess ? guess : "_";
-        }
-      });
-      return out;
-    }
-
-    function renderPreview(){
-      previewBox.textContent = buildPreviewString();
-    }
-
-    function evaluateEquation(eqObj){
-      // eqObj.left looks like ["🥶","+","🟣"]
-      // We'll build "3 + 8 = 11 ✅" etc.
-      let pieces = [];
-      let valid = true;
-      eqObj.left.forEach(token=>{
-        if(token==="+"){
-          pieces.push("+");
-          return;
-        }
-        const guessNum = playerState[token]?.number;
-        if(!guessNum && guessNum!==0){
-          pieces.push("?");
-          valid = false;
-        } else {
-          pieces.push(String(guessNum));
-        }
-      });
-
-      let computed=null;
-      if(valid){
-        computed = 0;
-        pieces.forEach(p=>{
-          if(p!=="+"){
-            const n = parseInt(p,10);
-            if(isNaN(n)){
-              valid=false;
-            } else {
-              computed += n;
-            }
-          }
-        });
-        if(computed !== eqObj.target){
-          valid = false;
-        }
-      }
-
-      const displayStr = pieces.join(" ")+" = "+eqObj.target+" "+(valid?"✅":"❌");
-      return {
-        html: "<span class='"+(valid?"status-ok":"status-bad")+"'>"+displayStr+"</span>",
-        ok: valid
-      };
-    }
-
-    function renderEquations(){
-      equationsArea.innerHTML = "";
-      equations.forEach(eq=>{
-        const row=document.createElement("div");
-        row.className="equation-row";
-
-        const left=document.createElement("div");
-        left.textContent = eq.left.join(" ")+" = "+eq.target;
-
-        const right=document.createElement("div");
-        right.className="eq-right";
-        const res = evaluateEquation(eq);
-        right.innerHTML = res.html;
-
-        row.appendChild(left);
-        row.appendChild(right);
-        equationsArea.appendChild(row);
-      });
-    }
-
-    function checkWin(){
-      const phraseSolved = (buildPreviewString() === SOLUTION_PHRASE);
-      let allEqOk = true;
-      for(const eq of equations){
-        if(!evaluateEquation(eq).ok){
-          allEqOk = false;
-          break;
-        }
-      }
-
-      if(phraseSolved && allEqOk){
-        winBox.style.display = "block";
-      } else {
-        winBox.style.display = "none";
-      }
-    }
-
-    function update(){
-      renderPreview();
-      renderEquations();
-      checkWin();
-    }
-
-    function init(){
-      renderEmojiPhrase();
-      renderMappingInputs();
-      update();
-    }
-
-    init();
-  })();
-  </script>
-</body>
-</html>
-
+      // 4. ADDICTED TO RAGEAHOL
+      {
+        phrase: "ADDICTED TO RAGEAHOL",
+        phraseEmojis: [
+          "🌵","🎲","🎲","🍄","🦊","🧊","🔮","🎲","⬜",

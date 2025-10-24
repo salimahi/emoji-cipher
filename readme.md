@@ -6,7 +6,7 @@ Each emoji stands for one **letter** and one **number** — decode both to revea
 ---
 
 ### 🧩 Play the Game
-👉 **[Play Emoji Cipher Puzzle #1 – COOL GAME](https://salimahi.github.io/emoji-cipher/)**  
+👉 **[Play Emoji Cipher Puzzle #1 (https://salimahi.github.io/emoji-cipher/)**  
 
 ---
 

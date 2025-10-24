@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emoji Cipher™ – Puzzle</title>
+  <title>Emoji Cipher™ – Prototype</title>
   <meta name="description" content="Emoji Cipher™ is an original logic puzzle by Salimah Ismail. Decode the emojis to reveal the hidden phrase and balance the equations.">
   <meta name="author" content="Salimah Ismail">
   <meta name="copyright" content="© 2025 Salimah Ismail. Licensed under CC BY-NC-ND 4.0 International.">
   <meta name="license" content="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+
   <style>
     body {
       font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
       margin: 2rem auto;
-      max-width: 640px;
+      max-width: 680px;
       line-height: 1.5;
       color: #222;
       background: #fdfdfd;
@@ -37,59 +38,128 @@
       color:#444;
     }
 
-    .cipher-phrase-emoji {
-      font-size:1.5rem;
+    /* Phrase layout */
+    .phrase-wrapper {
       background:#fff;
       border:1px solid #ddd;
       border-radius:.5rem;
-      padding:.75rem 1rem;
-      display:flex;
-      flex-wrap:wrap;
-      gap:1rem; /* spacing between words now */
+      padding:1rem 1rem .5rem;
       box-shadow:0 1px 2px rgb(0 0 0 / .05);
     }
-    .cipher-word {
+    .phrase-words {
       display:flex;
       flex-wrap:wrap;
-      gap:.5rem .6rem;
+      gap:1.5rem 1rem;
+    }
+    .word-block {
+      display:flex;
+      gap:.75rem;
+    }
+    .char-stack {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      min-width:2.5rem;
+    }
+    .char-input {
+      width:2.5rem;
+      height:2.5rem;
+      font-size:1.25rem;
+      font-weight:600;
+      text-align:center;
+      border:2px solid #bbb;
+      border-radius:.5rem;
+      background:#fff;
+      box-shadow:0 1px 2px rgb(0 0 0 / .05) inset;
+      font-family:inherit;
+    }
+    .char-input.correct {
+      background:#e6ffe6;
+      border-color:#108a00;
+      color:#0a4f00;
+      font-weight:600;
+    }
+    .char-input:disabled {
+      background:#e6ffe6;
+      border-color:#108a00;
+      color:#0a4f00;
+      font-weight:600;
+      cursor:default;
+    }
+    .char-emoji {
+      font-size:1.4rem;
+      line-height:1.2;
+      margin-top:.4rem;
     }
 
+    /* Equations layout */
     .equations-wrapper{
       border:1px solid #ddd;
       border-radius:.5rem;
       background:#fff;
       box-shadow:0 1px 2px rgb(0 0 0 / .05);
+      padding:.5rem .75rem;
     }
     .equation-row{
       display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:1rem;
-      padding:.75rem .75rem;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:.75rem;
+      padding:.75rem .25rem;
       border-bottom:1px solid #eee;
       font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
       font-size:.9rem;
       line-height:1.3;
     }
     .equation-row:last-child{border-bottom:none;}
-    .eq-right{text-align:right;min-width:7rem;font-weight:500;}
-    .status-ok{color:#108a00;}
-    .status-bad{color:#b00020;}
 
-    .phrase-box {
-      font-size:1.25rem;
+    .eq-stack {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      min-width:3rem;
+    }
+    .num-input {
+      width:2.5rem;
+      height:2.5rem;
+      font-size:1.1rem;
       font-weight:600;
-      letter-spacing:.05em;
-      background:#fff;
-      border:1px solid #ddd;
+      text-align:center;
+      border:2px solid #bbb;
       border-radius:.5rem;
-      padding:1rem;
-      min-height:3rem;
-      box-shadow:0 2px 4px rgb(0 0 0 / .06) inset;
-      word-wrap:break-word;
-      white-space:pre-wrap;
+      background:#fff;
+      box-shadow:0 1px 2px rgb(0 0 0 / .05) inset;
+      font-family:inherit;
+    }
+    .num-input.correct {
+      background:#e6ffe6;
+      border-color:#108a00;
+      color:#0a4f00;
+      font-weight:600;
+    }
+    .num-input:disabled {
+      background:#e6ffe6;
+      border-color:#108a00;
+      color:#0a4f00;
+      font-weight:600;
+      cursor:default;
     }
 
+    .eq-plus,
+    .eq-equals,
+    .eq-target {
+      font-size:1rem;
+      font-weight:600;
+    }
+
+    .eq-result {
+      font-size:1rem;
+      font-weight:600;
+    }
+    .status-ok { color:#108a00; }
+    .status-bad { color:#b00020; }
+
+    /* Mapping table */
     .mapping-row {
       display:grid;
       grid-template-columns:2rem 1fr 1fr;
@@ -109,17 +179,22 @@
     }
     .emoji-cell{font-size:1.5rem;text-align:center;}
     label{display:block;font-size:.7rem;font-weight:500;color:#555;margin-bottom:.25rem;}
-    input[type="text"],input[type="number"]{
+    .map-input{
       width:100%;
       font-size:1rem;
       padding:.4rem .5rem;
       border:1px solid #bbb;
       border-radius:.4rem;
       font-family:inherit;
-      background:white;
+      background:#fff;
     }
-    input:focus{border-color:#000;outline:none;}
-    input[disabled]{
+    .map-input.correct {
+      background:#e6ffe6;
+      border-color:#108a00;
+      color:#0a4f00;
+      font-weight:600;
+    }
+    .map-input:disabled{
       background:#e6ffe6;
       border-color:#108a00;
       color:#0a4f00;
@@ -154,22 +229,21 @@
 </head>
 <body>
   <h1>Emoji Cipher™</h1>
-  <h2>Puzzle</h2>
+  <h2>Prototype Puzzle</h2>
 
   <div class="note-box">
     Each emoji stands for <strong>one letter</strong> AND <strong>one number</strong>.<br>
-    If you guess either one correctly, we'll fill in the other for you.<br>
-    Solve the phrase AND make every equation true.
+    Type the correct letter OR the correct number once, and the game will fill in the rest for you.<br>
+    Solve the whole phrase AND make every equation true.
   </div>
 
-  <div class="section-title">Secret Phrase (in emojis)</div>
-  <div class="cipher-phrase-emoji" id="emojiPhraseDisplay"></div>
+  <div class="section-title">Your Decoded Phrase</div>
+  <div class="phrase-wrapper">
+    <div class="phrase-words" id="phraseWordsArea"></div>
+  </div>
 
   <div class="section-title">Check the Math</div>
   <div class="equations-wrapper" id="equationsArea"></div>
-
-  <div class="section-title">Your Decoded Phrase</div>
-  <div class="phrase-box" id="decodedPreview">_ _ _</div>
 
   <div class="section-title">Assign Letters and Numbers</div>
   <div id="mappingInputs"></div>
@@ -186,575 +260,22 @@
   <script>
   (function(){
 
-    // Helper to quickly build puzzle objects with less repetition
-    // (This is here so the structure is obvious, not for runtime magic.)
-
-    // ALL PUZZLES
-    const PUZZLES = [
-      // 1. COOL GAME BRO
-      {
-        phrase: "COOL GAME BRO",
-        phraseWords: [
-          ["🦊","🪐","🪐","🐸"],        // COOL
-          ["🚀","🌵","🎲","🔮"],        // GAME
-          ["🧊","🌵","🪐"]             // BRO
-        ],
-        mapping: {
-          "🦊": { letter:"C", number:3 },
-          "🪐": { letter:"O", number:8 },
-          "🐸": { letter:"L", number:4 },
-          "🚀": { letter:"G", number:7 },
-          "🌵": { letter:"A", number:1 },
-          "🎲": { letter:"M", number:6 },
-          "🔮": { letter:"E", number:2 },
-          "🧊": { letter:"B", number:5 }
-        },
-        uniqueEmojis: ["🦊","🪐","🐸","🚀","🌵","🎲","🔮","🧊"],
-        equations: [
-          { left:["🦊","+","🪐"], target:11 },              //3+8
-          { left:["🪐","+","🐸"], target:12 },              //8+4
-          { left:["🚀","+","🌵","+","🎲"], target:14 },     //7+1+6
-          { left:["🎲","+","🔮"], target:8 },              //6+2
-          { left:["🧊","+","🌵"], target:6 }               //5+1
-        ]
+    // ----- ONE PUZZLE (COOL GAME BRO) -----
+    const currentPuzzle = {
+      phrase: "COOL GAME BRO",
+      phraseWords: [
+        ["🦊","🪐","🪐","🐸"],        // COOL
+        ["🚀","🌵","🎲","🔮"],        // GAME
+        ["🧊","🌵","🪐"]             // BRO
+      ],
+      mapping: {
+        "🦊": { letter:"C", number:3 },
+        "🪐": { letter:"O", number:8 },
+        "🐸": { letter:"L", number:4 },
+        "🚀": { letter:"G", number:7 },
+        "🌵": { letter:"A", number:1 },
+        "🎲": { letter:"M", number:6 },
+        "🔮": { letter:"E", number:2 },
+        "🧊": { letter:"B", number:5 }
       },
-
-      // 2. IT IS NAP TIME
-      {
-        phrase: "IT IS NAP TIME",
-        phraseWords: [
-          ["🍄","🧊"],                // IT
-          ["🍄","🐸"],                // IS
-          ["🐙","🌵","🦊"],           // NAP
-          ["🧊","🍄","🎲","🔮"]       // TIME
-        ],
-        mapping: {
-          "🍄": { letter:"I", number:4 },
-          "🧊": { letter:"T", number:9 },
-          "🐸": { letter:"S", number:2 },
-          "🐙": { letter:"N", number:5 },
-          "🌵": { letter:"A", number:1 },
-          "🦊": { letter:"P", number:7 },
-          "🎲": { letter:"M", number:6 },
-          "🔮": { letter:"E", number:3 }
-        },
-        uniqueEmojis: ["🍄","🧊","🐸","🐙","🌵","🦊","🎲","🔮"],
-        equations: [
-          { left:["🍄","+","🧊"], target:13 },     //4+9
-          { left:["🐸","+","🐙"], target:7 },      //2+5
-          { left:["🌵","+","🦊"], target:8 },      //1+7
-          { left:["🎲","+","🔮"], target:9 },      //6+3
-          { left:["🧊","+","🎲"], target:15 }      //9+6
-        ]
-      },
-
-      // 3. HERBAL OR VERBAL TEA
-      {
-        phrase: "HERBAL OR VERBAL TEA",
-        phraseWords: [
-          ["🪐","🔮","🌊","🚀","🌵","🐙"],   // HERBAL
-          ["🎲","🌊"],                    // OR
-          ["🦊","🔮","🌊","🚀","🌵","🐙"],  // VERBAL
-          ["🧊","🔮","🌵"]                // TEA
-        ],
-        mapping: {
-          "🪐": { letter:"H", number:4 },
-          "🔮": { letter:"E", number:2 },
-          "🌊": { letter:"R", number:9 },
-          "🚀": { letter:"B", number:5 },
-          "🌵": { letter:"A", number:1 },
-          "🐙": { letter:"L", number:7 },
-          "🎲": { letter:"O", number:6 },
-          "🦊": { letter:"V", number:8 },
-          "🧊": { letter:"T", number:3 }
-        },
-        uniqueEmojis: ["🪐","🔮","🌊","🚀","🌵","🐙","🎲","🦊","🧊"],
-        equations: [
-          { left:["🪐","+","🔮"], target:6 },              //4+2
-          { left:["🌊","+","🚀"], target:14 },             //9+5
-          { left:["🌵","+","🐙"], target:8 },              //1+7
-          { left:["🎲","+","🌊"], target:15 },             //6+9
-          { left:["🦊","+","🔮"], target:10 },             //8+2
-          { left:["🧊","+","🔮","+","🌵"], target:6 }       //3+2+1
-        ]
-      },
-
-      // 4. ADDICTED TO RAGEAHOL
-      {
-        phrase: "ADDICTED TO RAGEAHOL",
-        phraseWords: [
-          ["🌵","🎲","🎲","🍄","🦊","🧊","🔮","🎲"], // ADDICTED
-          ["🧊","🎲"],                             // TO
-          ["🌊","🌵","🚀","🔮","🌵","🐸","🎲","🐙"]  // RAGEAHOL
-        ],
-        mapping: {
-          "🌵": { letter:"A", number:1 },
-          "🎲": { letter:"D", number:7 },
-          "🍄": { letter:"I", number:4 },
-          "🦊": { letter:"C", number:8 },
-          "🧊": { letter:"T", number:9 },
-          "🔮": { letter:"E", number:3 },
-          "🌊": { letter:"R", number:5 },
-          "🚀": { letter:"G", number:2 },
-          "🐸": { letter:"H", number:4 },
-          "🐙": { letter:"L", number:8 }
-        },
-        uniqueEmojis: ["🌵","🎲","🍄","🦊","🧊","🔮","🌊","🚀","🐸","🐙"],
-        equations: [
-          { left:["🌵","+","🎲"], target:8 },              //1+7
-          { left:["🎲","+","🍄"], target:11 },             //7+4
-          { left:["🦊","+","🧊"], target:17 },             //8+9
-          { left:["🔮","+","🎲"], target:10 },             //3+7
-          { left:["🌊","+","🌵","+","🚀"], target:8 },      //5+1+2
-          { left:["🐸","+","🎲"], target:11 },             //4+7
-          { left:["🎲","+","🐙"], target:15 }              //7+8
-        ]
-      },
-
-      // 5. I BARELY EVEN KNOW HER
-      {
-        phrase: "I BARELY EVEN KNOW HER",
-        phraseWords: [
-          ["🍄"],                                         // I
-          ["🚀","🌵","🌊","🔮","🐙","🧊"],                 // BARELY
-          ["🔮","🎲","🔮","🐙"],                           // EVEN
-          ["🧊","🐙","🎲","🪐"],                           // KNOW
-          ["🐸","🔮","🌊"]                                // HER
-        ],
-        mapping: {
-          "🍄": { letter:"I", number:4 },
-          "🚀": { letter:"B", number:6 },
-          "🌵": { letter:"A", number:1 },
-          "🌊": { letter:"R", number:9 },
-          "🔮": { letter:"E", number:2 },
-          "🐙": { letter:"L", number:7 },
-          "🧊": { letter:"Y", number:8 },
-          "🎲": { letter:"V", number:5 },
-          "🪐": { letter:"N", number:3 },
-          "🐸": { letter:"H", number:4 }
-        },
-        uniqueEmojis: ["🍄","🚀","🌵","🌊","🔮","🐙","🧊","🎲","🪐","🐸"],
-        equations: [
-          { left:["🍄","+","🚀"], target:10 },             //4+6
-          { left:["🌵","+","🌊"], target:10 },             //1+9
-          { left:["🔮","+","🐙","+","🧊"], target:17 },     //2+7+8
-          { left:["🔮","+","🎲"], target:7 },              //2+5
-          { left:["🎲","+","🪐"], target:8 },              //5+3
-          { left:["🐸","+","🔮"], target:6 }               //4+2
-        ]
-      },
-
-      // 6. SEND MORE KITTENS
-      {
-        phrase: "SEND MORE KITTENS",
-        phraseWords: [
-          ["🦊","🐸","🪐","🎲"],               // SEND
-          ["🚀","🔮","🌵","🐸"],               // MORE
-          ["🧊","🐙","🦴","🦴","🐸","🪼","🐍"] // KITTENS
-        ],
-        mapping: {
-          "🦊": { letter:"S", number:6 },
-          "🐸": { letter:"E", number:2 },
-          "🪐": { letter:"N", number:5 },
-          "🎲": { letter:"D", number:4 },
-          "🚀": { letter:"M", number:7 },
-          "🔮": { letter:"O", number:8 },
-          "🌵": { letter:"R", number:3 },
-          "🧊": { letter:"K", number:9 },
-          "🐙": { letter:"I", number:1 },
-          "🦴": { letter:"T", number:4 },
-          "🪼": { letter:"N", number:5 },
-          "🐍": { letter:"S", number:6 }
-        },
-        uniqueEmojis: ["🦊","🐸","🪐","🎲","🚀","🔮","🌵","🧊","🐙","🦴","🪼","🐍"],
-        equations: [
-          { left:["🦊","+","🐸"], target:8 },                //6+2
-          { left:["🐸","+","🪐","+","🎲"], target:11 },      //2+5+4
-          { left:["🚀","+","🔮"], target:15 },              //7+8
-          { left:["🌵","+","🐸"], target:5 },               //3+2
-          { left:["🧊","+","🐙"], target:10 },              //9+1
-          { left:["🦴","+","🦴"], target:8 },               //4+4
-          { left:["🐸","+","🪼","+","🐍"], target:13 }       //2+5+6
-        ]
-      },
-
-      // 7. CAUGHT A VIBE
-      {
-        phrase: "CAUGHT A VIBE",
-        phraseWords: [
-          ["🌵","🐙","🚀","🦊","🐸","🧊"], // CAUGHT
-          ["🐙"],                        // A
-          ["🎲","🔮","🪐","🦴"]          // VIBE
-        ],
-        mapping: {
-          "🌵": { letter:"C", number:2 },
-          "🐙": { letter:"A", number:1 },
-          "🚀": { letter:"U", number:6 },
-          "🦊": { letter:"G", number:7 },
-          "🐸": { letter:"H", number:4 },
-          "🧊": { letter:"T", number:9 },
-          "🎲": { letter:"V", number:8 },
-          "🔮": { letter:"I", number:3 },
-          "🪐": { letter:"B", number:5 },
-          "🦴": { letter:"E", number:2 }
-        },
-        uniqueEmojis: ["🌵","🐙","🚀","🦊","🐸","🧊","🎲","🔮","🪐","🦴"],
-        equations: [
-          { left:["🌵","+","🐙"], target:3 },       //2+1
-          { left:["🚀","+","🦊"], target:13 },      //6+7
-          { left:["🐸","+","🧊"], target:13 },      //4+9
-          { left:["🎲","+","🔮"], target:11 },      //8+3
-          { left:["🪐","+","🦴"], target:7 },       //5+2
-          { left:["🐙","+","🎲"], target:9 }        //1+8
-        ]
-      },
-
-      // 8. A CENTER FOR ANTS
-      {
-        phrase: "A CENTER FOR ANTS",
-        phraseWords: [
-          ["🐙"],                                  // A
-          ["🧊","🌵","🦴","🔮","🌵","🎲"],          // CENTER
-          ["🪐","🐸","🎲"],                         // FOR
-          ["🐙","🦴","🔮","🚀"]                     // ANTS
-        ],
-        mapping: {
-          "🐙": { letter:"A", number:1 },
-          "🧊": { letter:"C", number:6 },
-          "🌵": { letter:"E", number:2 },
-          "🦴": { letter:"N", number:5 },
-          "🔮": { letter:"T", number:9 },
-          "🎲": { letter:"R", number:4 },
-          "🪐": { letter:"F", number:7 },
-          "🐸": { letter:"O", number:8 },
-          "🚀": { letter:"S", number:3 }
-        },
-        uniqueEmojis: ["🐙","🧊","🌵","🦴","🔮","🎲","🪐","🐸","🚀"],
-        equations: [
-          { left:["🧊","+","🌵"], target:8 },                     //6+2
-          { left:["🦴","+","🔮"], target:14 },                   //5+9
-          { left:["🌵","+","🎲"], target:6 },                    //2+4
-          { left:["🪐","+","🐸"], target:15 },                   //7+8
-          { left:["🎲","+","🐙"], target:5 },                    //4+1
-          { left:["🐙","+","🦴","+","🔮","+","🚀"], target:18 }   //1+5+9+3
-        ]
-      },
-
-      // 9. BY DOG I MEAN SON
-      {
-        phrase: "BY DOG I MEAN SON",
-        phraseWords: [
-          ["🧊","🎲"],               // BY
-          ["🐸","🪐","🦊"],          // DOG
-          ["🍄"],                    // I
-          ["🚀","🌵","🪼","🔮"],     // MEAN
-          ["🐙","🪐","🔮"]           // SON
-        ],
-        mapping: {
-          "🧊": { letter:"B", number:4 },
-          "🎲": { letter:"Y", number:7 },
-          "🐸": { letter:"D", number:8 },
-          "🪐": { letter:"O", number:6 },
-          "🦊": { letter:"G", number:5 },
-          "🍄": { letter:"I", number:3 },
-          "🚀": { letter:"M", number:9 },
-          "🌵": { letter:"E", number:2 },
-          "🪼": { letter:"A", number:1 },
-          "🔮": { letter:"N", number:4 },
-          "🐙": { letter:"S", number:6 }
-        },
-        uniqueEmojis: ["🧊","🎲","🐸","🪐","🦊","🍄","🚀","🌵","🪼","🔮","🐙"],
-        equations: [
-          { left:["🧊","+","🎲"], target:11 },           //4+7
-          { left:["🐸","+","🪐"], target:14 },           //8+6
-          { left:["🦊","+","🍄"], target:8 },            //5+3
-          { left:["🚀","+","🌵"], target:11 },           //9+2
-          { left:["🪼","+","🔮"], target:5 },            //1+4
-          { left:["🐙","+","🪐","+","🔮"], target:16 }    //6+6+4
-        ]
-      },
-
-      // 10. GREAT WORK SO FAR
-      {
-        phrase: "GREAT WORK SO FAR",
-        phraseWords: [
-          ["🦊","🌵","🧊","🎲","🔮"],  // GREAT
-          ["🚀","🐸","🌵","🦴"],       // WORK
-          ["🐙","🐸"],                // SO
-          ["🍄","🎲","🌵"]            // FAR
-        ],
-        mapping: {
-          "🦊": { letter:"G", number:8 },
-          "🌵": { letter:"R", number:4 },
-          "🧊": { letter:"E", number:2 },
-          "🎲": { letter:"A", number:1 },
-          "🔮": { letter:"T", number:9 },
-          "🚀": { letter:"W", number:6 },
-          "🐸": { letter:"O", number:7 },
-          "🦴": { letter:"K", number:5 },
-          "🐙": { letter:"S", number:3 },
-          "🍄": { letter:"F", number:4 }
-        },
-        uniqueEmojis: ["🦊","🌵","🧊","🎲","🔮","🚀","🐸","🦴","🐙","🍄"],
-        equations: [
-          { left:["🦊","+","🌵"], target:12 },         //8+4
-          { left:["🧊","+","🎲"], target:3 },          //2+1
-          { left:["🔮","+","🚀"], target:15 },         //9+6
-          { left:["🐸","+","🌵"], target:11 },         //7+4
-          { left:["🦴","+","🐙"], target:8 },          //5+3
-          { left:["🍄","+","🎲","+","🌵"], target:9 }   //4+1+4
-        ]
-      }
-    ];
-
-    // Pick a random puzzle:
-    const currentPuzzle = PUZZLES[Math.floor(Math.random() * PUZZLES.length)];
-
-    // Player state: { [emoji]: {letter:"", number:"", solved:false} }
-    const playerState = {};
-    currentPuzzle.uniqueEmojis.forEach(em=>{
-      playerState[em] = { letter:"", number:"", solved:false };
-    });
-
-    // DOM refs
-    const phraseDisplay    = document.getElementById("emojiPhraseDisplay");
-    const equationsArea    = document.getElementById("equationsArea");
-    const previewBox       = document.getElementById("decodedPreview");
-    const mappingContainer = document.getElementById("mappingInputs");
-    const winBox           = document.getElementById("winBox");
-
-    // Render phrase as words (no ⬜)
-    function renderEmojiPhrase(){
-      phraseDisplay.innerHTML = "";
-      currentPuzzle.phraseWords.forEach(wordArr => {
-        const wordSpan = document.createElement("span");
-        wordSpan.className = "cipher-word";
-        wordArr.forEach(em => {
-          const eSpan = document.createElement("span");
-          eSpan.textContent = em;
-          wordSpan.appendChild(eSpan);
-        });
-        phraseDisplay.appendChild(wordSpan);
-      });
-    }
-
-    // Build Decoded Phrase preview like "C__L GAME ___"
-    function buildPreviewString(){
-      const wordsAsStrings = currentPuzzle.phraseWords.map(wordArr => {
-        return wordArr.map(em => {
-          const guessLetter = playerState[em]?.letter || "";
-          return guessLetter ? guessLetter : "_";
-        }).join("");
-      });
-      return wordsAsStrings.join(" ");
-    }
-
-    function renderPreview(){
-      previewBox.textContent = buildPreviewString();
-    }
-
-    // Render equations
-    function evaluateEquation(eqObj){
-      // eqObj.left = ["🦊","+","🪐",...]
-      let pieces = [];
-      let valid  = true;
-      eqObj.left.forEach(token=>{
-        if(token==="+"){
-          pieces.push("+");
-        } else {
-          const guessNum = playerState[token]?.number;
-          if(!guessNum && guessNum!==0){
-            pieces.push("?");
-            valid = false;
-          } else {
-            pieces.push(String(guessNum));
-          }
-        }
-      });
-      let computed = null;
-      if(valid){
-        computed = 0;
-        pieces.forEach(p=>{
-          if(p!=="+"){
-            const n = parseInt(p,10);
-            if(isNaN(n)){ valid=false; }
-            else { computed += n; }
-          }
-        });
-        if(computed !== eqObj.target){
-          valid = false;
-        }
-      }
-      const displayStr = pieces.join(" ")+" = "+eqObj.target+" "+(valid?"✅":"❌");
-      return {
-        html: "<span class='"+(valid?"status-ok":"status-bad")+"'>"+displayStr+"</span>",
-        ok: valid
-      };
-    }
-
-    function renderEquations(){
-      equationsArea.innerHTML = "";
-      currentPuzzle.equations.forEach(eq=>{
-        const row=document.createElement("div");
-        row.className="equation-row";
-
-        const left=document.createElement("div");
-        left.textContent = eq.left.join(" ")+" = "+eq.target;
-
-        const right=document.createElement("div");
-        right.className="eq-right";
-        const res=evaluateEquation(eq);
-        right.innerHTML = res.html;
-
-        row.appendChild(left);
-        row.appendChild(right);
-        equationsArea.appendChild(row);
-      });
-    }
-
-    // Render the mapping inputs (emoji → letter/number)
-    function renderMappingInputs(){
-      mappingContainer.innerHTML = "";
-      currentPuzzle.uniqueEmojis.forEach(em=>{
-        const row=document.createElement("div");
-        row.className="mapping-row";
-        row.setAttribute("data-row-emoji", em);
-
-        const emojiCell=document.createElement("div");
-        emojiCell.className="emoji-cell";
-        emojiCell.textContent=em;
-        row.appendChild(emojiCell);
-
-        // letter input
-        const letterWrap=document.createElement("div");
-        const letterLabel=document.createElement("label");
-        letterLabel.textContent="Letter";
-        const letterInput=document.createElement("input");
-        letterInput.type="text";
-        letterInput.maxLength=1;
-        letterInput.dataset.emoji=em;
-        letterInput.dataset.field="letter";
-        letterInput.addEventListener("input",handleInputChange);
-        letterWrap.appendChild(letterLabel);
-        letterWrap.appendChild(letterInput);
-
-        // number input
-        const numWrap=document.createElement("div");
-        const numLabel=document.createElement("label");
-        numLabel.textContent="Number (0-9)";
-        const numInput=document.createElement("input");
-        numInput.type="number";
-        numInput.min="0";
-        numInput.max="9";
-        numInput.dataset.emoji=em;
-        numInput.dataset.field="number";
-        numInput.addEventListener("input",handleInputChange);
-        numWrap.appendChild(numLabel);
-        numWrap.appendChild(numInput);
-
-        row.appendChild(letterWrap);
-        row.appendChild(numWrap);
-
-        mappingContainer.appendChild(row);
-      });
-    }
-
-    // When user types in a letter or number
-    function handleInputChange(e){
-      const em    = e.target.dataset.emoji;
-      const field = e.target.dataset.field;
-      let val     = e.target.value;
-
-      if(playerState[em].solved){
-        // already solved/locked, ignore edits
-        e.target.value = playerState[em][field];
-        return;
-      }
-
-      if(field==="letter"){
-        val = val.toUpperCase().replace(/[^A-Z]/g,"").slice(0,1);
-        e.target.value = val;
-      }
-
-      if(field==="number"){
-        if(val!==""){
-          let n = parseInt(val,10);
-          if(isNaN(n)) n = "";
-          if(n<0) n=0;
-          if(n>9) n=9;
-          e.target.value = n;
-          val = e.target.value;
-        }
-      }
-
-      // Update their guess
-      playerState[em][field] = val;
-
-      // Check if they guessed correctly for this emoji
-      const correctLetter = currentPuzzle.mapping[em].letter;
-      const correctNumber = String(currentPuzzle.mapping[em].number);
-
-      const gotLetter = (val === correctLetter);
-      const gotNumber = (val === correctNumber);
-
-      if(gotLetter || gotNumber){
-        // lock in the truth for this emoji
-        playerState[em].letter = correctLetter;
-        playerState[em].number = correctNumber;
-        playerState[em].solved = true;
-
-        lockInputsForEmoji(em, correctLetter, correctNumber);
-      }
-
-      update();
-    }
-
-    // Lock row visually + disable its inputs
-    function lockInputsForEmoji(em, finalLetter, finalNumber){
-      const row = mappingContainer.querySelector(`[data-row-emoji="${em}"]`);
-      if(row){
-        row.classList.add("solved");
-        const inputs = row.querySelectorAll("input");
-        inputs.forEach(inp=>{
-          if(inp.dataset.field === "letter") {
-            inp.value = finalLetter;
-          }
-          if(inp.dataset.field === "number") {
-            inp.value = finalNumber;
-          }
-          inp.disabled = true;
-        });
-      }
-    }
-
-    function checkWin(){
-      const solvedPhrase = buildPreviewString() === currentPuzzle.phrase;
-      let allEqOk = true;
-      for(const eq of currentPuzzle.equations){
-        if(!evaluateEquation(eq).ok){
-          allEqOk = false;
-          break;
-        }
-      }
-      winBox.style.display = (solvedPhrase && allEqOk) ? "block" : "none";
-    }
-
-    function update(){
-      renderPreview();
-      renderEquations();
-      checkWin();
-    }
-
-    // init
-    function init(){
-      renderEmojiPhrase();
-      renderMappingInputs();
-      update();
-    }
-
-    init();
-
-  })();
-  </script>
-</body>
-</html>
+      uniqueEmojis: ["🦊","🪐","🐸","🚀","🌵","🎲","🔮","🧊"],

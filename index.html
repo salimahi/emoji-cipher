@@ -18,6 +18,7 @@
       background: #fdfdfd;
     }
     h1, h2 { text-align: center; }
+
     .note-box {
       background: #fff8db;
       border: 1px solid #e6d78a;
@@ -26,54 +27,7 @@
       margin-bottom: 1rem;
       font-size: .9rem;
     }
-    .cipher-phrase-emoji {
-      font-size:1.5rem;
-      background:#fff;
-      border:1px solid #ddd;
-      border-radius:.5rem;
-      padding:.75rem 1rem;
-      display:flex;
-      flex-wrap:wrap;
-      gap:.5rem .6rem;
-      box-shadow:0 1px 2px rgb(0 0 0 / .05);
-    }
-    .phrase-box {
-      font-size:1.25rem;
-      font-weight:600;
-      letter-spacing:.05em;
-      background:#fff;
-      border:1px solid #ddd;
-      border-radius:.5rem;
-      padding:1rem;
-      min-height:3rem;
-      box-shadow:0 2px 4px rgb(0 0 0 / .06) inset;
-      word-wrap:break-word;
-      white-space:pre-wrap;
-    }
-    .mapping-row {
-      display:grid;
-      grid-template-columns:2rem 1fr 1fr;
-      align-items:center;
-      gap:.5rem;
-      padding:.5rem .75rem;
-      border:1px solid #ddd;
-      border-radius:.5rem;
-      background:#fafafa;
-      margin-bottom:.5rem;
-      box-shadow:0 1px 2px rgb(0 0 0 / .05);
-    }
-    .emoji-cell{font-size:1.5rem;text-align:center;}
-    label{display:block;font-size:.7rem;font-weight:500;color:#555;margin-bottom:.25rem;}
-    input[type="text"],input[type="number"]{
-      width:100%;
-      font-size:1rem;
-      padding:.4rem .5rem;
-      border:1px solid #bbb;
-      border-radius:.4rem;
-      font-family:inherit;
-      background:white;
-    }
-    input:focus{border-color:#000;outline:none;}
+
     .section-title{
       font-size:1rem;
       font-weight:600;
@@ -82,6 +36,24 @@
       letter-spacing:.03em;
       color:#444;
     }
+
+    .cipher-phrase-emoji {
+      font-size:1.5rem;
+      background:#fff;
+      border:1px solid #ddd;
+      border-radius:.5rem;
+      padding:.75rem 1rem;
+      display:flex;
+      flex-wrap:wrap;
+      gap:1rem; /* spacing between words now */
+      box-shadow:0 1px 2px rgb(0 0 0 / .05);
+    }
+    .cipher-word {
+      display:flex;
+      flex-wrap:wrap;
+      gap:.5rem .6rem;
+    }
+
     .equations-wrapper{
       border:1px solid #ddd;
       border-radius:.5rem;
@@ -103,6 +75,57 @@
     .eq-right{text-align:right;min-width:7rem;font-weight:500;}
     .status-ok{color:#108a00;}
     .status-bad{color:#b00020;}
+
+    .phrase-box {
+      font-size:1.25rem;
+      font-weight:600;
+      letter-spacing:.05em;
+      background:#fff;
+      border:1px solid #ddd;
+      border-radius:.5rem;
+      padding:1rem;
+      min-height:3rem;
+      box-shadow:0 2px 4px rgb(0 0 0 / .06) inset;
+      word-wrap:break-word;
+      white-space:pre-wrap;
+    }
+
+    .mapping-row {
+      display:grid;
+      grid-template-columns:2rem 1fr 1fr;
+      align-items:center;
+      gap:.5rem;
+      padding:.5rem .75rem;
+      border:1px solid #ddd;
+      border-radius:.5rem;
+      background:#fafafa;
+      margin-bottom:.5rem;
+      box-shadow:0 1px 2px rgb(0 0 0 / .05);
+      transition: background-color .15s ease, box-shadow .15s ease;
+    }
+    .mapping-row.solved {
+      background:#e6ffe6;
+      box-shadow:0 0 0 2px #108a0044 inset;
+    }
+    .emoji-cell{font-size:1.5rem;text-align:center;}
+    label{display:block;font-size:.7rem;font-weight:500;color:#555;margin-bottom:.25rem;}
+    input[type="text"],input[type="number"]{
+      width:100%;
+      font-size:1rem;
+      padding:.4rem .5rem;
+      border:1px solid #bbb;
+      border-radius:.4rem;
+      font-family:inherit;
+      background:white;
+    }
+    input:focus{border-color:#000;outline:none;}
+    input[disabled]{
+      background:#e6ffe6;
+      border-color:#108a00;
+      color:#0a4f00;
+      font-weight:600;
+    }
+
     .win-box{
       margin-top:1rem;
       border-radius:.75rem;
@@ -116,6 +139,7 @@
       color:#0a4f00;
       box-shadow:0 4px 10px rgb(0 0 0 / .08);
     }
+
     footer{
       margin-top:2rem;
       font-size:.8rem;
@@ -133,8 +157,9 @@
   <h2>Puzzle</h2>
 
   <div class="note-box">
-    Each emoji stands for <strong>one letter</strong> and <strong>one number</strong>.<br>
-    Decode the secret phrase <em>and</em> make all the equations true.
+    Each emoji stands for <strong>one letter</strong> AND <strong>one number</strong>.<br>
+    If you guess either one correctly, we'll fill in the other for you.<br>
+    Solve the phrase AND make every equation true.
   </div>
 
   <div class="section-title">Secret Phrase (in emojis)</div>
@@ -161,350 +186,378 @@
   <script>
   (function(){
 
-    // PUZZLES ARRAY: All 10 levels
+    // Helper to quickly build puzzle objects with less repetition
+    // (This is here so the structure is obvious, not for runtime magic.)
+
+    // ALL PUZZLES
     const PUZZLES = [
       // 1. COOL GAME BRO
       {
         phrase: "COOL GAME BRO",
-        phraseEmojis: [
-          "🦊","🪐","🪐","🐸","⬜",
-          "🚀","🌵","🎲","🔮","⬜",
-          "🧊","🌵","🪐"
+        phraseWords: [
+          ["🦊","🪐","🪐","🐸"],        // COOL
+          ["🚀","🌵","🎲","🔮"],        // GAME
+          ["🧊","🌵","🪐"]             // BRO
         ],
+        mapping: {
+          "🦊": { letter:"C", number:3 },
+          "🪐": { letter:"O", number:8 },
+          "🐸": { letter:"L", number:4 },
+          "🚀": { letter:"G", number:7 },
+          "🌵": { letter:"A", number:1 },
+          "🎲": { letter:"M", number:6 },
+          "🔮": { letter:"E", number:2 },
+          "🧊": { letter:"B", number:5 }
+        },
         uniqueEmojis: ["🦊","🪐","🐸","🚀","🌵","🎲","🔮","🧊"],
-        // numbers:
-        // 🦊 C=3, 🪐 O=8, 🐸 L=4, 🚀 G=7,
-        // 🌵 A=1, 🎲 M=6, 🔮 E=2, 🧊 B=5, (R uses 🌵? we reused A here, that's ok for level 1 simplicity)
         equations: [
-          { left:["🦊","+","🪐"], target:11 },          //3+8
-          { left:["🪐","+","🐸"], target:12 },          //8+4
-          { left:["🚀","+","🌵","+","🎲"], target:14 }, //7+1+6
-          { left:["🎲","+","🔮"], target:8 },          //6+2
-          { left:["🧊","+","🌵"], target:6 }           //5+1
+          { left:["🦊","+","🪐"], target:11 },              //3+8
+          { left:["🪐","+","🐸"], target:12 },              //8+4
+          { left:["🚀","+","🌵","+","🎲"], target:14 },     //7+1+6
+          { left:["🎲","+","🔮"], target:8 },              //6+2
+          { left:["🧊","+","🌵"], target:6 }               //5+1
         ]
       },
 
       // 2. IT IS NAP TIME
       {
         phrase: "IT IS NAP TIME",
-        phraseEmojis: [
-          "🍄","🧊","⬜",
-          "🍄","🐸","⬜",
-          "🐙","🌵","🦊","⬜",
-          "🧊","🍄","🎲","🔮"
+        phraseWords: [
+          ["🍄","🧊"],                // IT
+          ["🍄","🐸"],                // IS
+          ["🐙","🌵","🦊"],           // NAP
+          ["🧊","🍄","🎲","🔮"]       // TIME
         ],
+        mapping: {
+          "🍄": { letter:"I", number:4 },
+          "🧊": { letter:"T", number:9 },
+          "🐸": { letter:"S", number:2 },
+          "🐙": { letter:"N", number:5 },
+          "🌵": { letter:"A", number:1 },
+          "🦊": { letter:"P", number:7 },
+          "🎲": { letter:"M", number:6 },
+          "🔮": { letter:"E", number:3 }
+        },
         uniqueEmojis: ["🍄","🧊","🐸","🐙","🌵","🦊","🎲","🔮"],
-        // 🍄 I=4, 🧊 T=9, 🐸 S=2, 🐙 N=5,
-        // 🌵 A=1, 🦊 P=7, 🎲 M=6, 🔮 E=3
         equations: [
-          { left:["🍄","+","🧊"], target:13 },   //4+9
-          { left:["🐸","+","🐙"], target:7 },    //2+5
-          { left:["🌵","+","🦊"], target:8 },    //1+7
-          { left:["🎲","+","🔮"], target:9 },    //6+3
-          { left:["🧊","+","🎲"], target:15 }    //9+6
+          { left:["🍄","+","🧊"], target:13 },     //4+9
+          { left:["🐸","+","🐙"], target:7 },      //2+5
+          { left:["🌵","+","🦊"], target:8 },      //1+7
+          { left:["🎲","+","🔮"], target:9 },      //6+3
+          { left:["🧊","+","🎲"], target:15 }      //9+6
         ]
       },
 
       // 3. HERBAL OR VERBAL TEA
       {
         phrase: "HERBAL OR VERBAL TEA",
-        phraseEmojis: [
-          "🪐","🔮","🌊","🚀","🌵","🐙","⬜",
-          "🎲","🌊","⬜",
-          "🦊","🔮","🌊","🚀","🌵","🐙","⬜",
-          "🧊","🔮","🌵"
+        phraseWords: [
+          ["🪐","🔮","🌊","🚀","🌵","🐙"],   // HERBAL
+          ["🎲","🌊"],                    // OR
+          ["🦊","🔮","🌊","🚀","🌵","🐙"],  // VERBAL
+          ["🧊","🔮","🌵"]                // TEA
         ],
+        mapping: {
+          "🪐": { letter:"H", number:4 },
+          "🔮": { letter:"E", number:2 },
+          "🌊": { letter:"R", number:9 },
+          "🚀": { letter:"B", number:5 },
+          "🌵": { letter:"A", number:1 },
+          "🐙": { letter:"L", number:7 },
+          "🎲": { letter:"O", number:6 },
+          "🦊": { letter:"V", number:8 },
+          "🧊": { letter:"T", number:3 }
+        },
         uniqueEmojis: ["🪐","🔮","🌊","🚀","🌵","🐙","🎲","🦊","🧊"],
-        // 🪐 H=4, 🔮 E=2, 🌊 R=9, 🚀 B=5,
-        // 🌵 A=1, 🐙 L=7, 🎲 O=6, 🦊 V=8, 🧊 T=3
         equations: [
-          { left:["🪐","+","🔮"], target:6 },        //4+2
-          { left:["🌊","+","🚀"], target:14 },       //9+5
-          { left:["🌵","+","🐙"], target:8 },        //1+7
-          { left:["🎲","+","🌊"], target:15 },       //6+9
-          { left:["🦊","+","🔮"], target:10 },       //8+2
-          { left:["🧊","+","🔮","+","🌵"], target:6 } //3+2+1
+          { left:["🪐","+","🔮"], target:6 },              //4+2
+          { left:["🌊","+","🚀"], target:14 },             //9+5
+          { left:["🌵","+","🐙"], target:8 },              //1+7
+          { left:["🎲","+","🌊"], target:15 },             //6+9
+          { left:["🦊","+","🔮"], target:10 },             //8+2
+          { left:["🧊","+","🔮","+","🌵"], target:6 }       //3+2+1
         ]
       },
 
       // 4. ADDICTED TO RAGEAHOL
       {
         phrase: "ADDICTED TO RAGEAHOL",
-        phraseEmojis: [
-          "🌵","🎲","🎲","🍄","🦊","🧊","🔮","🎲","⬜",
-          "🧊","🎲","⬜",
-          "🌊","🌵","🚀","🔮","🌵","🐸","🎲","🐙"
+        phraseWords: [
+          ["🌵","🎲","🎲","🍄","🦊","🧊","🔮","🎲"], // ADDICTED
+          ["🧊","🎲"],                             // TO
+          ["🌊","🌵","🚀","🔮","🌵","🐸","🎲","🐙"]  // RAGEAHOL
         ],
+        mapping: {
+          "🌵": { letter:"A", number:1 },
+          "🎲": { letter:"D", number:7 },
+          "🍄": { letter:"I", number:4 },
+          "🦊": { letter:"C", number:8 },
+          "🧊": { letter:"T", number:9 },
+          "🔮": { letter:"E", number:3 },
+          "🌊": { letter:"R", number:5 },
+          "🚀": { letter:"G", number:2 },
+          "🐸": { letter:"H", number:4 },
+          "🐙": { letter:"L", number:8 }
+        },
         uniqueEmojis: ["🌵","🎲","🍄","🦊","🧊","🔮","🌊","🚀","🐸","🐙"],
-        // 🌵 A=1, 🎲 D=7, 🍄 I=4, 🦊 C=8,
-        // 🧊 T=9, 🔮 E=3, 🌊 R=5, 🚀 G=2,
-        // 🐸 H=4, 🐙 L=8 (reuse nums allowed)
         equations: [
-          { left:["🌵","+","🎲"], target:8 },        //1+7
-          { left:["🎲","+","🍄"], target:11 },       //7+4
-          { left:["🦊","+","🧊"], target:17 },       //8+9
-          { left:["🔮","+","🎲"], target:10 },       //3+7
-          { left:["🌊","+","🌵","+","🚀"], target:8 },//5+1+2
-          { left:["🐸","+","🎲"], target:11 },       //4+7
-          { left:["🎲","+","🐙"], target:15 }        //7+8
+          { left:["🌵","+","🎲"], target:8 },              //1+7
+          { left:["🎲","+","🍄"], target:11 },             //7+4
+          { left:["🦊","+","🧊"], target:17 },             //8+9
+          { left:["🔮","+","🎲"], target:10 },             //3+7
+          { left:["🌊","+","🌵","+","🚀"], target:8 },      //5+1+2
+          { left:["🐸","+","🎲"], target:11 },             //4+7
+          { left:["🎲","+","🐙"], target:15 }              //7+8
         ]
       },
 
       // 5. I BARELY EVEN KNOW HER
       {
         phrase: "I BARELY EVEN KNOW HER",
-        phraseEmojis: [
-          "🍄","⬜",
-          "🚀","🌵","🌊","🔮","🐙","🧊","⬜",
-          "🔮","🎲","🔮","🐙","⬜",
-          "🧊","🐙","🎲","🪐","⬜",
-          "🐸","🔮","🌊"
+        phraseWords: [
+          ["🍄"],                                         // I
+          ["🚀","🌵","🌊","🔮","🐙","🧊"],                 // BARELY
+          ["🔮","🎲","🔮","🐙"],                           // EVEN
+          ["🧊","🐙","🎲","🪐"],                           // KNOW
+          ["🐸","🔮","🌊"]                                // HER
         ],
+        mapping: {
+          "🍄": { letter:"I", number:4 },
+          "🚀": { letter:"B", number:6 },
+          "🌵": { letter:"A", number:1 },
+          "🌊": { letter:"R", number:9 },
+          "🔮": { letter:"E", number:2 },
+          "🐙": { letter:"L", number:7 },
+          "🧊": { letter:"Y", number:8 },
+          "🎲": { letter:"V", number:5 },
+          "🪐": { letter:"N", number:3 },
+          "🐸": { letter:"H", number:4 }
+        },
         uniqueEmojis: ["🍄","🚀","🌵","🌊","🔮","🐙","🧊","🎲","🪐","🐸"],
-        // 🍄 I=4, 🚀 B=6, 🌵 A=1, 🌊 R=9,
-        // 🔮 E=2, 🐙 L=7, 🧊 Y=8,
-        // 🎲 V=5, 🪐 N=3, 🐸 K=4
         equations: [
-          { left:["🍄","+","🚀"], target:10 },       //4+6
-          { left:["🌵","+","🌊"], target:10 },       //1+9
-          { left:["🔮","+","🐙","+","🧊"], target:17 }, //2+7+8
-          { left:["🔮","+","🎲"], target:7 },        //2+5
-          { left:["🎲","+","🪐"], target:8 },        //5+3
-          { left:["🐸","+","🔮"], target:6 }         //4+2
+          { left:["🍄","+","🚀"], target:10 },             //4+6
+          { left:["🌵","+","🌊"], target:10 },             //1+9
+          { left:["🔮","+","🐙","+","🧊"], target:17 },     //2+7+8
+          { left:["🔮","+","🎲"], target:7 },              //2+5
+          { left:["🎲","+","🪐"], target:8 },              //5+3
+          { left:["🐸","+","🔮"], target:6 }               //4+2
         ]
       },
 
       // 6. SEND MORE KITTENS
       {
         phrase: "SEND MORE KITTENS",
-        phraseEmojis: [
-          "🦊","🐸","🪐","🎲","⬜",
-          "🚀","🔮","🌵","🐸","⬜",
-          "🧊","🐙","🦴","🦴","🐸","🪼","🐍"
+        phraseWords: [
+          ["🦊","🐸","🪐","🎲"],               // SEND
+          ["🚀","🔮","🌵","🐸"],               // MORE
+          ["🧊","🐙","🦴","🦴","🐸","🪼","🐍"] // KITTENS
         ],
+        mapping: {
+          "🦊": { letter:"S", number:6 },
+          "🐸": { letter:"E", number:2 },
+          "🪐": { letter:"N", number:5 },
+          "🎲": { letter:"D", number:4 },
+          "🚀": { letter:"M", number:7 },
+          "🔮": { letter:"O", number:8 },
+          "🌵": { letter:"R", number:3 },
+          "🧊": { letter:"K", number:9 },
+          "🐙": { letter:"I", number:1 },
+          "🦴": { letter:"T", number:4 },
+          "🪼": { letter:"N", number:5 },
+          "🐍": { letter:"S", number:6 }
+        },
         uniqueEmojis: ["🦊","🐸","🪐","🎲","🚀","🔮","🌵","🧊","🐙","🦴","🪼","🐍"],
-        // 🦊 S=6, 🐸 E=2, 🪐 N=5, 🎲 D=4,
-        // 🚀 M=7, 🔮 O=8, 🌵 R=3,
-        // 🧊 K=9, 🐙 I=1, 🦴 T=4,
-        // 🪼 N=5, 🐍 S=6
         equations: [
-          { left:["🦊","+","🐸"], target:8 },             //6+2
-          { left:["🐸","+","🪐","+","🎲"], target:11 },   //2+5+4
-          { left:["🚀","+","🔮"], target:15 },           //7+8
-          { left:["🌵","+","🐸"], target:5 },            //3+2
-          { left:["🧊","+","🐙"], target:10 },           //9+1
-          { left:["🦴","+","🦴"], target:8 },            //4+4
-          { left:["🐸","+","🪼","+","🐍"], target:13 }    //2+5+6
+          { left:["🦊","+","🐸"], target:8 },                //6+2
+          { left:["🐸","+","🪐","+","🎲"], target:11 },      //2+5+4
+          { left:["🚀","+","🔮"], target:15 },              //7+8
+          { left:["🌵","+","🐸"], target:5 },               //3+2
+          { left:["🧊","+","🐙"], target:10 },              //9+1
+          { left:["🦴","+","🦴"], target:8 },               //4+4
+          { left:["🐸","+","🪼","+","🐍"], target:13 }       //2+5+6
         ]
       },
 
       // 7. CAUGHT A VIBE
       {
         phrase: "CAUGHT A VIBE",
-        phraseEmojis: [
-          "🌵","🐙","🚀","🦊","🐸","🧊","⬜",
-          "🐙","⬜",
-          "🎲","🔮","🪐","🦴"
+        phraseWords: [
+          ["🌵","🐙","🚀","🦊","🐸","🧊"], // CAUGHT
+          ["🐙"],                        // A
+          ["🎲","🔮","🪐","🦴"]          // VIBE
         ],
+        mapping: {
+          "🌵": { letter:"C", number:2 },
+          "🐙": { letter:"A", number:1 },
+          "🚀": { letter:"U", number:6 },
+          "🦊": { letter:"G", number:7 },
+          "🐸": { letter:"H", number:4 },
+          "🧊": { letter:"T", number:9 },
+          "🎲": { letter:"V", number:8 },
+          "🔮": { letter:"I", number:3 },
+          "🪐": { letter:"B", number:5 },
+          "🦴": { letter:"E", number:2 }
+        },
         uniqueEmojis: ["🌵","🐙","🚀","🦊","🐸","🧊","🎲","🔮","🪐","🦴"],
-        // 🌵 C=2, 🐙 A=1, 🚀 U=6, 🦊 G=7,
-        // 🐸 H=4, 🧊 T=9,
-        // 🎲 V=8, 🔮 I=3, 🪐 B=5, 🦴 E=2
         equations: [
-          { left:["🌵","+","🐙"], target:3 },      //2+1
-          { left:["🚀","+","🦊"], target:13 },     //6+7
-          { left:["🐸","+","🧊"], target:13 },     //4+9
-          { left:["🎲","+","🔮"], target:11 },     //8+3
-          { left:["🪐","+","🦴"], target:7 },      //5+2
-          { left:["🐙","+","🎲"], target:9 }       //1+8
+          { left:["🌵","+","🐙"], target:3 },       //2+1
+          { left:["🚀","+","🦊"], target:13 },      //6+7
+          { left:["🐸","+","🧊"], target:13 },      //4+9
+          { left:["🎲","+","🔮"], target:11 },      //8+3
+          { left:["🪐","+","🦴"], target:7 },       //5+2
+          { left:["🐙","+","🎲"], target:9 }        //1+8
         ]
       },
 
       // 8. A CENTER FOR ANTS
       {
         phrase: "A CENTER FOR ANTS",
-        phraseEmojis: [
-          "🐙","⬜",
-          "🧊","🌵","🦴","🔮","🌵","🎲","⬜",
-          "🪐","🐸","🎲","⬜",
-          "🐙","🦴","🔮","🚀"
+        phraseWords: [
+          ["🐙"],                                  // A
+          ["🧊","🌵","🦴","🔮","🌵","🎲"],          // CENTER
+          ["🪐","🐸","🎲"],                         // FOR
+          ["🐙","🦴","🔮","🚀"]                     // ANTS
         ],
+        mapping: {
+          "🐙": { letter:"A", number:1 },
+          "🧊": { letter:"C", number:6 },
+          "🌵": { letter:"E", number:2 },
+          "🦴": { letter:"N", number:5 },
+          "🔮": { letter:"T", number:9 },
+          "🎲": { letter:"R", number:4 },
+          "🪐": { letter:"F", number:7 },
+          "🐸": { letter:"O", number:8 },
+          "🚀": { letter:"S", number:3 }
+        },
         uniqueEmojis: ["🐙","🧊","🌵","🦴","🔮","🎲","🪐","🐸","🚀"],
-        // 🐙 A=1, 🧊 C=6, 🌵 E=2, 🦴 N=5,
-        // 🔮 T=9, 🎲 R=4, 🪐 F=7,
-        // 🐸 O=8, 🚀 S=3
         equations: [
-          { left:["🧊","+","🌵"], target:8 },           //6+2
-          { left:["🦴","+","🔮"], target:14 },         //5+9
-          { left:["🌵","+","🎲"], target:6 },          //2+4
-          { left:["🪐","+","🐸"], target:15 },         //7+8
-          { left:["🎲","+","🐙"], target:5 },          //4+1
-          { left:["🐙","+","🦴","+","🔮","+","🚀"], target:18 } //1+5+9+3
+          { left:["🧊","+","🌵"], target:8 },                     //6+2
+          { left:["🦴","+","🔮"], target:14 },                   //5+9
+          { left:["🌵","+","🎲"], target:6 },                    //2+4
+          { left:["🪐","+","🐸"], target:15 },                   //7+8
+          { left:["🎲","+","🐙"], target:5 },                    //4+1
+          { left:["🐙","+","🦴","+","🔮","+","🚀"], target:18 }   //1+5+9+3
         ]
       },
 
       // 9. BY DOG I MEAN SON
       {
         phrase: "BY DOG I MEAN SON",
-        phraseEmojis: [
-          "🧊","🎲","⬜",
-          "🐸","🪐","🦊","⬜",
-          "🍄","⬜",
-          "🚀","🌵","🪼","🔮","⬜",
-          "🐙","🪐","🔮"
+        phraseWords: [
+          ["🧊","🎲"],               // BY
+          ["🐸","🪐","🦊"],          // DOG
+          ["🍄"],                    // I
+          ["🚀","🌵","🪼","🔮"],     // MEAN
+          ["🐙","🪐","🔮"]           // SON
         ],
+        mapping: {
+          "🧊": { letter:"B", number:4 },
+          "🎲": { letter:"Y", number:7 },
+          "🐸": { letter:"D", number:8 },
+          "🪐": { letter:"O", number:6 },
+          "🦊": { letter:"G", number:5 },
+          "🍄": { letter:"I", number:3 },
+          "🚀": { letter:"M", number:9 },
+          "🌵": { letter:"E", number:2 },
+          "🪼": { letter:"A", number:1 },
+          "🔮": { letter:"N", number:4 },
+          "🐙": { letter:"S", number:6 }
+        },
         uniqueEmojis: ["🧊","🎲","🐸","🪐","🦊","🍄","🚀","🌵","🪼","🔮","🐙"],
-        // 🧊 B=4, 🎲 Y=7, 🐸 D=8, 🪐 O=6,
-        // 🦊 G=5, 🍄 I=3, 🚀 M=9, 🌵 E=2,
-        // 🪼 A=1, 🔮 N=4, 🐙 S=6
         equations: [
-          { left:["🧊","+","🎲"], target:11 },        //4+7
-          { left:["🐸","+","🪐"], target:14 },        //8+6
-          { left:["🦊","+","🍄"], target:8 },         //5+3
-          { left:["🚀","+","🌵"], target:11 },        //9+2
-          { left:["🪼","+","🔮"], target:5 },         //1+4
-          { left:["🐙","+","🪐","+","🔮"], target:16 } //6+6+4
+          { left:["🧊","+","🎲"], target:11 },           //4+7
+          { left:["🐸","+","🪐"], target:14 },           //8+6
+          { left:["🦊","+","🍄"], target:8 },            //5+3
+          { left:["🚀","+","🌵"], target:11 },           //9+2
+          { left:["🪼","+","🔮"], target:5 },            //1+4
+          { left:["🐙","+","🪐","+","🔮"], target:16 }    //6+6+4
         ]
       },
 
       // 10. GREAT WORK SO FAR
       {
         phrase: "GREAT WORK SO FAR",
-        phraseEmojis: [
-          "🦊","🌵","🧊","🎲","🔮","⬜",
-          "🚀","🐸","🌵","🦴","⬜",
-          "🐙","🐸","⬜",
-          "🍄","🎲","🌵"
+        phraseWords: [
+          ["🦊","🌵","🧊","🎲","🔮"],  // GREAT
+          ["🚀","🐸","🌵","🦴"],       // WORK
+          ["🐙","🐸"],                // SO
+          ["🍄","🎲","🌵"]            // FAR
         ],
+        mapping: {
+          "🦊": { letter:"G", number:8 },
+          "🌵": { letter:"R", number:4 },
+          "🧊": { letter:"E", number:2 },
+          "🎲": { letter:"A", number:1 },
+          "🔮": { letter:"T", number:9 },
+          "🚀": { letter:"W", number:6 },
+          "🐸": { letter:"O", number:7 },
+          "🦴": { letter:"K", number:5 },
+          "🐙": { letter:"S", number:3 },
+          "🍄": { letter:"F", number:4 }
+        },
         uniqueEmojis: ["🦊","🌵","🧊","🎲","🔮","🚀","🐸","🦴","🐙","🍄"],
-        // 🦊 G=8, 🌵 R=4, 🧊 E=2, 🎲 A=1,
-        // 🔮 T=9, 🚀 W=6, 🐸 O=7,
-        // 🦴 K=5, 🐙 S=3, 🍄 F=4
         equations: [
-          { left:["🦊","+","🌵"], target:12 },        //8+4
-          { left:["🧊","+","🎲"], target:3 },         //2+1
-          { left:["🔮","+","🚀"], target:15 },        //9+6
-          { left:["🐸","+","🌵"], target:11 },        //7+4
-          { left:["🦴","+","🐙"], target:8 },         //5+3
-          { left:["🍄","+","🎲","+","🌵"], target:9 }  //4+1+4
+          { left:["🦊","+","🌵"], target:12 },         //8+4
+          { left:["🧊","+","🎲"], target:3 },          //2+1
+          { left:["🔮","+","🚀"], target:15 },         //9+6
+          { left:["🐸","+","🌵"], target:11 },         //7+4
+          { left:["🦴","+","🐙"], target:8 },          //5+3
+          { left:["🍄","+","🎲","+","🌵"], target:9 }   //4+1+4
         ]
       }
     ];
 
-    // Pick a random puzzle from all 10
+    // Pick a random puzzle:
     const currentPuzzle = PUZZLES[Math.floor(Math.random() * PUZZLES.length)];
 
-    // Track player's guesses
+    // Player state: { [emoji]: {letter:"", number:"", solved:false} }
     const playerState = {};
-    currentPuzzle.uniqueEmojis.forEach(e=>{
-      playerState[e] = { letter:"", number:"" };
+    currentPuzzle.uniqueEmojis.forEach(em=>{
+      playerState[em] = { letter:"", number:"", solved:false };
     });
 
-    // DOM references
-    const phraseDisplay   = document.getElementById("emojiPhraseDisplay");
-    const equationsArea   = document.getElementById("equationsArea");
-    const previewBox      = document.getElementById("decodedPreview");
-    const mappingContainer= document.getElementById("mappingInputs");
-    const winBox          = document.getElementById("winBox");
+    // DOM refs
+    const phraseDisplay    = document.getElementById("emojiPhraseDisplay");
+    const equationsArea    = document.getElementById("equationsArea");
+    const previewBox       = document.getElementById("decodedPreview");
+    const mappingContainer = document.getElementById("mappingInputs");
+    const winBox           = document.getElementById("winBox");
 
+    // Render phrase as words (no ⬜)
     function renderEmojiPhrase(){
       phraseDisplay.innerHTML = "";
-      currentPuzzle.phraseEmojis.forEach(em=>{
-        const span=document.createElement("span");
-        span.textContent=em;
-        phraseDisplay.appendChild(span);
+      currentPuzzle.phraseWords.forEach(wordArr => {
+        const wordSpan = document.createElement("span");
+        wordSpan.className = "cipher-word";
+        wordArr.forEach(em => {
+          const eSpan = document.createElement("span");
+          eSpan.textContent = em;
+          wordSpan.appendChild(eSpan);
+        });
+        phraseDisplay.appendChild(wordSpan);
       });
     }
 
-    function renderMappingInputs(){
-      mappingContainer.innerHTML = "";
-      currentPuzzle.uniqueEmojis.forEach(em=>{
-        const row=document.createElement("div");
-        row.className="mapping-row";
-
-        const emojiCell=document.createElement("div");
-        emojiCell.className="emoji-cell";
-        emojiCell.textContent=em;
-        row.appendChild(emojiCell);
-
-        const letterWrap=document.createElement("div");
-        const letterLabel=document.createElement("label");
-        letterLabel.textContent="Letter";
-        const letterInput=document.createElement("input");
-        letterInput.type="text";
-        letterInput.maxLength=1;
-        letterInput.dataset.emoji=em;
-        letterInput.dataset.field="letter";
-        letterInput.addEventListener("input",handleInputChange);
-        letterWrap.appendChild(letterLabel);
-        letterWrap.appendChild(letterInput);
-
-        const numWrap=document.createElement("div");
-        const numLabel=document.createElement("label");
-        numLabel.textContent="Number (0-9)";
-        const numInput=document.createElement("input");
-        numInput.type="number";
-        numInput.min="0";
-        numInput.max="9";
-        numInput.dataset.emoji=em;
-        numInput.dataset.field="number";
-        numInput.addEventListener("input",handleInputChange);
-        numWrap.appendChild(numLabel);
-        numWrap.appendChild(numInput);
-
-        row.appendChild(letterWrap);
-        row.appendChild(numWrap);
-
-        mappingContainer.appendChild(row);
-      });
-    }
-
-    function handleInputChange(e){
-      const em = e.target.dataset.emoji;
-      const field = e.target.dataset.field;
-      let val = e.target.value;
-
-      if(field==="letter"){
-        val = val.toUpperCase().replace(/[^A-Z ]/g,"").slice(0,1);
-        e.target.value = val;
-      }
-
-      if(field==="number"){
-        if(val!==""){
-          let n=parseInt(val,10);
-          if(isNaN(n)) n="";
-          if(n<0) n=0;
-          if(n>9) n=9;
-          e.target.value = n;
-          val = e.target.value;
-        }
-      }
-
-      playerState[em][field] = val;
-      update();
-    }
-
+    // Build Decoded Phrase preview like "C__L GAME ___"
     function buildPreviewString(){
-      let out = "";
-      currentPuzzle.phraseEmojis.forEach(em=>{
-        if(em==="⬜"){
-          out += " ";
-        } else {
-          const guess = playerState[em]?.letter || "";
-          out += guess ? guess : "_";
-        }
+      const wordsAsStrings = currentPuzzle.phraseWords.map(wordArr => {
+        return wordArr.map(em => {
+          const guessLetter = playerState[em]?.letter || "";
+          return guessLetter ? guessLetter : "_";
+        }).join("");
       });
-      return out;
+      return wordsAsStrings.join(" ");
     }
 
     function renderPreview(){
       previewBox.textContent = buildPreviewString();
     }
 
+    // Render equations
     function evaluateEquation(eqObj){
+      // eqObj.left = ["🦊","+","🪐",...]
       let pieces = [];
       let valid  = true;
-
       eqObj.left.forEach(token=>{
         if(token==="+"){
           pieces.push("+");
@@ -518,25 +571,20 @@
           }
         }
       });
-
       let computed = null;
       if(valid){
         computed = 0;
         pieces.forEach(p=>{
           if(p!=="+"){
             const n = parseInt(p,10);
-            if(isNaN(n)){
-              valid=false;
-            } else {
-              computed += n;
-            }
+            if(isNaN(n)){ valid=false; }
+            else { computed += n; }
           }
         });
         if(computed !== eqObj.target){
           valid = false;
         }
       }
-
       const displayStr = pieces.join(" ")+" = "+eqObj.target+" "+(valid?"✅":"❌");
       return {
         html: "<span class='"+(valid?"status-ok":"status-bad")+"'>"+displayStr+"</span>",
@@ -564,6 +612,121 @@
       });
     }
 
+    // Render the mapping inputs (emoji → letter/number)
+    function renderMappingInputs(){
+      mappingContainer.innerHTML = "";
+      currentPuzzle.uniqueEmojis.forEach(em=>{
+        const row=document.createElement("div");
+        row.className="mapping-row";
+        row.setAttribute("data-row-emoji", em);
+
+        const emojiCell=document.createElement("div");
+        emojiCell.className="emoji-cell";
+        emojiCell.textContent=em;
+        row.appendChild(emojiCell);
+
+        // letter input
+        const letterWrap=document.createElement("div");
+        const letterLabel=document.createElement("label");
+        letterLabel.textContent="Letter";
+        const letterInput=document.createElement("input");
+        letterInput.type="text";
+        letterInput.maxLength=1;
+        letterInput.dataset.emoji=em;
+        letterInput.dataset.field="letter";
+        letterInput.addEventListener("input",handleInputChange);
+        letterWrap.appendChild(letterLabel);
+        letterWrap.appendChild(letterInput);
+
+        // number input
+        const numWrap=document.createElement("div");
+        const numLabel=document.createElement("label");
+        numLabel.textContent="Number (0-9)";
+        const numInput=document.createElement("input");
+        numInput.type="number";
+        numInput.min="0";
+        numInput.max="9";
+        numInput.dataset.emoji=em;
+        numInput.dataset.field="number";
+        numInput.addEventListener("input",handleInputChange);
+        numWrap.appendChild(numLabel);
+        numWrap.appendChild(numInput);
+
+        row.appendChild(letterWrap);
+        row.appendChild(numWrap);
+
+        mappingContainer.appendChild(row);
+      });
+    }
+
+    // When user types in a letter or number
+    function handleInputChange(e){
+      const em    = e.target.dataset.emoji;
+      const field = e.target.dataset.field;
+      let val     = e.target.value;
+
+      if(playerState[em].solved){
+        // already solved/locked, ignore edits
+        e.target.value = playerState[em][field];
+        return;
+      }
+
+      if(field==="letter"){
+        val = val.toUpperCase().replace(/[^A-Z]/g,"").slice(0,1);
+        e.target.value = val;
+      }
+
+      if(field==="number"){
+        if(val!==""){
+          let n = parseInt(val,10);
+          if(isNaN(n)) n = "";
+          if(n<0) n=0;
+          if(n>9) n=9;
+          e.target.value = n;
+          val = e.target.value;
+        }
+      }
+
+      // Update their guess
+      playerState[em][field] = val;
+
+      // Check if they guessed correctly for this emoji
+      const correctLetter = currentPuzzle.mapping[em].letter;
+      const correctNumber = String(currentPuzzle.mapping[em].number);
+
+      const gotLetter = (val === correctLetter);
+      const gotNumber = (val === correctNumber);
+
+      if(gotLetter || gotNumber){
+        // lock in the truth for this emoji
+        playerState[em].letter = correctLetter;
+        playerState[em].number = correctNumber;
+        playerState[em].solved = true;
+
+        lockInputsForEmoji(em, correctLetter, correctNumber);
+      }
+
+      update();
+    }
+
+    // Lock row visually + disable its inputs
+    function lockInputsForEmoji(em, finalLetter, finalNumber){
+      const row = mappingContainer.querySelector(`[data-row-emoji="${em}"]`);
+      if(row){
+        row.classList.add("solved");
+        const inputs = row.querySelectorAll("input");
+        inputs.forEach(inp=>{
+          if(inp.dataset.field === "letter") {
+            inp.value = finalLetter;
+          }
+          if(inp.dataset.field === "number") {
+            inp.value = finalNumber;
+          }
+          inp.disabled = true;
+        });
+      }
+    }
+
     function checkWin(){
       const solvedPhrase = buildPreviewString() === currentPuzzle.phrase;
       let allEqOk = true;
@@ -573,11 +736,7 @@
           break;
         }
       }
-      if(solvedPhrase && allEqOk){
-        winBox.style.display = "block";
-      } else {
-        winBox.style.display = "none";
-      }
+      winBox.style.display = (solvedPhrase && allEqOk) ? "block" : "none";
     }
 
     function update(){
@@ -586,6 +745,7 @@
       checkWin();
     }
 
+    // init
     function init(){
       renderEmojiPhrase();
       renderMappingInputs();

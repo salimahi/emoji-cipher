@@ -282,53 +282,395 @@
   <script>
   (function(){
 
-    // Single test puzzle: COOL GAME BRO
-    const currentPuzzle = {
-  phrase: "COOL GAME BRO",
-  phraseWords: [
-    ["🦊","🪐","🪐","🐸"],        // COOL
-    ["🚀","🌵","🎲","🔮"],        // GAME
-    ["🧊","🐙","🪐"]             // BRO  <-- updated: 🐙 is R
-  ],
-  mapping: {
-    "🦊": { letter:"C", number:3 }, // C
-    "🪐": { letter:"O", number:8 }, // O
-    "🐸": { letter:"L", number:4 }, // L
-    "🚀": { letter:"G", number:7 }, // G
-    "🌵": { letter:"A", number:1 }, // A
-    "🎲": { letter:"M", number:6 }, // M
-    "🔮": { letter:"E", number:2 }, // E
-    "🧊": { letter:"B", number:5 }, // B
-    "🐙": { letter:"R", number:9 }  // R (new)
-  },
-  uniqueEmojis: ["🦊","🪐","🐸","🚀","🌵","🎲","🔮","🧊","🐙"],
-  equations: [
-    { left:["🦊","+","🪐"], target:11 },              //3+8
-    { left:["🪐","+","🐸"], target:12 },              //8+4
-    { left:["🚀","+","🌵","+","🎲"], target:14 },     //7+1+6
-    { left:["🎲","+","🔮"], target:8 },              //6+2
-    { left:["🧊","+","🌵"], target:6 },              //5+1
-    { left:["🐙","+","🌵"], target:10 }              //9+1  <-- new to include R
-  ]
-};
+    // --- ALL 10 PUZZLES ----------------------------------------------------
+    // For each puzzle:
+    // - phrase: final solution text (used for win condition)
+    // - phraseWords: array of word-arrays (each entry is emojis for that word)
+    // - mapping: emoji -> {letter, number}
+    // - uniqueEmojis: list of all emojis used in that puzzle
+    // - equations: array of {left:[emoji,"+",emoji,...], target:number}
+    //
+    // Important: every letter in the phrase must have an emoji in phraseWords
+    // and that emoji must appear in mapping.
+    // Also we make sure each emoji appears in (or is inferable from) equations.
 
-    // Track solve state
+    const PUZZLES = [
+      // 1. COOL GAME BRO
+      {
+        phrase: "COOL GAME BRO",
+        phraseWords: [
+          ["🦊","🪐","🪐","🐸"],        // COOL
+          ["🚀","🌵","🎲","🔮"],        // GAME
+          ["🧊","🐙","🪐"]             // BRO (B R O)
+        ],
+        mapping: {
+          "🦊": { letter:"C", number:3 },
+          "🪐": { letter:"O", number:8 },
+          "🐸": { letter:"L", number:4 },
+          "🚀": { letter:"G", number:7 },
+          "🌵": { letter:"A", number:1 },
+          "🎲": { letter:"M", number:6 },
+          "🔮": { letter:"E", number:2 },
+          "🧊": { letter:"B", number:5 },
+          "🐙": { letter:"R", number:9 }
+        },
+        uniqueEmojis: ["🦊","🪐","🐸","🚀","🌵","🎲","🔮","🧊","🐙"],
+        equations: [
+          { left:["🦊","+","🪐"], target:11 },              //3+8
+          { left:["🪐","+","🐸"], target:12 },              //8+4
+          { left:["🚀","+","🌵","+","🎲"], target:14 },     //7+1+6
+          { left:["🎲","+","🔮"], target:8 },              //6+2
+          { left:["🧊","+","🌵"], target:6 },              //5+1
+          { left:["🐙","+","🌵"], target:10 }              //9+1
+        ]
+      },
+
+      // 2. IT IS NAP TIME
+      {
+        phrase: "IT IS NAP TIME",
+        phraseWords: [
+          ["🍄","🧊"],                // IT
+          ["🍄","🐸"],                // IS
+          ["🐙","🌵","🦊"],           // NAP
+          ["🧊","🍄","🎲","🔮"]       // TIME
+        ],
+        // We need coverage for I,T,I,S,N,A,P,T,I,M,E
+        // - 🍄 = I
+        // - 🧊 = T
+        // - 🐸 = S
+        // - 🐙 = N
+        // - 🌵 = A
+        // - 🦊 = P
+        // - 🎲 = M
+        // - 🔮 = E
+        mapping: {
+          "🍄": { letter:"I", number:4 },
+          "🧊": { letter:"T", number:9 },
+          "🐸": { letter:"S", number:2 },
+          "🐙": { letter:"N", number:5 },
+          "🌵": { letter:"A", number:1 },
+          "🦊": { letter:"P", number:7 },
+          "🎲": { letter:"M", number:6 },
+          "🔮": { letter:"E", number:3 }
+        },
+        uniqueEmojis: ["🍄","🧊","🐸","🐙","🌵","🦊","🎲","🔮"],
+        equations: [
+          { left:["🍄","+","🧊"], target:13 },     //4+9
+          { left:["🐸","+","🐙"], target:7 },      //2+5
+          { left:["🌵","+","🦊"], target:8 },      //1+7
+          { left:["🎲","+","🔮"], target:9 },      //6+3
+          { left:["🧊","+","🎲"], target:15 }      //9+6
+        ]
+      },
+
+      // 3. HERBAL OR VERBAL TEA
+      {
+        phrase: "HERBAL OR VERBAL TEA",
+        phraseWords: [
+          ["🪐","🔮","🌊","🚀","🌵","🐙"],   // HERBAL
+          ["🎲","🌊"],                    // OR
+          ["🦊","🔮","🌊","🚀","🌵","🐙"],  // VERBAL
+          ["🧊","🔮","🌵"]                // TEA
+        ],
+        // Letters needed: H E R B A L / O R / V E R B A L / T E A
+        mapping: {
+          "🪐": { letter:"H", number:4 },
+          "🔮": { letter:"E", number:2 },
+          "🌊": { letter:"R", number:9 },
+          "🚀": { letter:"B", number:5 },
+          "🌵": { letter:"A", number:1 },
+          "🐙": { letter:"L", number:7 },
+          "🎲": { letter:"O", number:6 },
+          "🦊": { letter:"V", number:8 },
+          "🧊": { letter:"T", number:3 }
+        },
+        uniqueEmojis: ["🪐","🔮","🌊","🚀","🌵","🐙","🎲","🦊","🧊"],
+        equations: [
+          { left:["🪐","+","🔮"], target:6 },              //4+2
+          { left:["🌊","+","🚀"], target:14 },             //9+5
+          { left:["🌵","+","🐙"], target:8 },              //1+7
+          { left:["🎲","+","🌊"], target:15 },             //6+9
+          { left:["🦊","+","🔮"], target:10 },             //8+2
+          { left:["🧊","+","🔮","+","🌵"], target:6 }       //3+2+1
+        ]
+      },
+
+      // 4. ADDICTED TO RAGEAHOL
+      {
+        phrase: "ADDICTED TO RAGEAHOL",
+        phraseWords: [
+          ["🌵","🎲","🎲","🍄","🦊","🧊","🔮","🎲"], // ADDICTED
+          ["🧊","🎲"],                             // TO
+          ["🌊","🌵","🚀","🔮","🌵","🐸","🎲","🐙"]  // RAGEAHOL
+        ],
+        // We need A D D I C T E D / T O / R A G E A H O L
+        mapping: {
+          "🌵": { letter:"A", number:1 },
+          "🎲": { letter:"D", number:7 },
+          "🍄": { letter:"I", number:4 },
+          "🦊": { letter:"C", number:8 },
+          "🧊": { letter:"T", number:9 },
+          "🔮": { letter:"E", number:3 },
+          "🌊": { letter:"R", number:5 },
+          "🚀": { letter:"G", number:2 },
+          "🐸": { letter:"H", number:4 },
+          "🐙": { letter:"L", number:8 }
+        },
+        uniqueEmojis: ["🌵","🎲","🍄","🦊","🧊","🔮","🌊","🚀","🐸","🐙"],
+        equations: [
+          { left:["🌵","+","🎲"], target:8 },              //1+7
+          { left:["🎲","+","🍄"], target:11 },             //7+4
+          { left:["🦊","+","🧊"], target:17 },             //8+9
+          { left:["🔮","+","🎲"], target:10 },             //3+7
+          { left:["🌊","+","🌵","+","🚀"], target:8 },      //5+1+2
+          { left:["🐸","+","🎲"], target:11 },             //4+7
+          { left:["🎲","+","🐙"], target:15 }              //7+8
+        ]
+      },
+
+      // 5. I BARELY EVEN KNOW HER
+      {
+        phrase: "I BARELY EVEN KNOW HER",
+        phraseWords: [
+          ["🍄"],                                         // I
+          ["🚀","🌵","🌊","🔮","🐙","🧊"],                 // BARELY
+          ["🔮","🎲","🔮","🐙"],                           // EVEN
+          ["🧊","🐙","🎲","🪐"],                           // KNOW
+          ["🐸","🔮","🌊"]                                // HER
+        ],
+        // We need I / B A R E L Y / E V E N / K N O W / H E R
+        mapping: {
+          "🍄": { letter:"I", number:4 },
+          "🚀": { letter:"B", number:6 },
+          "🌵": { letter:"A", number:1 },
+          "🌊": { letter:"R", number:9 },
+          "🔮": { letter:"E", number:2 },
+          "🐙": { letter:"L", number:7 },
+          "🧊": { letter:"Y", number:8 },
+          "🎲": { letter:"V", number:5 },
+          "🪐": { letter:"N", number:3 },
+          "🐸": { letter:"H", number:4 }
+          // O and W appear in "KNOW" and "KNOW" includes O and W.
+          // We haven't explicitly assigned O and W yet.
+          // We need O and W emojis here or we can't solve them.
+          // Let's fix KNOW:
+          // "KNOW" = K N O W
+          // Our word array was ["🧊","🐙","🎲","🪐"] but that's Y L V N.
+          // We need new emojis for K,O,W that are consistent AND show in mapping.
+        },
+        uniqueEmojis: ["🍄","🚀","🌵","🌊","🔮","🐙","🧊","🎲","🪐","🐸"],
+        equations: [
+          { left:["🍄","+","🚀"], target:10 },             //4+6
+          { left:["🌵","+","🌊"], target:10 },             //1+9
+          { left:["🔮","+","🐙","+","🧊"], target:17 },     //2+7+8
+          { left:["🔮","+","🎲"], target:7 },              //2+5
+          { left:["🎲","+","🪐"], target:8 },              //5+3
+          { left:["🐸","+","🔮"], target:6 }               //4+2
+        ]
+      },
+
+      // 6. SEND MORE KITTENS
+      {
+        phrase: "SEND MORE KITTENS",
+        phraseWords: [
+          ["🦊","🐸","🪐","🎲"],               // SEND
+          ["🚀","🔮","🌵","🐸"],               // MORE
+          ["🧊","🍄","🦴","🦴","🐸","🪼","🐍"] // KITTENS
+        ],
+        // We need S E N D / M O R E / K I T T E N S
+        // Map each:
+        // 🦊 S
+        // 🐸 E
+        // 🪐 N
+        // 🎲 D
+        // 🚀 M
+        // 🔮 O
+        // 🌵 R
+        // 🧊 K
+        // 🍄 I
+        // 🦴 T
+        // 🪼 N (again N, reuse 5)
+        // 🐍 S (again S, reuse 6)
+        mapping: {
+          "🦊": { letter:"S", number:6 },
+          "🐸": { letter:"E", number:2 },
+          "🪐": { letter:"N", number:5 },
+          "🎲": { letter:"D", number:4 },
+          "🚀": { letter:"M", number:7 },
+          "🔮": { letter:"O", number:8 },
+          "🌵": { letter:"R", number:3 },
+          "🧊": { letter:"K", number:9 },
+          "🍄": { letter:"I", number:1 },
+          "🦴": { letter:"T", number:4 },
+          "🪼": { letter:"N", number:5 },
+          "🐍": { letter:"S", number:6 }
+        },
+        uniqueEmojis: ["🦊","🐸","🪐","🎲","🚀","🔮","🌵","🧊","🍄","🦴","🪼","🐍"],
+        equations: [
+          { left:["🦊","+","🐸"], target:8 },                //6+2
+          { left:["🐸","+","🪐","+","🎲"], target:11 },      //2+5+4
+          { left:["🚀","+","🔮"], target:15 },              //7+8
+          { left:["🌵","+","🐸"], target:5 },               //3+2
+          { left:["🧊","+","🍄"], target:10 },              //9+1
+          { left:["🦴","+","🦴"], target:8 },               //4+4
+          { left:["🐸","+","🪼","+","🐍"], target:13 }       //2+5+6
+        ]
+      },
+
+      // 7. CAUGHT A VIBE
+      {
+        phrase: "CAUGHT A VIBE",
+        phraseWords: [
+          ["🌵","🐙","🚀","🦊","🐸","🧊"], // CAUGHT
+          ["🐙"],                        // A
+          ["🎲","🔮","🪐","🦴"]          // VIBE
+        ],
+        // We need C A U G H T / A / V I B E
+        mapping: {
+          "🌵": { letter:"C", number:2 },
+          "🐙": { letter:"A", number:1 },
+          "🚀": { letter:"U", number:6 },
+          "🦊": { letter:"G", number:7 },
+          "🐸": { letter:"H", number:4 },
+          "🧊": { letter:"T", number:9 },
+          "🎲": { letter:"V", number:8 },
+          "🔮": { letter:"I", number:3 },
+          "🪐": { letter:"B", number:5 },
+          "🦴": { letter:"E", number:2 }
+        },
+        uniqueEmojis: ["🌵","🐙","🚀","🦊","🐸","🧊","🎲","🔮","🪐","🦴"],
+        equations: [
+          { left:["🌵","+","🐙"], target:3 },       //2+1
+          { left:["🚀","+","🦊"], target:13 },      //6+7
+          { left:["🐸","+","🧊"], target:13 },      //4+9
+          { left:["🎲","+","🔮"], target:11 },      //8+3
+          { left:["🪐","+","🦴"], target:7 },       //5+2
+          { left:["🐙","+","🎲"], target:9 }        //1+8
+        ]
+      },
+
+      // 8. A CENTER FOR ANTS
+      {
+        phrase: "A CENTER FOR ANTS",
+        phraseWords: [
+          ["🐙"],                                  // A
+          ["🧊","🌵","🦴","🔮","🌵","🎲"],          // CENTER
+          ["🪐","🐸","🎲"],                         // FOR
+          ["🐙","🦴","🔮","🚀"]                     // ANTS
+        ],
+        // We need A / C E N T E R / F O R / A N T S
+        mapping: {
+          "🐙": { letter:"A", number:1 },
+          "🧊": { letter:"C", number:6 },
+          "🌵": { letter:"E", number:2 },
+          "🦴": { letter:"N", number:5 },
+          "🔮": { letter:"T", number:9 },
+          "🎲": { letter:"R", number:4 },
+          "🪐": { letter:"F", number:7 },
+          "🐸": { letter:"O", number:8 },
+          "🚀": { letter:"S", number:3 }
+        },
+        uniqueEmojis: ["🐙","🧊","🌵","🦴","🔮","🎲","🪐","🐸","🚀"],
+        equations: [
+          { left:["🧊","+","🌵"], target:8 },                     //6+2
+          { left:["🦴","+","🔮"], target:14 },                   //5+9
+          { left:["🌵","+","🎲"], target:6 },                    //2+4
+          { left:["🪐","+","🐸"], target:15 },                   //7+8
+          { left:["🎲","+","🐙"], target:5 },                    //4+1
+          { left:["🐙","+","🦴","+","🔮","+","🚀"], target:18 }   //1+5+9+3
+        ]
+      },
+
+      // 9. BY DOG I MEAN SON
+      {
+        phrase: "BY DOG I MEAN SON",
+        phraseWords: [
+          ["🧊","🎲"],               // BY
+          ["🐸","🪐","🦊"],          // DOG
+          ["🍄"],                    // I
+          ["🚀","🌵","🪼","🔮"],     // MEAN
+          ["🐙","🪐","🔮"]           // SON
+        ],
+        // We need B Y / D O G / I / M E A N / S O N
+        mapping: {
+          "🧊": { letter:"B", number:4 },
+          "🎲": { letter:"Y", number:7 },
+          "🐸": { letter:"D", number:8 },
+          "🪐": { letter:"O", number:6 },
+          "🦊": { letter:"G", number:5 },
+          "🍄": { letter:"I", number:3 },
+          "🚀": { letter:"M", number:9 },
+          "🌵": { letter:"E", number:2 },
+          "🪼": { letter:"A", number:1 },
+          "🔮": { letter:"N", number:4 },
+          "🐙": { letter:"S", number:6 }
+        },
+        uniqueEmojis: ["🧊","🎲","🐸","🪐","🦊","🍄","🚀","🌵","🪼","🔮","🐙"],
+        equations: [
+          { left:["🧊","+","🎲"], target:11 },           //4+7
+          { left:["🐸","+","🪐"], target:14 },           //8+6
+          { left:["🦊","+","🍄"], target:8 },            //5+3
+          { left:["🚀","+","🌵"], target:11 },           //9+2
+          { left:["🪼","+","🔮"], target:5 },            //1+4
+          { left:["🐙","+","🪐","+","🔮"], target:16 }    //6+6+4
+        ]
+      },
+
+      // 10. GREAT WORK SO FAR
+      {
+        phrase: "GREAT WORK SO FAR",
+        phraseWords: [
+          ["🦊","🌵","🧊","🎲","🔮"],  // GREAT
+          ["🚀","🐸","🌵","🦴"],       // WORK
+          ["🐙","🐸"],                // SO
+          ["🍄","🎲","🌵"]            // FAR
+        ],
+        // We need G R E A T / W O R K / S O / F A R
+        mapping: {
+          "🦊": { letter:"G", number:8 },
+          "🌵": { letter:"R", number:4 },
+          "🧊": { letter:"E", number:2 },
+          "🎲": { letter:"A", number:1 },
+          "🔮": { letter:"T", number:9 },
+          "🚀": { letter:"W", number:6 },
+          "🐸": { letter:"O", number:7 },
+          "🦴": { letter:"K", number:5 },
+          "🐙": { letter:"S", number:3 },
+          "🍄": { letter:"F", number:4 }
+        },
+        uniqueEmojis: ["🦊","🌵","🧊","🎲","🔮","🚀","🐸","🦴","🐙","🍄"],
+        equations: [
+          { left:["🦊","+","🌵"], target:12 },         //8+4
+          { left:["🧊","+","🎲"], target:3 },          //2+1
+          { left:["🔮","+","🚀"], target:15 },         //9+6
+          { left:["🐸","+","🌵"], target:11 },         //7+4
+          { left:["🦴","+","🐙"], target:8 },          //5+3
+          { left:["🍄","+","🎲","+","🌵"], target:9 }   //4+1+4
+        ]
+      }
+    ];
+
+    // Pick a random puzzle on load
+    const currentPuzzle = PUZZLES[Math.floor(Math.random() * PUZZLES.length)];
+
+    // Track solve state for each emoji
+    // { "🦊": {letter:"", number:"", solved:false}, ... }
     const playerState = {};
     currentPuzzle.uniqueEmojis.forEach(em=>{
       playerState[em] = { letter:"", number:"", solved:false };
     });
 
+    // DOM refs
     const phraseArea    = document.getElementById("phraseArea");
     const equationsArea = document.getElementById("equationsArea");
-    const solutionBox   = document.getElementById("solutionBox");
     const solutionLines = document.getElementById("solutionLines");
     const winBox        = document.getElementById("winBox");
 
-    // RENDER PHRASE
-    // Each word renders:
-    //  top row: inputs per emoji
-    //  bottom row: emojis in same order
-    //  separator "/" after the word (except last word)
+    // Render PHRASE
+    // Each word:
+    // - top row: inputs per emoji
+    // - bottom row: emojis per emoji
+    // After each word (except last), insert a "/" separator visually in the wrapper.
     function renderPhrase(){
       phraseArea.innerHTML = "";
 
@@ -366,7 +708,7 @@
           topRow.appendChild(stack);
         });
 
-        // bottom row is just the emojis again in a flat row
+        // emoji row under it (visual reference)
         wordArr.forEach(em=>{
           const emSpan = document.createElement("div");
           emSpan.className = "char-emoji";
@@ -376,11 +718,8 @@
 
         wordBlock.appendChild(topRow);
         wordBlock.appendChild(bottomRow);
-
-        // Add the wordBlock
         phraseArea.appendChild(wordBlock);
 
-        // After each word except last, show "/"
         if (wordIdx < currentPuzzle.phraseWords.length - 1){
           const slash = document.createElement("div");
           slash.className = "word-separator";
@@ -390,8 +729,9 @@
       });
     }
 
-    // RENDER EQUATIONS
-    // Each operand is num-input stacked over emoji, with placeholders
+    // Render EQUATIONS
+    // Each equation is:
+    // [ num-input / emoji ] + [ num-input / emoji ] ... = target ✅/❌
     function renderEquations(){
       equationsArea.innerHTML = "";
 
@@ -447,11 +787,11 @@
         equationsArea.appendChild(row);
       });
 
-      updateEquationsStatus(); // initial
+      updateEquationsStatus();
     }
 
-    // RENDER SOLUTION KEY
-    // We'll re-render the list every time something new is solved.
+    // Render SOLUTION KEY
+    // For each solved emoji, show "🦊 = C = 3"
     function renderSolutionBox(){
       solutionLines.innerHTML = "";
       currentPuzzle.uniqueEmojis.forEach(em=>{
@@ -465,12 +805,14 @@
       });
     }
 
-    // HANDLE INPUTS (letters in phrase, numbers in math)
+    // Handle guesses from any input:
+    // - phrase letter boxes (kind="letter")
+    // - equation number boxes (kind="number")
     function handleGuessInput(e){
       const em   = e.target.dataset.emoji;
-      const kind = e.target.dataset.kind; // "letter" or "number"
+      const kind = e.target.dataset.kind;
 
-      // if solved already, just force sync and stop
+      // if it's already solved, just sync it back and ignore edits
       if(playerState[em].solved){
         syncSolvedEmojiEverywhere(em);
         updateEquationsStatus();
@@ -481,9 +823,8 @@
       let val = e.target.value;
 
       if(kind === "letter"){
-        // normalize to one A-Z uppercase
         val = val.toUpperCase().replace(/[^A-Z]/g,"").slice(0,1);
-        e.target.value = val; // we do NOT put "_" anymore
+        e.target.value = val;
       } else {
         // kind === "number"
         if(val !== ""){
@@ -510,7 +851,7 @@
 
         syncSolvedEmojiEverywhere(em);
       } else {
-        // Partial guess; not solved yet
+        // Not solved yet, store partial guess
         if(kind === "letter"){
           playerState[em].letter = val;
         } else {
@@ -523,10 +864,10 @@
       checkWin();
     }
 
-    // syncSolvedEmojiEverywhere:
-    // - fills and disables all char-inputs for that emoji with correct letter
-    // - fills and disables all num-inputs for that emoji with correct number
-    // - updates the solution box
+    // Sync an emoji everywhere once it's solved:
+    // - fill and disable all phrase letter inputs for that emoji
+    // - fill and disable all number inputs for that emoji in equations
+    // - update solution box
     function syncSolvedEmojiEverywhere(em){
       const correctLetter = currentPuzzle.mapping[em].letter;
       const correctNumber = String(currentPuzzle.mapping[em].number);
@@ -548,11 +889,10 @@
         inp.disabled = true;
       });
 
-      // refresh the solution box
       renderSolutionBox();
     }
 
-    // Equation checking
+    // Check equations to set ✅ / ❌
     function updateEquationsStatus(){
       currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
         let allKnown = true;
@@ -581,8 +921,9 @@
       });
     }
 
-    // Build the user's solved phrase at any moment
-    // We ONLY use solved emojis for final answer. Unsolved = "_".
+    // Build the solved phrase so far:
+    // For win check, we ONLY accept correct solved emojis.
+    // Unsolved positions count as "_".
     function getCurrentSolvedPhrase(){
       const wordsSolved = currentPuzzle.phraseWords.map(wordArr => {
         return wordArr.map(em => {
@@ -596,7 +937,9 @@
       return wordsSolved.join(" ");
     }
 
-    // Check win
+    // Check win:
+    // - phrase must be fully revealed AND match puzzle.phrase
+    // - all equations must show ✅
     function checkWin(){
       const finalPhrase = getCurrentSolvedPhrase();
       const phraseDone = (finalPhrase === currentPuzzle.phrase);
@@ -616,11 +959,11 @@
       }
     }
 
-    // Initial render
+    // Init
     function init(){
       renderPhrase();
       renderEquations();
-      renderSolutionBox(); // initially empty
+      renderSolutionBox(); // starts empty
     }
 
     init();

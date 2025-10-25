@@ -288,7 +288,6 @@
     Each emoji hides a secret <b>LETTER</b> and <b>NUMBER</b>.<br>
     Every letter is unique, <i>but numbers can repeat.</i> <br>
     Unlock one and you'll get the other. <br>
-    There are ten randomly generated puzzles (for now). <br>
     Good Luck!
   </div>
 
@@ -719,6 +718,7 @@
     const prevBtn      = document.getElementById("prevBtn");
     const nextBtn      = document.getElementById("nextBtn");
     const puzzleLabel  = document.getElementById("puzzleLabel");
+    const confettiLayer = document.getElementById("confettiLayer");
 
     // Render PHRASE
     // Each word:
@@ -842,19 +842,65 @@
     // Render SOLUTION KEY
     // For each solved emoji, show "🦊 = C = 3"
     function renderSolutionBox(){
-      if (!solutionLines) return; // box hidden
+  if (!solutionLines) return; // box hidden
   solutionLines.innerHTML = "";
-      currentPuzzle.uniqueEmojis.forEach(em=>{
-        const st = playerState[em];
-        if(st.solved){
-          const line = document.createElement("div");
-          line.className = "solution-line-solved";
-          line.textContent = `${em} = ${st.letter} = ${st.number}`;
-          solutionLines.appendChild(line);
+  currentPuzzle.uniqueEmojis.forEach(em=>{
+    const st = playerState[em];
+    if(st.solved){
+      const line = document.createElement("div");
+      line.className = "solution-line-solved";
+      line.textContent = `${em} = ${st.letter} = ${st.number}`;
+      solutionLines.appendChild(line);
+    }
+  });
+}
+    
+     // Check equations to set ✅ / ❌
+    function updateEquationsStatus(){
+      currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
+        let allKnown = true;
+        let total = 0;
+
+        eqObj.left.forEach(token=>{
+          if(token === "+") return;
+          if(playerState[token].solved){
+            total += currentPuzzle.mapping[token].number;
+          } else {
+            allKnown = false;
+          }
+        });
+
+        const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
+        if(!resDiv) return;
+        if(allKnown && total === eqObj.target){
+          resDiv.textContent = "✅";
+          resDiv.classList.remove("status-bad");
+          resDiv.classList.add("status-ok");
+        } else {
+          resDiv.textContent = "❌";
+          resDiv.classList.remove("status-ok");
+          resDiv.classList.add("status-bad");
         }
       });
     }
 
+    
+    // Build the solved phrase so far:
+    // For win check, we ONLY accept correct solved emojis.
+    // Unsolved positions count as "_".
+    function getCurrentSolvedPhrase(){
+      const wordsSolved = currentPuzzle.phraseWords.map(wordArr => {
+        return wordArr.map(em => {
+          if(playerState[em].solved){
+            return currentPuzzle.mapping[em].letter;
+          } else {
+            return "_";
+          }
+        }).join("");
+      });
+      return wordsSolved.join(" ");
+    }
+    
     // Handle guesses from any input:
     // - phrase letter boxes (kind="letter")
     // - equation number boxes (kind="number")
@@ -942,50 +988,6 @@
       renderSolutionBox();
     }
 
-    // Check equations to set ✅ / ❌
-    function updateEquationsStatus(){
-      currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
-        let allKnown = true;
-        let total = 0;
-
-        eqObj.left.forEach(token=>{
-          if(token === "+") return;
-          if(playerState[token].solved){
-            total += currentPuzzle.mapping[token].number;
-          } else {
-            allKnown = false;
-          }
-        });
-
-        const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
-        if(!resDiv) return;
-        if(allKnown && total === eqObj.target){
-          resDiv.textContent = "✅";
-          resDiv.classList.remove("status-bad");
-          resDiv.classList.add("status-ok");
-        } else {
-          resDiv.textContent = "❌";
-          resDiv.classList.remove("status-ok");
-          resDiv.classList.add("status-bad");
-        }
-      });
-    }
-
-    // Build the solved phrase so far:
-    // For win check, we ONLY accept correct solved emojis.
-    // Unsolved positions count as "_".
-    function getCurrentSolvedPhrase(){
-      const wordsSolved = currentPuzzle.phraseWords.map(wordArr => {
-        return wordArr.map(em => {
-          if(playerState[em].solved){
-            return currentPuzzle.mapping[em].letter;
-          } else {
-            return "_";
-          }
-        }).join("");
-      });
-      return wordsSolved.join(" ");
-    }
 
     function launchConfetti() {
   if (hasCelebrated) return;

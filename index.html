@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emoji Cipher™ – Puzzle</title>
+  <title>Emoji Cipher™ – A New Puzzle!</title>
   <meta name="description" content="Emoji Cipher™ is an original logic puzzle by Salimah Ismail. Decode the emojis to reveal the hidden phrase and balance the equations.">
   <meta name="author" content="Salimah Ismail">
   <meta name="copyright" content="© 2025 Salimah Ismail. Licensed under CC BY-NC-ND 4.0 International.">
@@ -266,6 +266,29 @@ h2 {
   z-index: 999999; /* keep it above the puzzle */
 }
 
+    /* full-screen win text */
+#solvedMessage {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  font-size: 6vw;
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 0 25px rgba(0,0,0,0.6);
+  opacity: 0;
+  z-index: 1000000;
+  pointer-events: none;
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
+}
+#solvedMessage.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+
   </style>
 </head>
 <body>
@@ -322,6 +345,8 @@ h2 {
   </footer>
 
   <canvas id="confettiCanvas"></canvas>
+
+  <div id="solvedMessage">YOU SOLVED IT!</div>
 
   <script>
   (function(){
@@ -953,6 +978,16 @@ function launchConfetti() {
   }
   resizeCanvas();
 
+  // show "YOU SOLVED IT" message
+const msg = document.getElementById("solvedMessage");
+if (msg) {
+  msg.classList.add("show");
+  // fade it out after 2.5 seconds
+  setTimeout(() => {
+    msg.classList.remove("show");
+  }, 2500);
+}
+  
   // -----------------------
   // 1. Create particle sprites (offscreen emoji bitmaps)
   // -----------------------

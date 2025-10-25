@@ -19,6 +19,15 @@
     }
     h1, h2 { text-align: center; }
 
+    h1 {
+  color: #8C6737; /* pick your color here */
+}
+h2 {
+  color: #8C6737; /* match, or choose a different accent */
+  font-weight: 500;
+}
+
+
     .note-box {
       background: #F6EAED;
       border: 1px solid #36171D;
@@ -265,6 +274,7 @@
       animation-timing-function: ease-out;
       animation-iteration-count: 1;
       animation-fill-mode: forwards;
+      pointer-events: none;
     }
 
     @keyframes burst-fade {
@@ -301,6 +311,12 @@
       Next ▶
     </button>
   </div>
+
+  <div style="text-align:center; margin-top:.5rem;">
+  <button id="testConfettiBtn" style="padding:.5rem .75rem; font-size:.8rem; border-radius:.5rem; border:1px solid #aaa; background:#fff; cursor:pointer;">
+    🎉 Test Confetti
+  </button>
+</div>
 
   <div class="section-title">Decode the Phrase</div>
   <div class="phrase-wrapper" id="phraseArea"></div>
@@ -1056,6 +1072,13 @@
     }
 
     init();
+
+    const testConfettiBtn = document.getElementById("testConfettiBtn");
+if (testConfettiBtn) {
+  testConfettiBtn.addEventListener("click", () => {
+    launchConfetti();
+  });
+}
 
     // After init, hook up buttons
     if (prevBtn) {

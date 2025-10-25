@@ -961,24 +961,26 @@ h2 {
 // ---------- CONFETTI ENGINE (canvas-based) ----------
 
 // We'll keep a single particle burst at a time.
+// ---------- CONFETTI ENGINE (canvas-based) ----------
 function launchConfetti() {
-  // block auto-repeat on win unless manually forced with Test Confetti
+  // block repeat on win unless forced from the Test Confetti button
   if (hasCelebrated && !window._forceConfetti) return;
   hasCelebrated = true;
 
-  // 1. Show the big "YOU SOLVED IT!" message
+  //
+  // 0. "YOU SOLVED IT!" overlay
+  //
   const msg = document.getElementById("solvedMessage");
   if (msg) {
-    // force it on
     msg.classList.add("show");
-
-    // hide it after 2.5s
     setTimeout(() => {
       msg.classList.remove("show");
     }, 2500);
   }
 
-  // 2. Confetti canvas setup
+  //
+  // 1. Canvas setup
+  //
   const canvas = document.getElementById("confettiCanvas");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
@@ -989,36 +991,19 @@ function launchConfetti() {
   }
   resizeCanvas();
 
-  // ... keep the rest of the particle code exactly as before ...
-
-
-  // show "YOU SOLVED IT" message
-const msg = document.getElementById("solvedMessage");
-if (msg) {
-  msg.classList.add("show");
-  // fade it out after 2.5 seconds
-  setTimeout(() => {
-    msg.classList.remove("show");
-  }, 2500);
-}
-  
-  // -----------------------
-  // 1. Create particle sprites (offscreen emoji bitmaps)
-  // -----------------------
-
+  //
+  // 2. Pre-render emoji sprites for perf
+  //
   const EMOJIS = [
     "🎉","🎊","✨","💥","💫","🌟","🔥","🤩","😎","🦄",
     "🦊","🐸","🪐","🎲","🚀","★","🔮","🧊","🐙","🌸",
-    "🦩","🐢","🪼","🐍", "🏵️"
+    "🦩","🐢","🪼","🐍","🏵️"
   ];
 
-  // We'll pre-render each emoji at a base size to its own tiny canvas.
-  // That way in the main loop we're just drawing images, which is fast.
   function makeEmojiSprite(char, sizePx) {
     const off = document.createElement("canvas");
     const offCtx = off.getContext("2d");
 
-    // give padding so rotation doesn't clip
     const pad = sizePx;
     off.width = sizePx + pad * 2;
     off.height = sizePx + pad * 2;
@@ -1031,51 +1016,42 @@ if (msg) {
     return {
       canvas: off,
       w: off.width,
-      h: off.height,
-      baseSize: sizePx
+      h: off.height
     };
   }
 
-  // cache a few sprite sizes so particles can reuse them
+  // build sprite variants (random sizes)
   const SPRITES = [];
   for (let i = 0; i < EMOJIS.length; i++) {
-    // randomize size a little so the burst isn't uniform
     const sizePx = 28 + Math.random() * 10; // 28-38px
     SPRITES.push(makeEmojiSprite(EMOJIS[i], sizePx));
   }
 
-  // -----------------------
-  // 2. Build particles
-  // -----------------------
-
+  //
+  // 3. Build particles
+  //
   const particles = [];
-  const COUNT = 60; // slightly fewer for smoother perf
+  const COUNT = 60; // can bump up/down
 
-  // origin = bottom center
   const originX = canvas.width * 0.5;
   const originY = canvas.height * 0.9;
 
   for (let i = 0; i < COUNT; i++) {
     const sprite = SPRITES[Math.floor(Math.random() * SPRITES.length)];
 
-    // Angle between -150° and -30° so they all go upward/outward
-    const angleDeg = -150 + Math.random() * 120; // -150..-30
+    // Upward fanburst: -150deg .. -30deg (no downward shots)
+    const angleDeg = -150 + Math.random() * 120;
     const angleRad = angleDeg * Math.PI / 180;
 
     // Speed in px/sec
     const speed = 550 + Math.random() * 450; // 550-1000
 
-    // Velocity components
     const vx = Math.cos(angleRad) * speed;
     const vy = Math.sin(angleRad) * speed;
 
-    // Spin speed (deg/sec)
-    const spinSpeed = (Math.random() * 720 - 360);
+    const spinSpeed = (Math.random() * 720 - 360); // deg/sec
+    const life = 2200 + Math.random() * 400;       // ms
 
-    // How long it lives (ms)
-    const life = 2200 + Math.random() * 400; // 2.2s - 2.6s
-
-    // Start jitter
     const startX = originX + (Math.random() - 0.5) * 30;
     const startY = originY + (Math.random() - 0.5) * 15;
 
@@ -1090,25 +1066,23 @@ if (msg) {
       scaleStart: 1.0,
       scaleEnd: 0.5,
       alpha: 1,
-      age: 0,     // ms since birth
+      age: 0,
       life,
       dead: false
     });
   }
 
-  // -----------------------
-  // 3. Animate with delta time for smoothness
-  // -----------------------
-
+  //
+  // 4. Animate with delta time
+  //
   let running = true;
   let prevTS = performance.now();
 
   function frame(now) {
     if (!running) return;
-    const dt = now - prevTS; // ms since last frame
+    const dt = now - prevTS;
     prevTS = now;
 
-    // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     let aliveCount = 0;
@@ -1116,7 +1090,6 @@ if (msg) {
     for (const p of particles) {
       if (p.dead) continue;
 
-      // advance particle
       p.age += dt;
       if (p.age >= p.life) {
         p.dead = true;
@@ -1126,27 +1099,26 @@ if (msg) {
 
       const tNorm = p.age / p.life; // 0 -> 1
 
-      // position update using velocity and dt (smooth motion, independent of frame hiccups)
+      // move
       p.x += p.vx * (dt / 1000);
       p.y += p.vy * (dt / 1000);
 
-      // no gravity at all = no pooling at bottom
-      // could add very tiny upward bias if you want longer lift, but not needed
-
-      // spin update
+      // spin
       p.spin += p.spinSpeed * (dt / 1000);
 
-      // scale shrinks over life
+      // scale tween
       const scale = p.scaleStart + (p.scaleEnd - p.scaleStart) * tNorm;
 
-      // alpha: stay solid until 70%, then fade out by 100%
+      // alpha tween: solid first 70%, then fade
+      let alpha;
       if (tNorm < 0.7) {
-        p.alpha = 1;
+        alpha = 1;
       } else {
         const tail = (tNorm - 0.7) / 0.3; // 0..1
-        p.alpha = 1 - tail;
-        if (p.alpha < 0) p.alpha = 0;
+        alpha = 1 - tail;
+        if (alpha < 0) alpha = 0;
       }
+      p.alpha = alpha;
 
       // draw
       ctx.save();
@@ -1154,8 +1126,6 @@ if (msg) {
       ctx.translate(p.x, p.y);
       ctx.rotate(p.spin * Math.PI / 180);
       ctx.scale(scale, scale);
-
-      // center the sprite so rotation happens around middle
       ctx.drawImage(
         p.sprite.canvas,
         -p.sprite.w / 2,
@@ -1163,12 +1133,10 @@ if (msg) {
         p.sprite.w,
         p.sprite.h
       );
-
       ctx.restore();
     }
 
     if (aliveCount === 0) {
-      // done: clear and stop
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       running = false;
       return;

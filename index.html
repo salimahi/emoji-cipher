@@ -247,6 +247,7 @@
       text-decoration:none;
     }
     /* celebration confetti */
+/* celebration confetti */
 #confettiLayer {
   pointer-events: none;
   position: fixed;
@@ -254,26 +255,26 @@
   top: 0;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
+  overflow: visible;
   z-index: 9999;
 }
 
 .confetti-emoji {
   position: absolute;
   font-size: 2rem;
-  animation-name: fall-spin;
-  animation-timing-function: linear;
+  will-change: transform, opacity;
+  animation-timing-function: ease-out;
   animation-iteration-count: 1;
+  animation-fill-mode: forwards;
 }
-
-@keyframes fall-spin {
+@keyframes burst-fade {
   0% {
-    transform: translate3d(var(--x-start), -10vh, 0) rotate(0deg) scale(1);
     opacity: 1;
+    transform: translate3d(var(--x-start), var(--y-start), 0) scale(1) rotate(0deg);
   }
   100% {
-    transform: translate3d(var(--x-end), 110vh, 0) rotate(720deg) scale(0.8);
     opacity: 0;
+    transform: translate3d(var(--x-end), var(--y-end), 0) scale(0.6) rotate(540deg);
   }
 }
 
@@ -291,12 +292,25 @@
     Good Luck!
   </div>
 
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem; gap:.5rem;">
+  <button id="prevBtn" style="flex:1; padding:.75rem 1rem; font-size:1rem; border-radius:.5rem; border:1px solid #999; background:#fff; cursor:pointer;">
+    ◀ Previous
+  </button>
+  <div id="puzzleLabel" style="flex:0; font-size:.9rem; font-weight:600; color:#555; text-align:center; white-space:nowrap;">
+    Puzzle 1 / 10
+  </div>
+  <button id="nextBtn" style="flex:1; padding:.75rem 1rem; font-size:1rem; border-radius:.5rem; border:1px solid #999; background:#fff; cursor:pointer;">
+    Next ▶
+  </button>
+</div>
+
   <div class="section-title">Decode the Phrase</div>
   <div class="phrase-wrapper" id="phraseArea"></div>
 
   <div class="section-title">Crack the Math</div>
   <div class="equations-wrapper" id="equationsArea"></div>
 
+  <!--
   <div class="section-title">Solution Key (auto-fills as you solve)</div>
   <div class="solution-box" id="solutionBox">
     <div class="solution-hint">Solve any letter or number to unlock its pair:</div>
@@ -306,6 +320,7 @@
   <div class="win-box" id="winBox">
     ✅ You solved it!
   </div>
+  -->
 
   <footer>
     Emoji Cipher™ © 2025 Salimah Ismail.<br>
@@ -682,8 +697,10 @@
       }
     ];
 
-    // Pick a random puzzle on load
-    const currentPuzzle = PUZZLES[Math.floor(Math.random() * PUZZLES.length)];
+    // Put Puzzles in Order
+    let currentIndex = 0; // start at puzzle 0
+    let currentPuzzle = PUZZLES[currentIndex];
+
 
     // Track solve state for each emoji
     // { "🦊": {letter:"", number:"", solved:false}, ... }
@@ -697,8 +714,11 @@
     // DOM refs
     const phraseArea    = document.getElementById("phraseArea");
     const equationsArea = document.getElementById("equationsArea");
-    const solutionLines = document.getElementById("solutionLines");
-    const winBox        = document.getElementById("winBox");
+    const solutionLines = document.getElementById("solutionLines"); //may be null now
+    const winBox        = document.getElementById("winBox"); //may be null now
+    const prevBtn      = document.getElementById("prevBtn");
+    const nextBtn      = document.getElementById("nextBtn");
+    const puzzleLabel  = document.getElementById("puzzleLabel");
 
     // Render PHRASE
     // Each word:
@@ -822,7 +842,8 @@
     // Render SOLUTION KEY
     // For each solved emoji, show "🦊 = C = 3"
     function renderSolutionBox(){
-      solutionLines.innerHTML = "";
+      if (!solutionLines) return; // box hidden
+  solutionLines.innerHTML = "";
       currentPuzzle.uniqueEmojis.forEach(em=>{
         const st = playerState[em];
         if(st.solved){
@@ -967,51 +988,73 @@
     }
 
     function launchConfetti() {
-  if (hasCelebrated) return; // don't run twice
+  if (hasCelebrated) return;
   hasCelebrated = true;
 
   const layer = document.getElementById("confettiLayer");
   if (!layer) return;
 
-  // pick some fun emojis for the celebration
-  const confettiEmojis = ["🎉","✨","🎊","💥","🌟","💫","🔥","😎","🤩","🦄"];
+  // MUCH larger pool, including puzzle-ish symbols and hype emojis
+  const confettiEmojis = [
+    "🎉","🎊","✨","💥","💫","🌟","🔥","🤩","😎","🦄",
+    "🦊","🐸","🪐","🎲","🚀","🌵","🔮","🧊","🐙","🍄","🦴","🐢","🪼","🐍"
+  ];
 
-  const howMany = 30; // number of pieces to drop
+  // Spawn more particles for bigger celebration
+  const howMany = 60;
+
   for (let i = 0; i < howMany; i++) {
     const piece = document.createElement("div");
     piece.className = "confetti-emoji";
-
-    // pick an emoji
     piece.textContent = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
 
-    // random horizontal start position across viewport
-    const startXvw = Math.random() * 100; // 0 to 100vw
-    // give it a little horizontal drift so it doesn't fall straight down
-    const endXvw = startXvw + (Math.random()*20 - 10); // +/-10vw
+    // Start near bottom center
+    // We'll express start position in viewport units so it scales
+    const startXvw = 50;                 // middle of screen
+    const startYvh = 90 + Math.random()*4; // around bottom (90-94vh)
 
-    // random fall duration (longer = slower float)
-    const duration = 1500 + Math.random() * 1500; // 1.5s - 3s
+    // Pick a launch angle and distance
+    // angle between, say, -75deg (up-left) to -105deg (up-right) gives narrow cone,
+    // but you asked "all corners", so let's go wide: -40deg (up-right-ish) to -140deg (up-left-ish)
+    const angleDeg = -40 - Math.random()*100; // -40 to -140
+    const angleRad = angleDeg * Math.PI / 180;
 
-    // custom properties for keyframes to use
+    // speed magnitude (how far it travels)
+    const distanceVh = 40 + Math.random()*30; // 40-70vh "height" of travel
+    // convert polar to x/y deltas in viewport units
+    const dxVw = Math.cos(angleRad) * (distanceVh * 0.6); // scale to vw-ish
+    const dyVh = Math.sin(angleRad) * distanceVh; // negative (goes up)
+
+    // end positions
+    const endXvw = startXvw + dxVw;
+    const endYvh = startYvh + dyVh; // should be much smaller vh (toward top)
+
+    // animation timing
+    const duration = 800 + Math.random()*700; // 0.8s - 1.5s
+    const delay    = Math.random()*100;       // up to 0.1s
+
+    // feed the keyframe custom props
     piece.style.setProperty('--x-start', startXvw + 'vw');
-    piece.style.setProperty('--x-end', endXvw + 'vw');
+    piece.style.setProperty('--y-start', startYvh + 'vh');
+    piece.style.setProperty('--x-end',   endXvw  + 'vw');
+    piece.style.setProperty('--y-end',   endYvh  + 'vh');
 
-    // random delay so they don't all drop in the same exact millisecond
-    const delay = Math.random() * 300; // up to 0.3s
-
+    // hook into animation
     piece.style.left = startXvw + "vw";
-    piece.style.top = "-10vh";
+    piece.style.top  = startYvh + "vh";
+    piece.style.animationName = "burst-fade";
     piece.style.animationDuration = duration + "ms";
-    piece.style.animationDelay = delay + "ms";
+    piece.style.animationDelay    = delay + "ms";
 
     layer.appendChild(piece);
 
-    // cleanup after animation so DOM doesn't fill forever
+    // cleanup after it's done
     setTimeout(() => {
       piece.remove();
     }, duration + delay + 200);
   }
 }
+
 
     // Check win:
     // - phrase must be fully revealed AND match puzzle.phrase
@@ -1029,21 +1072,60 @@
   });
 
   if (phraseDone && allEqCorrect) {
+  if (winBox) {
     winBox.style.display = "block";
-    launchConfetti();
-  } else {
+  }
+  launchConfetti();
+} else {
+  if (winBox) {
     winBox.style.display = "none";
+  }
+}
+
+      /*Load Puzzle */
+function loadPuzzle(index){
+  if (index < 0) index = 0;
+  if (index > PUZZLES.length - 1) index = PUZZLES.length - 1;
+  currentIndex = index;
+  currentPuzzle = PUZZLES[currentIndex];
+  hasCelebrated = false;
+
+  // reset state
+  for (const key of Object.keys(playerState)) {
+    delete playerState[key];
+  }
+  currentPuzzle.uniqueEmojis.forEach(em=>{
+    playerState[em] = { letter:"", number:"", solved:false };
+  });
+
+  // re-render
+  renderPhrase();
+  renderEquations();
+  renderSolutionBox();
+
+  // update label
+  if (puzzleLabel) {
+    puzzleLabel.textContent = `Puzzle ${currentIndex+1} / ${PUZZLES.length}`;
   }
 }
 
     // Init
     function init(){
-      renderPhrase();
-      renderEquations();
-      renderSolutionBox(); // starts empty
-    }
-
+  loadPuzzle(0); // start on the first puzzle
+}
     init();
+
+      if (prevBtn) {
+  prevBtn.addEventListener("click", ()=>{
+    loadPuzzle(currentIndex - 1);
+  });
+}
+if (nextBtn) {
+  nextBtn.addEventListener("click", ()=>{
+    loadPuzzle(currentIndex + 1);
+  });
+}
+
 
   })();
   </script>

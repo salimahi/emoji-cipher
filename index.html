@@ -348,896 +348,850 @@ h2 {
 
   <div id="solvedMessage">YOU SOLVED IT!</div>
 
-  <script>
-  (function(){
+<script>
+(function(){
 
-    // -----------------------
-    // 1. PUZZLES
-    // -----------------------
-    const PUZZLES = [
-      // 1. COOL GAME BRO
-      {
-        phrase: "COOL GAME BRO",
-        phraseWords: [
-          ["🦊","🪐","🪐","🐸"],        // COOL
-          ["🚀","🌵","🎲","🔮"],        // GAME
-          ["🧊","🐙","🪐"]             // BRO
-        ],
-        mapping: {
-          "🦊": { letter:"C", number:3 },
-          "🪐": { letter:"O", number:8 },
-          "🐸": { letter:"L", number:4 },
-          "🚀": { letter:"G", number:7 },
-          "🌵": { letter:"A", number:1 },
-          "🎲": { letter:"M", number:6 },
-          "🔮": { letter:"E", number:2 },
-          "🧊": { letter:"B", number:5 },
-          "🐙": { letter:"R", number:9 }
-        },
-        uniqueEmojis: ["🦊","🪐","🐸","🚀","🌵","🎲","🔮","🧊","🐙"],
-        equations: [
-          { left:["🦊","+","🪐"], target:11 },
-          { left:["🪐","+","🐸"], target:12 },
-          { left:["🚀","+","🌵","+","🎲"], target:14 },
-          { left:["🎲","+","🔮"], target:8 },
-          { left:["🧊","+","🌵"], target:6 },
-          { left:["🐙","+","🌵"], target:10 }
-        ]
+  // -----------------------
+  // 1. PUZZLES
+  // -----------------------
+  const PUZZLES = [
+    {
+      phrase: "COOL GAME BRO",
+      phraseWords: [
+        ["🦊","🪐","🪐","🐸"],
+        ["🚀","🌵","🎲","🔮"],
+        ["🧊","🐙","🪐"]
+      ],
+      mapping: {
+        "🦊": { letter:"C", number:3 },
+        "🪐": { letter:"O", number:8 },
+        "🐸": { letter:"L", number:4 },
+        "🚀": { letter:"G", number:7 },
+        "🌵": { letter:"A", number:1 },
+        "🎲": { letter:"M", number:6 },
+        "🔮": { letter:"E", number:2 },
+        "🧊": { letter:"B", number:5 },
+        "🐙": { letter:"R", number:9 }
       },
-
-      // 2. IT IS NAP TIME
-      {
-        phrase: "IT IS NAP TIME",
-        phraseWords: [
-          ["🍄","🧊"],                // IT
-          ["🍄","🐸"],                // IS
-          ["🐙","🌵","🦊"],           // NAP
-          ["🧊","🍄","🎲","🔮"]       // TIME
-        ],
-        mapping: {
-          "🍄": { letter:"I", number:4 },
-          "🧊": { letter:"T", number:9 },
-          "🐸": { letter:"S", number:2 },
-          "🐙": { letter:"N", number:5 },
-          "🌵": { letter:"A", number:1 },
-          "🦊": { letter:"P", number:7 },
-          "🎲": { letter:"M", number:6 },
-          "🔮": { letter:"E", number:3 }
-        },
-        uniqueEmojis: ["🍄","🧊","🐸","🐙","🌵","🦊","🎲","🔮"],
-        equations: [
-          { left:["🍄","+","🧊"], target:13 },
-          { left:["🐸","+","🐙"], target:7 },
-          { left:["🌵","+","🦊"], target:8 },
-          { left:["🎲","+","🔮"], target:9 },
-          { left:["🧊","+","🎲"], target:15 }
-        ]
+      uniqueEmojis: ["🦊","🪐","🐸","🚀","🌵","🎲","🔮","🧊","🐙"],
+      equations: [
+        { left:["🦊","+","🪐"], target:11 },
+        { left:["🪐","+","🐸"], target:12 },
+        { left:["🚀","+","🌵","+","🎲"], target:14 },
+        { left:["🎲","+","🔮"], target:8 },
+        { left:["🧊","+","🌵"], target:6 },
+        { left:["🐙","+","🌵"], target:10 }
+      ]
+    },
+    {
+      phrase: "IT IS NAP TIME",
+      phraseWords: [
+        ["🍄","🧊"],
+        ["🍄","🐸"],
+        ["🐙","🌵","🦊"],
+        ["🧊","🍄","🎲","🔮"]
+      ],
+      mapping: {
+        "🍄": { letter:"I", number:4 },
+        "🧊": { letter:"T", number:9 },
+        "🐸": { letter:"S", number:2 },
+        "🐙": { letter:"N", number:5 },
+        "🌵": { letter:"A", number:1 },
+        "🦊": { letter:"P", number:7 },
+        "🎲": { letter:"M", number:6 },
+        "🔮": { letter:"E", number:3 }
       },
-
-      // 3. HERBAL OR VERBAL TEA
-      {
-        phrase: "HERBAL OR VERBAL TEA",
-        phraseWords: [
-          ["🪐","🔮","🌊","🚀","🌵","🐙"],   // HERBAL
-          ["🎲","🌊"],                    // OR
-          ["🦊","🔮","🌊","🚀","🌵","🐙"],  // VERBAL
-          ["🧊","🔮","🌵"]                // TEA
-        ],
-        mapping: {
-          "🪐": { letter:"H", number:4 },
-          "🔮": { letter:"E", number:2 },
-          "🌊": { letter:"R", number:9 },
-          "🚀": { letter:"B", number:5 },
-          "🌵": { letter:"A", number:1 },
-          "🐙": { letter:"L", number:7 },
-          "🎲": { letter:"O", number:6 },
-          "🦊": { letter:"V", number:8 },
-          "🧊": { letter:"T", number:3 }
-        },
-        uniqueEmojis: ["🪐","🔮","🌊","🚀","🌵","🐙","🎲","🦊","🧊"],
-        equations: [
-          { left:["🪐","+","🔮"], target:6 },
-          { left:["🌊","+","🚀"], target:14 },
-          { left:["🌵","+","🐙"], target:8 },
-          { left:["🎲","+","🌊"], target:15 },
-          { left:["🦊","+","🔮"], target:10 },
-          { left:["🧊","+","🔮","+","🌵"], target:6 }
-        ]
+      uniqueEmojis: ["🍄","🧊","🐸","🐙","🌵","🦊","🎲","🔮"],
+      equations: [
+        { left:["🍄","+","🧊"], target:13 },
+        { left:["🐸","+","🐙"], target:7 },
+        { left:["🌵","+","🦊"], target:8 },
+        { left:["🎲","+","🔮"], target:9 },
+        { left:["🧊","+","🎲"], target:15 }
+      ]
+    },
+    {
+      phrase: "HERBAL OR VERBAL TEA",
+      phraseWords: [
+        ["🪐","🔮","🌊","🚀","🌵","🐙"],
+        ["🎲","🌊"],
+        ["🦊","🔮","🌊","🚀","🌵","🐙"],
+        ["🧊","🔮","🌵"]
+      ],
+      mapping: {
+        "🪐": { letter:"H", number:4 },
+        "🔮": { letter:"E", number:2 },
+        "🌊": { letter:"R", number:9 },
+        "🚀": { letter:"B", number:5 },
+        "🌵": { letter:"A", number:1 },
+        "🐙": { letter:"L", number:7 },
+        "🎲": { letter:"O", number:6 },
+        "🦊": { letter:"V", number:8 },
+        "🧊": { letter:"T", number:3 }
       },
-
-      // 4. ADDICTED TO RAGEAHOL
-      {
-        phrase: "ADDICTED TO RAGEAHOL",
-        phraseWords: [
-          ["🌵","🎲","🎲","🍄","🦊","🧊","🔮","🎲"], // ADDICTED
-          ["🧊","🎲"],                             // TO
-          ["🌊","🌵","🚀","🔮","🌵","🐸","🎲","🐙"]  // RAGEAHOL
-        ],
-        mapping: {
-          "🌵": { letter:"A", number:1 },
-          "🎲": { letter:"D", number:7 },
-          "🍄": { letter:"I", number:4 },
-          "🦊": { letter:"C", number:8 },
-          "🧊": { letter:"T", number:9 },
-          "🔮": { letter:"E", number:3 },
-          "🌊": { letter:"R", number:5 },
-          "🚀": { letter:"G", number:2 },
-          "🐸": { letter:"H", number:4 },
-          "🐙": { letter:"L", number:8 }
-        },
-        uniqueEmojis: ["🌵","🎲","🍄","🦊","🧊","🔮","🌊","🚀","🐸","🐙"],
-        equations: [
-          { left:["🌵","+","🎲"], target:8 },
-          { left:["🎲","+","🍄"], target:11 },
-          { left:["🦊","+","🧊"], target:17 },
-          { left:["🔮","+","🎲"], target:10 },
-          { left:["🌊","+","🌵","+","🚀"], target:8 },
-          { left:["🐸","+","🎲"], target:11 },
-          { left:["🎲","+","🐙"], target:15 }
-        ]
+      uniqueEmojis: ["🪐","🔮","🌊","🚀","🌵","🐙","🎲","🦊","🧊"],
+      equations: [
+        { left:["🪐","+","🔮"], target:6 },
+        { left:["🌊","+","🚀"], target:14 },
+        { left:["🌵","+","🐙"], target:8 },
+        { left:["🎲","+","🌊"], target:15 },
+        { left:["🦊","+","🔮"], target:10 },
+        { left:["🧊","+","🔮","+","🌵"], target:6 }
+      ]
+    },
+    {
+      phrase: "ADDICTED TO RAGEAHOL",
+      phraseWords: [
+        ["🌵","🎲","🎲","🍄","🦊","🧊","🔮","🎲"],
+        ["🧊","🎲"],
+        ["🌊","🌵","🚀","🔮","🌵","🐸","🎲","🐙"]
+      ],
+      mapping: {
+        "🌵": { letter:"A", number:1 },
+        "🎲": { letter:"D", number:7 },
+        "🍄": { letter:"I", number:4 },
+        "🦊": { letter:"C", number:8 },
+        "🧊": { letter:"T", number:9 },
+        "🔮": { letter:"E", number:3 },
+        "🌊": { letter:"R", number:5 },
+        "🚀": { letter:"G", number:2 },
+        "🐸": { letter:"H", number:4 },
+        "🐙": { letter:"L", number:8 }
       },
-
-      // 5. I BARELY EVEN KNOW HER (FIXED)
-      {
-        phrase: "I BARELY EVEN KNOW HER",
-        phraseWords: [
-          ["🍄"],                                         // I
-          ["🚀","🌵","🌊","🔮","🐙","🧊"],                 // BARELY
-          ["🔮","🎲","🔮","🪐"],                           // EVEN
-          ["🦊","🪐","🐸","🦴"],                           // KNOW
-          ["🐢","🔮","🌊"]                                // HER
-        ],
-        mapping: {
-          "🍄": { letter:"I", number:4 },
-          "🚀": { letter:"B", number:6 },
-          "🌵": { letter:"A", number:1 },
-          "🌊": { letter:"R", number:9 },
-          "🔮": { letter:"E", number:2 },
-          "🐙": { letter:"L", number:7 },
-          "🧊": { letter:"Y", number:8 },
-          "🎲": { letter:"V", number:5 },
-          "🪐": { letter:"N", number:3 },
-          "🦊": { letter:"K", number:4 },
-          "🐸": { letter:"O", number:6 },
-          "🦴": { letter:"W", number:2 },
-          "🐢": { letter:"H", number:5 }
-        },
-        uniqueEmojis: ["🍄","🚀","🌵","🌊","🔮","🐙","🧊","🎲","🪐","🦊","🐸","🦴","🐢"],
-        equations: [
-          { left:["🍄","+","🚀"], target:10 },
-          { left:["🌵","+","🌊"], target:10 },
-          { left:["🔮","+","🐙","+","🧊"], target:17 },
-          { left:["🔮","+","🎲"], target:7 },
-          { left:["🦊","+","🪐","+","🐸","+","🦴"], target:15 },
-          { left:["🐢","+","🔮"], target:7 }
-        ]
+      uniqueEmojis: ["🌵","🎲","🍄","🦊","🧊","🔮","🌊","🚀","🐸","🐙"],
+      equations: [
+        { left:["🌵","+","🎲"], target:8 },
+        { left:["🎲","+","🍄"], target:11 },
+        { left:["🦊","+","🧊"], target:17 },
+        { left:["🔮","+","🎲"], target:10 },
+        { left:["🌊","+","🌵","+","🚀"], target:8 },
+        { left:["🐸","+","🎲"], target:11 },
+        { left:["🎲","+","🐙"], target:15 }
+      ]
+    },
+    {
+      phrase: "I BARELY EVEN KNOW HER",
+      phraseWords: [
+        ["🍄"],
+        ["🚀","🌵","🌊","🔮","🐙","🧊"],
+        ["🔮","🎲","🔮","🪐"],
+        ["🦊","🪐","🐸","🦴"],
+        ["🐢","🔮","🌊"]
+      ],
+      mapping: {
+        "🍄": { letter:"I", number:4 },
+        "🚀": { letter:"B", number:6 },
+        "🌵": { letter:"A", number:1 },
+        "🌊": { letter:"R", number:9 },
+        "🔮": { letter:"E", number:2 },
+        "🐙": { letter:"L", number:7 },
+        "🧊": { letter:"Y", number:8 },
+        "🎲": { letter:"V", number:5 },
+        "🪐": { letter:"N", number:3 },
+        "🦊": { letter:"K", number:4 },
+        "🐸": { letter:"O", number:6 },
+        "🦴": { letter:"W", number:2 },
+        "🐢": { letter:"H", number:5 }
       },
-
-      // 6. SEND MORE KITTENS
-      {
-        phrase: "SEND MORE KITTENS",
-        phraseWords: [
-          ["🦊","🐸","🪐","🎲"],               // SEND
-          ["🚀","🔮","🌵","🐸"],               // MORE
-          ["🧊","🍄","🦴","🦴","🐸","🪼","🐍"] // KITTENS
-        ],
-        mapping: {
-          "🦊": { letter:"S", number:6 },
-          "🐸": { letter:"E", number:2 },
-          "🪐": { letter:"N", number:5 },
-          "🎲": { letter:"D", number:4 },
-          "🚀": { letter:"M", number:7 },
-          "🔮": { letter:"O", number:8 },
-          "🌵": { letter:"R", number:3 },
-          "🧊": { letter:"K", number:9 },
-          "🍄": { letter:"I", number:1 },
-          "🦴": { letter:"T", number:4 },
-          "🪼": { letter:"N", number:5 },
-          "🐍": { letter:"S", number:6 }
-        },
-        uniqueEmojis: ["🦊","🐸","🪐","🎲","🚀","🔮","🌵","🧊","🍄","🦴","🪼","🐍"],
-        equations: [
-          { left:["🦊","+","🐸"], target:8 },
-          { left:["🐸","+","🪐","+","🎲"], target:11 },
-          { left:["🚀","+","🔮"], target:15 },
-          { left:["🌵","+","🐸"], target:5 },
-          { left:["🧊","+","🍄"], target:10 },
-          { left:["🦴","+","🦴"], target:8 },
-          { left:["🐸","+","🪼","+","🐍"], target:13 }
-        ]
+      uniqueEmojis: ["🍄","🚀","🌵","🌊","🔮","🐙","🧊","🎲","🪐","🦊","🐸","🦴","🐢"],
+      equations: [
+        { left:["🍄","+","🚀"], target:10 },
+        { left:["🌵","+","🌊"], target:10 },
+        { left:["🔮","+","🐙","+","🧊"], target:17 },
+        { left:["🔮","+","🎲"], target:7 },
+        { left:["🦊","+","🪐","+","🐸","+","🦴"], target:15 },
+        { left:["🐢","+","🔮"], target:7 }
+      ]
+    },
+    {
+      phrase: "SEND MORE KITTENS",
+      phraseWords: [
+        ["🦊","🐸","🪐","🎲"],
+        ["🚀","🔮","🌵","🐸"],
+        ["🧊","🍄","🦴","🦴","🐸","🪼","🐍"]
+      ],
+      mapping: {
+        "🦊": { letter:"S", number:6 },
+        "🐸": { letter:"E", number:2 },
+        "🪐": { letter:"N", number:5 },
+        "🎲": { letter:"D", number:4 },
+        "🚀": { letter:"M", number:7 },
+        "🔮": { letter:"O", number:8 },
+        "🌵": { letter:"R", number:3 },
+        "🧊": { letter:"K", number:9 },
+        "🍄": { letter:"I", number:1 },
+        "🦴": { letter:"T", number:4 },
+        "🪼": { letter:"N", number:5 },
+        "🐍": { letter:"S", number:6 }
       },
-
-      // 7. CAUGHT A VIBE
-      {
-        phrase: "CAUGHT A VIBE",
-        phraseWords: [
-          ["🌵","🐙","🚀","🦊","🐸","🧊"], // CAUGHT
-          ["🐙"],                        // A
-          ["🎲","🔮","🪐","🦴"]          // VIBE
-        ],
-        mapping: {
-          "🌵": { letter:"C", number:2 },
-          "🐙": { letter:"A", number:1 },
-          "🚀": { letter:"U", number:6 },
-          "🦊": { letter:"G", number:7 },
-          "🐸": { letter:"H", number:4 },
-          "🧊": { letter:"T", number:9 },
-          "🎲": { letter:"V", number:8 },
-          "🔮": { letter:"I", number:3 },
-          "🪐": { letter:"B", number:5 },
-          "🦴": { letter:"E", number:2 }
-        },
-        uniqueEmojis: ["🌵","🐙","🚀","🦊","🐸","🧊","🎲","🔮","🪐","🦴"],
-        equations: [
-          { left:["🌵","+","🐙"], target:3 },
-          { left:["🚀","+","🦊"], target:13 },
-          { left:["🐸","+","🧊"], target:13 },
-          { left:["🎲","+","🔮"], target:11 },
-          { left:["🪐","+","🦴"], target:7 },
-          { left:["🐙","+","🎲"], target:9 }
-        ]
+      uniqueEmojis: ["🦊","🐸","🪐","🎲","🚀","🔮","🌵","🧊","🍄","🦴","🪼","🐍"],
+      equations: [
+        { left:["🦊","+","🐸"], target:8 },
+        { left:["🐸","+","🪐","+","🎲"], target:11 },
+        { left:["🚀","+","🔮"], target:15 },
+        { left:["🌵","+","🐸"], target:5 },
+        { left:["🧊","+","🍄"], target:10 },
+        { left:["🦴","+","🦴"], target:8 },
+        { left:["🐸","+","🪼","+","🐍"], target:13 }
+      ]
+    },
+    {
+      phrase: "CAUGHT A VIBE",
+      phraseWords: [
+        ["🌵","🐙","🚀","🦊","🐸","🧊"],
+        ["🐙"],
+        ["🎲","🔮","🪐","🦴"]
+      ],
+      mapping: {
+        "🌵": { letter:"C", number:2 },
+        "🐙": { letter:"A", number:1 },
+        "🚀": { letter:"U", number:6 },
+        "🦊": { letter:"G", number:7 },
+        "🐸": { letter:"H", number:4 },
+        "🧊": { letter:"T", number:9 },
+        "🎲": { letter:"V", number:8 },
+        "🔮": { letter:"I", number:3 },
+        "🪐": { letter:"B", number:5 },
+        "🦴": { letter:"E", number:2 }
       },
-
-      // 8. A CENTER FOR ANTS
-      {
-        phrase: "A CENTER FOR ANTS",
-        phraseWords: [
-          ["🐙"],                                  // A
-          ["🧊","🌵","🦴","🔮","🌵","🎲"],          // CENTER
-          ["🪐","🐸","🎲"],                         // FOR
-          ["🐙","🦴","🔮","🚀"]                     // ANTS
-        ],
-        mapping: {
-          "🐙": { letter:"A", number:1 },
-          "🧊": { letter:"C", number:6 },
-          "🌵": { letter:"E", number:2 },
-          "🦴": { letter:"N", number:5 },
-          "🔮": { letter:"T", number:9 },
-          "🎲": { letter:"R", number:4 },
-          "🪐": { letter:"F", number:7 },
-          "🐸": { letter:"O", number:8 },
-          "🚀": { letter:"S", number:3 }
-        },
-        uniqueEmojis: ["🐙","🧊","🌵","🦴","🔮","🎲","🪐","🐸","🚀"],
-        equations: [
-          { left:["🧊","+","🌵"], target:8 },
-          { left:["🦴","+","🔮"], target:14 },
-          { left:["🌵","+","🎲"], target:6 },
-          { left:["🪐","+","🐸"], target:15 },
-          { left:["🎲","+","🐙"], target:5 },
-          { left:["🐙","+","🦴","+","🔮","+","🚀"], target:18 }
-        ]
+      uniqueEmojis: ["🌵","🐙","🚀","🦊","🐸","🧊","🎲","🔮","🪐","🦴"],
+      equations: [
+        { left:["🌵","+","🐙"], target:3 },
+        { left:["🚀","+","🦊"], target:13 },
+        { left:["🐸","+","🧊"], target:13 },
+        { left:["🎲","+","🔮"], target:11 },
+        { left:["🪐","+","🦴"], target:7 },
+        { left:["🐙","+","🎲"], target:9 }
+      ]
+    },
+    {
+      phrase: "A CENTER FOR ANTS",
+      phraseWords: [
+        ["🐙"],
+        ["🧊","🌵","🦴","🔮","🌵","🎲"],
+        ["🪐","🐸","🎲"],
+        ["🐙","🦴","🔮","🚀"]
+      ],
+      mapping: {
+        "🐙": { letter:"A", number:1 },
+        "🧊": { letter:"C", number:6 },
+        "🌵": { letter:"E", number:2 },
+        "🦴": { letter:"N", number:5 },
+        "🔮": { letter:"T", number:9 },
+        "🎲": { letter:"R", number:4 },
+        "🪐": { letter:"F", number:7 },
+        "🐸": { letter:"O", number:8 },
+        "🚀": { letter:"S", number:3 }
       },
-
-      // 9. BY DOG I MEAN SON
-      {
-        phrase: "BY DOG I MEAN SON",
-        phraseWords: [
-          ["🧊","🎲"],               // BY
-          ["🐸","🪐","🦊"],          // DOG
-          ["🍄"],                    // I
-          ["🚀","🌵","🪼","🔮"],     // MEAN
-          ["🐙","🪐","🔮"]           // SON
-        ],
-        mapping: {
-          "🧊": { letter:"B", number:4 },
-          "🎲": { letter:"Y", number:7 },
-          "🐸": { letter:"D", number:8 },
-          "🪐": { letter:"O", number:6 },
-          "🦊": { letter:"G", number:5 },
-          "🍄": { letter:"I", number:3 },
-          "🚀": { letter:"M", number:9 },
-          "🌵": { letter:"E", number:2 },
-          "🪼": { letter:"A", number:1 },
-          "🔮": { letter:"N", number:4 },
-          "🐙": { letter:"S", number:6 }
-        },
-        uniqueEmojis: ["🧊","🎲","🐸","🪐","🦊","🍄","🚀","🌵","🪼","🔮","🐙"],
-        equations: [
-          { left:["🧊","+","🎲"], target:11 },
-          { left:["🐸","+","🪐"], target:14 },
-          { left:["🦊","+","🍄"], target:8 },
-          { left:["🚀","+","🌵"], target:11 },
-          { left:["🪼","+","🔮"], target:5 },
-          { left:["🐙","+","🪐","+","🔮"], target:16 }
-        ]
+      uniqueEmojis: ["🐙","🧊","🌵","🦴","🔮","🎲","🪐","🐸","🚀"],
+      equations: [
+        { left:["🧊","+","🌵"], target:8 },
+        { left:["🦴","+","🔮"], target:14 },
+        { left:["🌵","+","🎲"], target:6 },
+        { left:["🪐","+","🐸"], target:15 },
+        { left:["🎲","+","🐙"], target:5 },
+        { left:["🐙","+","🦴","+","🔮","+","🚀"], target:18 }
+      ]
+    },
+    {
+      phrase: "BY DOG I MEAN SON",
+      phraseWords: [
+        ["🧊","🎲"],
+        ["🐸","🪐","🦊"],
+        ["🍄"],
+        ["🚀","🌵","🪼","🔮"],
+        ["🐙","🪐","🔮"]
+      ],
+      mapping: {
+        "🧊": { letter:"B", number:4 },
+        "🎲": { letter:"Y", number:7 },
+        "🐸": { letter:"D", number:8 },
+        "🪐": { letter:"O", number:6 },
+        "🦊": { letter:"G", number:5 },
+        "🍄": { letter:"I", number:3 },
+        "🚀": { letter:"M", number:9 },
+        "🌵": { letter:"E", number:2 },
+        "🪼": { letter:"A", number:1 },
+        "🔮": { letter:"N", number:4 },
+        "🐙": { letter:"S", number:6 }
       },
+      uniqueEmojis: ["🧊","🎲","🐸","🪐","🦊","🍄","🚀","🌵","🪼","🔮","🐙"],
+      equations: [
+        { left:["🧊","+","🎲"], target:11 },
+        { left:["🐸","+","🪐"], target:14 },
+        { left:["🦊","+","🍄"], target:8 },
+        { left:["🚀","+","🌵"], target:11 },
+        { left:["🪼","+","🔮"], target:5 },
+        { left:["🐙","+","🪐","+","🔮"], target:16 }
+      ]
+    },
+    {
+      phrase: "GREAT WORK SO FAR",
+      phraseWords: [
+        ["🦊","🌵","🧊","🎲","🔮"],
+        ["🚀","🐸","🌵","🦴"],
+        ["🐙","🐸"],
+        ["🍄","🎲","🌵"]
+      ],
+      mapping: {
+        "🦊": { letter:"G", number:8 },
+        "🌵": { letter:"R", number:4 },
+        "🧊": { letter:"E", number:2 },
+        "🎲": { letter:"A", number:1 },
+        "🔮": { letter:"T", number:9 },
+        "🚀": { letter:"W", number:6 },
+        "🐸": { letter:"O", number:7 },
+        "🦴": { letter:"K", number:5 },
+        "🐙": { letter:"S", number:3 },
+        "🍄": { letter:"F", number:4 }
+      },
+      uniqueEmojis: ["🦊","🌵","🧊","🎲","🔮","🚀","🐸","🦴","🐙","🍄"],
+      equations: [
+        { left:["🦊","+","🌵"], target:12 },
+        { left:["🧊","+","🎲"], target:3 },
+        { left:["🔮","+","🚀"], target:15 },
+        { left:["🐸","+","🌵"], target:11 },
+        { left:["🦴","+","🐙"], target:8 },
+        { left:["🍄","+","🎲","+","🌵"], target:9 }
+      ]
+    }
+  ];
 
-      // 10. GREAT WORK SO FAR
-      {
-        phrase: "GREAT WORK SO FAR",
-        phraseWords: [
-          ["🦊","🌵","🧊","🎲","🔮"],  // GREAT
-          ["🚀","🐸","🌵","🦴"],       // WORK
-          ["🐙","🐸"],                // SO
-          ["🍄","🎲","🌵"]            // FAR
-        ],
-        mapping: {
-          "🦊": { letter:"G", number:8 },
-          "🌵": { letter:"R", number:4 },
-          "🧊": { letter:"E", number:2 },
-          "🎲": { letter:"A", number:1 },
-          "🔮": { letter:"T", number:9 },
-          "🚀": { letter:"W", number:6 },
-          "🐸": { letter:"O", number:7 },
-          "🦴": { letter:"K", number:5 },
-          "🐙": { letter:"S", number:3 },
-          "🍄": { letter:"F", number:4 }
-        },
-        uniqueEmojis: ["🦊","🌵","🧊","🎲","🔮","🚀","🐸","🦴","🐙","🍄"],
-        equations: [
-          { left:["🦊","+","🌵"], target:12 },
-          { left:["🧊","+","🎲"], target:3 },
-          { left:["🔮","+","🚀"], target:15 },
-          { left:["🐸","+","🌵"], target:11 },
-          { left:["🦴","+","🐙"], target:8 },
-          { left:["🍄","+","🎲","+","🌵"], target:9 }
-        ]
-      }
-    ];
+  // -----------------------
+  // 2. GLOBAL STATE
+  // -----------------------
+  let currentIndex = 0;
+  let currentPuzzle = PUZZLES[currentIndex];
 
-    // -----------------------
-    // 2. GLOBAL STATE
-    // -----------------------
-    let currentIndex = 0;
-    let currentPuzzle = PUZZLES[currentIndex];
+  let hasCelebrated = false; // confetti lock
 
-    // per-emoji solve state for current puzzle
-    const playerState = {};
+  // each emoji's current guessed state in THIS puzzle
+  let playerState = {};
+  initPlayerState();
+
+  // -----------------------
+  // 3. DOM REFS
+  // -----------------------
+  const phraseArea    = document.getElementById("phraseArea");
+  const equationsArea = document.getElementById("equationsArea");
+  const solutionLines = document.getElementById("solutionLines"); // may be null
+  const winBox        = document.getElementById("winBox");        // may be null
+  const prevBtn       = document.getElementById("prevBtn");
+  const nextBtn       = document.getElementById("nextBtn");
+  const puzzleLabel   = document.getElementById("puzzleLabel");
+  const testConfettiBtn = document.getElementById("testConfettiBtn");
+
+  // -----------------------
+  // helpers
+  // -----------------------
+  function initPlayerState() {
+    playerState = {};
     currentPuzzle.uniqueEmojis.forEach(em=>{
       playerState[em] = { letter:"", number:"", solved:false };
     });
+    hasCelebrated = false;
+  }
 
-    // confetti state
-    let hasCelebrated = false;
+  // -----------------------
+  // 4. RENDER PHRASE
+  // -----------------------
+  function renderPhrase(){
+    phraseArea.innerHTML = "";
 
-    // -----------------------
-    // 3. DOM REFS
-    // -----------------------
-    const phraseArea    = document.getElementById("phraseArea");
-    const equationsArea = document.getElementById("equationsArea");
-    const solutionLines = document.getElementById("solutionLines"); // may be null (hidden box)
-    const winBox        = document.getElementById("winBox");        // may be null (hidden box)
-    const prevBtn       = document.getElementById("prevBtn");
-    const nextBtn       = document.getElementById("nextBtn");
-    const puzzleLabel   = document.getElementById("puzzleLabel");
+    currentPuzzle.phraseWords.forEach((wordArr, wordIdx)=>{
+      const wordBlock = document.createElement("div");
+      wordBlock.className = "word-block";
 
-    // -----------------------
-    // 4. RENDER PHRASE
-    // -----------------------
-    function renderPhrase(){
-      phraseArea.innerHTML = "";
+      const topRow = document.createElement("div");
+      topRow.className = "word-top-row";
 
-      currentPuzzle.phraseWords.forEach((wordArr, wordIdx)=>{
-        const wordBlock = document.createElement("div");
-        wordBlock.className = "word-block";
+      wordArr.forEach((em, charIdx)=>{
+        const stack = document.createElement("div");
+        stack.className = "char-stack";
+        stack.dataset.emoji = em;
+        stack.dataset.wordIndex = wordIdx;
+        stack.dataset.charIndex = charIdx;
 
-        const topRow = document.createElement("div");
-        topRow.className = "word-top-row";
+        const inp = document.createElement("input");
+        inp.className = "char-input";
+        inp.maxLength = 1;
+        inp.placeholder = "_";
+        inp.dataset.emoji = em;
+        inp.dataset.kind = "letter";
+        inp.addEventListener("input", handleGuessInput);
 
-        wordArr.forEach((em, charIdx)=>{
-          const stack = document.createElement("div");
-          stack.className = "char-stack";
-          stack.dataset.emoji = em;
-          stack.dataset.wordIndex = wordIdx;
-          stack.dataset.charIndex = charIdx;
+        const emDiv = document.createElement("div");
+        emDiv.className = "char-emoji";
+        emDiv.textContent = em;
 
-          const inp = document.createElement("input");
-          inp.className = "char-input";
-          inp.maxLength = 1;
-          inp.placeholder = "_";
-          inp.dataset.emoji = em;
-          inp.dataset.kind = "letter";
-          inp.addEventListener("input", handleGuessInput);
-
-          const emDiv = document.createElement("div");
-          emDiv.className = "char-emoji";
-          emDiv.textContent = em;
-
-          stack.appendChild(inp);
-          stack.appendChild(emDiv);
-          topRow.appendChild(stack);
-        });
-
-        wordBlock.appendChild(topRow);
-        phraseArea.appendChild(wordBlock);
-
-        if (wordIdx < currentPuzzle.phraseWords.length - 1){
-          const slash = document.createElement("div");
-          slash.className = "word-separator";
-          slash.textContent = "/";
-          phraseArea.appendChild(slash);
-        }
-      });
-    }
-
-    // -----------------------
-    // 5. RENDER EQUATIONS
-    // -----------------------
-    function renderEquations(){
-      equationsArea.innerHTML = "";
-
-      currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
-        const row = document.createElement("div");
-        row.className = "equation-row";
-
-        const leftWrap = document.createElement("div");
-        leftWrap.className = "eq-left";
-
-        eqObj.left.forEach(token=>{
-          if(token === "+"){
-            const plus = document.createElement("div");
-            plus.className = "eq-op";
-            plus.textContent = "+";
-            leftWrap.appendChild(plus);
-          } else {
-            const stack = document.createElement("div");
-            stack.className = "eq-stack";
-            stack.dataset.emoji = token;
-            stack.dataset.eqIndex = eqIndex;
-
-            const numInp = document.createElement("input");
-            numInp.className = "num-input";
-            numInp.maxLength = 1;
-            numInp.placeholder = "_";
-            numInp.dataset.emoji = token;
-            numInp.dataset.kind = "number";
-            numInp.addEventListener("input", handleGuessInput);
-
-            const emDiv = document.createElement("div");
-            emDiv.className = "char-emoji";
-            emDiv.textContent = token;
-
-            stack.appendChild(numInp);
-            stack.appendChild(emDiv);
-            leftWrap.appendChild(stack);
-          }
-        });
-
-        const eqTarget = document.createElement("div");
-        eqTarget.className = "eq-target";
-        eqTarget.textContent = "= " + eqObj.target;
-
-        const eqRes = document.createElement("div");
-        eqRes.className = "eq-result status-bad";
-        eqRes.dataset.eqIndex = eqIndex;
-        eqRes.textContent = "❌";
-
-        row.appendChild(leftWrap);
-        row.appendChild(eqTarget);
-        row.appendChild(eqRes);
-        equationsArea.appendChild(row);
+        stack.appendChild(inp);
+        stack.appendChild(emDiv);
+        topRow.appendChild(stack);
       });
 
-      updateEquationsStatus();
-    }
+      wordBlock.appendChild(topRow);
+      phraseArea.appendChild(wordBlock);
 
-    // -----------------------
-    // 6. SOLUTION KEY (hidden UI-safe)
-    // -----------------------
-    function renderSolutionBox(){
-      if (!solutionLines) return;
-      solutionLines.innerHTML = "";
-      currentPuzzle.uniqueEmojis.forEach(em=>{
-        const st = playerState[em];
-        if(st.solved){
-          const line = document.createElement("div");
-          line.className = "solution-line-solved";
-          line.textContent = `${em} = ${st.letter} = ${st.number}`;
-          solutionLines.appendChild(line);
-        }
-      });
-    }
-
-    // -----------------------
-    // 7. EQUATIONS STATUS
-    // -----------------------
-    function updateEquationsStatus(){
-      currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
-        let allKnown = true;
-        let total = 0;
-
-        eqObj.left.forEach(token=>{
-          if(token === "+") return;
-          if(playerState[token].solved){
-            total += currentPuzzle.mapping[token].number;
-          } else {
-            allKnown = false;
-          }
-        });
-
-        const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
-        if(!resDiv) return;
-        if(allKnown && total === eqObj.target){
-          resDiv.textContent = "✅";
-          resDiv.classList.remove("status-bad");
-          resDiv.classList.add("status-ok");
-        } else {
-          resDiv.textContent = "❌";
-          resDiv.classList.remove("status-ok");
-          resDiv.classList.add("status-bad");
-        }
-      });
-    }
-
-    // -----------------------
-    // 8. CURRENT SOLVED PHRASE STRING
-    // -----------------------
-    function getCurrentSolvedPhrase(){
-      const wordsSolved = currentPuzzle.phraseWords.map(wordArr => {
-        return wordArr.map(em => {
-          if(playerState[em].solved){
-            return currentPuzzle.mapping[em].letter;
-          } else {
-            return "_";
-          }
-        }).join("");
-      });
-      return wordsSolved.join(" ");
-    }
-
-    // -----------------------
-    // 9. HANDLE INPUT FROM USER
-    // -----------------------
-    function handleGuessInput(e){
-      const em   = e.target.dataset.emoji;
-      const kind = e.target.dataset.kind;
-
-      if(playerState[em].solved){
-        syncSolvedEmojiEverywhere(em);
-        updateEquationsStatus();
-        checkWin();
-        return;
+      if (wordIdx < currentPuzzle.phraseWords.length - 1){
+        const slash = document.createElement("div");
+        slash.className = "word-separator";
+        slash.textContent = "/";
+        phraseArea.appendChild(slash);
       }
-
-      let val = e.target.value;
-
-      if(kind === "letter"){
-        val = val.toUpperCase().replace(/[^A-Z]/g,"").slice(0,1);
-        e.target.value = val;
-      } else {
-        if(val !== ""){
-          let n = parseInt(val,10);
-          if(isNaN(n)) n = "";
-          if(n < 0) n = 0;
-          if(n > 9) n = 9;
-          e.target.value = n === "" ? "" : String(n);
-          val = e.target.value;
-        }
-      }
-
-      const correctLetter = currentPuzzle.mapping[em].letter;
-      const correctNumber = String(currentPuzzle.mapping[em].number);
-
-      const solvedByLetter = (kind==="letter" && val === correctLetter);
-      const solvedByNumber = (kind==="number" && val === correctNumber);
-
-      if(solvedByLetter || solvedByNumber){
-        playerState[em].solved  = true;
-        playerState[em].letter  = correctLetter;
-        playerState[em].number  = correctNumber;
-        syncSolvedEmojiEverywhere(em);
-      } else {
-        if(kind === "letter"){
-          playerState[em].letter = val;
-        } else {
-          playerState[em].number = val;
-        }
-      }
-
-      updateEquationsStatus();
-      renderSolutionBox();
-      checkWin();
-    }
-
-    // -----------------------
-    // 10. SYNC SOLVED EMOJI
-    // -----------------------
-    function syncSolvedEmojiEverywhere(em){
-      const correctLetter = currentPuzzle.mapping[em].letter;
-      const correctNumber = String(currentPuzzle.mapping[em].number);
-      playerState[em].solved  = true;
-      playerState[em].letter  = correctLetter;
-      playerState[em].number  = correctNumber;
-
-      const phraseInputs = phraseArea.querySelectorAll(`.char-input[data-emoji="${em}"]`);
-      phraseInputs.forEach(inp=>{
-        inp.value = correctLetter;
-        inp.disabled = true;
-      });
-
-      const eqInputs = equationsArea.querySelectorAll(`.num-input[data-emoji="${em}"]`);
-      eqInputs.forEach(inp=>{
-        inp.value = correctNumber;
-        inp.disabled = true;
-      });
-
-      renderSolutionBox();
-    }
-
-    // -----------------------
-    // 11. CONFETTI
-    // -----------------------
-// ---------- CONFETTI ENGINE (canvas-based) ----------
-
-// We'll keep a single particle burst at a time.
-// ---------- CONFETTI ENGINE (canvas-based) ----------
-function launchConfetti() {
-  // block repeat on win unless forced from the Test Confetti button
-  if (hasCelebrated && !window._forceConfetti) return;
-  hasCelebrated = true;
-
-  //
-  // 0. "YOU SOLVED IT!" overlay
-  //
-  const msg = document.getElementById("solvedMessage");
-  if (msg) {
-    msg.classList.add("show");
-    setTimeout(() => {
-      msg.classList.remove("show");
-    }, 2500);
-  }
-
-  //
-  // 1. Canvas setup
-  //
-  const canvas = document.getElementById("confettiCanvas");
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-
-  function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  resizeCanvas();
-
-  //
-  // 2. Pre-render emoji sprites for perf
-  //
-  const EMOJIS = [
-    "🎉","🎊","✨","💥","💫","🌟","🔥","🤩","😎","🦄",
-    "🦊","🐸","🪐","🎲","🚀","★","🔮","🧊","🐙","🌸",
-    "🦩","🐢","🪼","🐍","🏵️"
-  ];
-
-  function makeEmojiSprite(char, sizePx) {
-    const off = document.createElement("canvas");
-    const offCtx = off.getContext("2d");
-
-    const pad = sizePx;
-    off.width = sizePx + pad * 2;
-    off.height = sizePx + pad * 2;
-
-    offCtx.font = `${sizePx}px sans-serif`;
-    offCtx.textAlign = "center";
-    offCtx.textBaseline = "middle";
-    offCtx.fillText(char, off.width / 2, off.height / 2);
-
-    return {
-      canvas: off,
-      w: off.width,
-      h: off.height
-    };
-  }
-
-  // build sprite variants (random sizes)
-  const SPRITES = [];
-  for (let i = 0; i < EMOJIS.length; i++) {
-    const sizePx = 28 + Math.random() * 10; // 28-38px
-    SPRITES.push(makeEmojiSprite(EMOJIS[i], sizePx));
-  }
-
-  //
-  // 3. Build particles
-  //
-  const particles = [];
-  const COUNT = 60; // can bump up/down
-
-  const originX = canvas.width * 0.5;
-  const originY = canvas.height * 0.9;
-
-  for (let i = 0; i < COUNT; i++) {
-    const sprite = SPRITES[Math.floor(Math.random() * SPRITES.length)];
-
-    // Upward fanburst: -150deg .. -30deg (no downward shots)
-    const angleDeg = -150 + Math.random() * 120;
-    const angleRad = angleDeg * Math.PI / 180;
-
-    // Speed in px/sec
-    const speed = 550 + Math.random() * 450; // 550-1000
-
-    const vx = Math.cos(angleRad) * speed;
-    const vy = Math.sin(angleRad) * speed;
-
-    const spinSpeed = (Math.random() * 720 - 360); // deg/sec
-    const life = 2200 + Math.random() * 400;       // ms
-
-    const startX = originX + (Math.random() - 0.5) * 30;
-    const startY = originY + (Math.random() - 0.5) * 15;
-
-    particles.push({
-      sprite,
-      x: startX,
-      y: startY,
-      vx,
-      vy,
-      spin: 0,
-      spinSpeed,
-      scaleStart: 1.0,
-      scaleEnd: 0.5,
-      alpha: 1,
-      age: 0,
-      life,
-      dead: false
     });
   }
 
-  //
-  // 4. Animate with delta time
-  //
-  let running = true;
-  let prevTS = performance.now();
+  // -----------------------
+  // 5. RENDER EQUATIONS
+  // -----------------------
+  function renderEquations(){
+    equationsArea.innerHTML = "";
 
-  function frame(now) {
-    if (!running) return;
-    const dt = now - prevTS;
-    prevTS = now;
+    currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
+      const row = document.createElement("div");
+      row.className = "equation-row";
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const leftWrap = document.createElement("div");
+      leftWrap.className = "eq-left";
 
-    let aliveCount = 0;
+      eqObj.left.forEach(token=>{
+        if(token === "+"){
+          const plus = document.createElement("div");
+          plus.className = "eq-op";
+          plus.textContent = "+";
+          leftWrap.appendChild(plus);
+        } else {
+          const stack = document.createElement("div");
+          stack.className = "eq-stack";
+          stack.dataset.emoji = token;
+          stack.dataset.eqIndex = eqIndex;
 
-    for (const p of particles) {
-      if (p.dead) continue;
+          const numInp = document.createElement("input");
+          numInp.className = "num-input";
+          numInp.maxLength = 1;
+          numInp.placeholder = "_";
+          numInp.dataset.emoji = token;
+          numInp.dataset.kind = "number";
+          numInp.addEventListener("input", handleGuessInput);
 
-      p.age += dt;
-      if (p.age >= p.life) {
-        p.dead = true;
-        continue;
+          const emDiv = document.createElement("div");
+          emDiv.className = "char-emoji";
+          emDiv.textContent = token;
+
+          stack.appendChild(numInp);
+          stack.appendChild(emDiv);
+          leftWrap.appendChild(stack);
+        }
+      });
+
+      const eqTarget = document.createElement("div");
+      eqTarget.className = "eq-target";
+      eqTarget.textContent = "= " + eqObj.target;
+
+      const eqRes = document.createElement("div");
+      eqRes.className = "eq-result status-bad";
+      eqRes.dataset.eqIndex = eqIndex;
+      eqRes.textContent = "❌";
+
+      row.appendChild(leftWrap);
+      row.appendChild(eqTarget);
+      row.appendChild(eqRes);
+      equationsArea.appendChild(row);
+    });
+
+    updateEquationsStatus();
+  }
+
+  // -----------------------
+  // 6. SOLUTION BOX (if visible)
+  // -----------------------
+  function renderSolutionBox(){
+    if (!solutionLines) return;
+    solutionLines.innerHTML = "";
+    currentPuzzle.uniqueEmojis.forEach(em=>{
+      const st = playerState[em];
+      if(st.solved){
+        const line = document.createElement("div");
+        line.className = "solution-line-solved";
+        line.textContent = `${em} = ${st.letter} = ${st.number}`;
+        solutionLines.appendChild(line);
       }
-      aliveCount++;
+    });
+  }
 
-      const tNorm = p.age / p.life; // 0 -> 1
+  // -----------------------
+  // 7. UPDATE EQUATIONS STATUS
+  // -----------------------
+  function updateEquationsStatus(){
+    currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
+      let allKnown = true;
+      let total = 0;
 
-      // move
-      p.x += p.vx * (dt / 1000);
-      p.y += p.vy * (dt / 1000);
+      eqObj.left.forEach(token=>{
+        if(token === "+") return;
+        if(playerState[token].solved){
+          total += currentPuzzle.mapping[token].number;
+        } else {
+          allKnown = false;
+        }
+      });
 
-      // spin
-      p.spin += p.spinSpeed * (dt / 1000);
-
-      // scale tween
-      const scale = p.scaleStart + (p.scaleEnd - p.scaleStart) * tNorm;
-
-      // alpha tween: solid first 70%, then fade
-      let alpha;
-      if (tNorm < 0.7) {
-        alpha = 1;
+      const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
+      if(!resDiv) return;
+      if(allKnown && total === eqObj.target){
+        resDiv.textContent = "✅";
+        resDiv.classList.remove("status-bad");
+        resDiv.classList.add("status-ok");
       } else {
-        const tail = (tNorm - 0.7) / 0.3; // 0..1
-        alpha = 1 - tail;
-        if (alpha < 0) alpha = 0;
+        resDiv.textContent = "❌";
+        resDiv.classList.remove("status-ok");
+        resDiv.classList.add("status-bad");
       }
-      p.alpha = alpha;
+    });
+  }
 
-      // draw
-      ctx.save();
-      ctx.globalAlpha = p.alpha;
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.spin * Math.PI / 180);
-      ctx.scale(scale, scale);
-      ctx.drawImage(
-        p.sprite.canvas,
-        -p.sprite.w / 2,
-        -p.sprite.h / 2,
-        p.sprite.w,
-        p.sprite.h
-      );
-      ctx.restore();
+  // -----------------------
+  // 8. RETURN CURRENT PHRASE AS USER HAS SOLVED SO FAR
+  // -----------------------
+  function getCurrentSolvedPhrase(){
+    const wordsSolved = currentPuzzle.phraseWords.map(wordArr => {
+      return wordArr.map(em => {
+        if(playerState[em].solved){
+          return currentPuzzle.mapping[em].letter;
+        } else {
+          return "_";
+        }
+      }).join("");
+    });
+    return wordsSolved.join(" ");
+  }
+
+  // -----------------------
+  // 9. INPUT HANDLER
+  // -----------------------
+  function handleGuessInput(e){
+    const em   = e.target.dataset.emoji;
+    const kind = e.target.dataset.kind;
+
+    // If already solved, just sync UI
+    if(playerState[em].solved){
+      syncSolvedEmojiEverywhere(em);
+      updateEquationsStatus();
+      checkWin();
+      return;
     }
 
-    if (aliveCount === 0) {
+    // clean input
+    let val = e.target.value;
+
+    if(kind === "letter"){
+      val = val.toUpperCase().replace(/[^A-Z]/g,"").slice(0,1);
+      e.target.value = val;
+    } else { // number
+      if(val !== ""){
+        let n = parseInt(val,10);
+        if(isNaN(n)) n = "";
+        if(n < 0) n = 0;
+        if(n > 9) n = 9;
+        e.target.value = n === "" ? "" : String(n);
+        val = e.target.value;
+      }
+    }
+
+    // check against correct mapping
+    const correctLetter = currentPuzzle.mapping[em].letter;
+    const correctNumber = currentPuzzle.mapping[em].number.toString();
+
+    if(kind === "letter" && val === correctLetter){
+      // lock it in
+      playerState[em].letter = correctLetter;
+      playerState[em].number = correctNumber;
+      playerState[em].solved = true;
+    } else if(kind === "number" && val === correctNumber){
+      playerState[em].letter = correctLetter;
+      playerState[em].number = correctNumber;
+      playerState[em].solved = true;
+    }
+
+    // sync UI if solved
+    if(playerState[em].solved){
+      syncSolvedEmojiEverywhere(em);
+      updateEquationsStatus();
+      renderSolutionBox();
+    }
+
+    checkWin();
+  }
+
+  // -----------------------
+  // 10. SYNC SOLVED VALUES EVERYWHERE
+  // -----------------------
+  function syncSolvedEmojiEverywhere(em){
+    const solvedLetter = playerState[em].letter;
+    const solvedNumber = playerState[em].number;
+
+    // all phrase inputs with this emoji
+    phraseArea.querySelectorAll(`.char-stack[data-emoji="${em}"] .char-input`).forEach(inp=>{
+      inp.value = solvedLetter;
+      inp.disabled = true;
+    });
+
+    // all equation inputs with this emoji
+    equationsArea.querySelectorAll(`.eq-stack[data-emoji="${em}"] .num-input`).forEach(inp=>{
+      inp.value = solvedNumber;
+      inp.disabled = true;
+    });
+  }
+
+  // -----------------------
+  // 11. CONFETTI + "YOU SOLVED IT"
+  // -----------------------
+  function launchConfetti() {
+    // gate unless forced
+    if (hasCelebrated && !window._forceConfetti) return;
+    hasCelebrated = true;
+
+    // show big message
+    const msg = document.getElementById("solvedMessage");
+    if (msg) {
+      msg.classList.add("show");
+      setTimeout(()=>{ msg.classList.remove("show"); }, 2500);
+    }
+
+    // canvas setup
+    const canvas = document.getElementById("confettiCanvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const EMOJIS = [
+      "🎉","🎊","✨","💥","💫","🌟","🔥","🤩","😎","🦄",
+      "🦊","🐸","🪐","🎲","🚀","★","🔮","🧊","🐙","🌸",
+      "🦩","🐢","🪼","🐍","🏵️"
+    ];
+
+    // pre-render sprites for perf
+    function makeEmojiSprite(char, sizePx) {
+      const off = document.createElement("canvas");
+      const offCtx = off.getContext("2d");
+      const pad = sizePx;
+      off.width = sizePx + pad * 2;
+      off.height = sizePx + pad * 2;
+      offCtx.font = `${sizePx}px sans-serif`;
+      offCtx.textAlign = "center";
+      offCtx.textBaseline = "middle";
+      offCtx.fillText(char, off.width / 2, off.height / 2);
+      return {
+        canvas: off,
+        w: off.width,
+        h: off.height
+      };
+    }
+
+    const SPRITES = [];
+    for (let i = 0; i < EMOJIS.length; i++) {
+      const sizePx = 28 + Math.random() * 10;
+      SPRITES.push(makeEmojiSprite(EMOJIS[i], sizePx));
+    }
+
+    const particles = [];
+    const COUNT = 60;
+
+    const originX = canvas.width * 0.5;
+    const originY = canvas.height * 0.9;
+
+    for (let i = 0; i < COUNT; i++) {
+      const sprite = SPRITES[Math.floor(Math.random() * SPRITES.length)];
+
+      // upward fanburst angle: -150deg..-30deg
+      const angleDeg = -150 + Math.random() * 120;
+      const angleRad = angleDeg * Math.PI / 180;
+
+      const speed = 550 + Math.random() * 450; // px/sec
+      const vx = Math.cos(angleRad) * speed;
+      const vy = Math.sin(angleRad) * speed;
+
+      const spinSpeed = (Math.random() * 720 - 360); // deg/sec
+      const life = 2200 + Math.random() * 400;       // ms
+
+      const startX = originX + (Math.random() - 0.5) * 30;
+      const startY = originY + (Math.random() - 0.5) * 15;
+
+      particles.push({
+        sprite,
+        x: startX,
+        y: startY,
+        vx,
+        vy,
+        spin: 0,
+        spinSpeed,
+        scaleStart: 1.0,
+        scaleEnd: 0.5,
+        alpha: 1,
+        age: 0,
+        life,
+        dead: false
+      });
+    }
+
+    let running = true;
+    let prevTS = performance.now();
+
+    function frame(now){
+      if (!running) return;
+      const dt = now - prevTS;
+      prevTS = now;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      running = false;
-      return;
+
+      let aliveCount = 0;
+
+      for (const p of particles) {
+        if (p.dead) continue;
+
+        p.age += dt;
+        if (p.age >= p.life) {
+          p.dead = true;
+          continue;
+        }
+        aliveCount++;
+
+        const tNorm = p.age / p.life; // 0..1
+
+        // move
+        p.x += p.vx * (dt / 1000);
+        p.y += p.vy * (dt / 1000);
+
+        // spin
+        p.spin += p.spinSpeed * (dt / 1000);
+
+        // scale
+        const scale = p.scaleStart + (p.scaleEnd - p.scaleStart) * tNorm;
+
+        // fade near end only
+        let alpha;
+        if (tNorm < 0.7) {
+          alpha = 1;
+        } else {
+          const tail = (tNorm - 0.7) / 0.3;
+          alpha = 1 - tail;
+          if (alpha < 0) alpha = 0;
+        }
+        p.alpha = alpha;
+
+        // draw
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.spin * Math.PI / 180);
+        ctx.scale(scale, scale);
+        ctx.drawImage(
+          p.sprite.canvas,
+          -p.sprite.w / 2,
+          -p.sprite.h / 2,
+          p.sprite.w,
+          p.sprite.h
+        );
+        ctx.restore();
+      }
+
+      if (aliveCount === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        running = false;
+        return;
+      }
+
+      requestAnimationFrame(frame);
     }
 
     requestAnimationFrame(frame);
   }
 
-  requestAnimationFrame(frame);
-}
+  // -----------------------
+  // 12. CHECK WIN
+  // -----------------------
+  function checkWin(){
+    const finalPhrase = getCurrentSolvedPhrase();
+    const phraseDone = (finalPhrase === currentPuzzle.phrase);
 
-    // -----------------------
-    // 12. CHECK WIN
-    // -----------------------
-   function checkWin(){
-  const finalPhrase = getCurrentSolvedPhrase();
-  const phraseDone = (finalPhrase === currentPuzzle.phrase);
+    let allEqCorrect = true;
+    currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
+      const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
+      if(!resDiv || !resDiv.classList.contains("status-ok")){
+        allEqCorrect = false;
+      }
+    });
 
-  let allEqCorrect = true;
-  currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
-    const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
-    if(!resDiv || !resDiv.classList.contains("status-ok")){
-      allEqCorrect = false;
-    }
-  });
-
-  if (phraseDone && allEqCorrect) {
-    if (winBox) {
-      winBox.style.display = "block";
-    }
-    if (!hasCelebrated) {
-      launchConfetti();
-    }
-  } else {
-    if (winBox) {
-      winBox.style.display = "none";
+    if (phraseDone && allEqCorrect) {
+      if (winBox) { winBox.style.display = "block"; }
+      if (!hasCelebrated) {
+        launchConfetti();
+      }
+    } else {
+      if (winBox) { winBox.style.display = "none"; }
     }
   }
-}
 
-    // -----------------------
-    // 13. LOAD PUZZLE (Prev/Next)
-    // -----------------------
-    function loadPuzzle(index){
-      if (index < 0) index = 0;
-      if (index > PUZZLES.length - 1) index = PUZZLES.length - 1;
-      currentIndex = index;
-      currentPuzzle = PUZZLES[currentIndex];
-      hasCelebrated = false;
+  // -----------------------
+  // 13. LOAD PUZZLE INDEX
+  // -----------------------
+  function loadPuzzle(newIndex){
+    // clamp
+    if(newIndex < 0) newIndex = 0;
+    if(newIndex > PUZZLES.length-1) newIndex = PUZZLES.length-1;
 
-      // reset playerState for new puzzle
-      for (const key of Object.keys(playerState)) {
-        delete playerState[key];
-      }
-      currentPuzzle.uniqueEmojis.forEach(em=>{
-        playerState[em] = { letter:"", number:"", solved:false };
-      });
+    currentIndex = newIndex;
+    currentPuzzle = PUZZLES[currentIndex];
+    initPlayerState();
 
-      // draw UI fresh
-      renderPhrase();
-      renderEquations();
-      renderSolutionBox();
+    // render everything fresh
+    renderPhrase();
+    renderEquations();
+    renderSolutionBox();
+    updateEquationsStatus();
+    checkWin();
 
-      // label
-      if (puzzleLabel) {
-        puzzleLabel.textContent = `Puzzle ${currentIndex+1} / ${PUZZLES.length}`;
-      }
+    // label
+    if (puzzleLabel){
+      puzzleLabel.textContent = `Puzzle ${currentIndex+1} / ${PUZZLES.length}`;
     }
+  }
 
-    // -----------------------
-    // 14. INIT
-    // -----------------------
-    function init(){
-      loadPuzzle(0); // show first puzzle on load
-    }
-
-    init();
-
-const testConfettiBtn = document.getElementById("testConfettiBtn");
-if (testConfettiBtn) {
-  testConfettiBtn.addEventListener("click", () => {
-    window._forceConfetti = true;
-    launchConfetti();
-    window._forceConfetti = false;
-  });
-}
-
-    // After init, hook up buttons
-    if (prevBtn) {
+  // -----------------------
+  // 14. INIT / EVENT LISTENERS
+  // -----------------------
+  function init(){
+    // wire nav buttons
+    if(prevBtn){
       prevBtn.addEventListener("click", ()=>{
         loadPuzzle(currentIndex - 1);
       });
     }
-
-    if (nextBtn) {
+    if(nextBtn){
       nextBtn.addEventListener("click", ()=>{
         loadPuzzle(currentIndex + 1);
       });
     }
 
-  })();
-  </script>
+    // test confetti button
+    if (testConfettiBtn){
+      testConfettiBtn.addEventListener("click", ()=>{
+        window._forceConfetti = true;
+        launchConfetti();
+        window._forceConfetti = false;
+      });
+    }
+
+    loadPuzzle(0);
+  }
+
+  // kick it off
+  init();
+
+})(); 
+</script>
+
 </body>
 </html>

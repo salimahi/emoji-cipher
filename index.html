@@ -23,7 +23,7 @@
   color: #8C6737; /* pick your color here */
 }
 h2 {
-  color: #8C6737; /* match, or choose a different accent */
+  color: #36171D; /* match, or choose a different accent */
   font-weight: 500;
 }
 
@@ -257,36 +257,39 @@ h2 {
 
     /* celebration confetti */
     #confettiLayer {
-      pointer-events: none;
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 100vw;
-      height: 100vh;
-      overflow: visible;
-      z-index: 9999;
-    }
+  pointer-events: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: visible;
+  z-index: 999999; /* bump it absurdly high just in case */
+}
 
-    .confetti-emoji {
-      position: absolute;
-      font-size: 2rem;
-      will-change: transform, opacity;
-      animation-timing-function: ease-out;
-      animation-iteration-count: 1;
-      animation-fill-mode: forwards;
-      pointer-events: none;
-    }
+.confetti-emoji {
+  position: absolute;
+  font-size: 2rem;
+  will-change: transform, opacity;
+  pointer-events: none;
+  opacity: 1;
+  animation-name: fade-spin;
+  animation-timing-function: ease-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
 
-    @keyframes burst-fade {
-      0% {
-        opacity: 1;
-        transform: translate3d(var(--x-start), var(--y-start), 0) scale(1) rotate(0deg);
-      }
-      100% {
-        opacity: 0;
-        transform: translate3d(var(--x-end), var(--y-end), 0) scale(0.6) rotate(540deg);
-      }
-    }
+@keyframes fade-spin {
+  0% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.6) rotate(540deg);
+  }
+}
+
   </style>
 </head>
 <body>
@@ -954,59 +957,77 @@ h2 {
     // -----------------------
     // 11. CONFETTI
     // -----------------------
-    function launchConfetti() {
-      if (hasCelebrated) return;
-      hasCelebrated = true;
+  function launchConfetti() {
+  // remove this "only once ever" guard for test button fun.
+  // you probably still want to block double-fire on win, so we’ll
+  // only gate inside the win logic, not here.
+  // if (hasCelebrated) return;
+  hasCelebrated = true;
 
-      const layer = document.getElementById("confettiLayer");
-      if (!layer) return;
+  const layer = document.getElementById("confettiLayer");
+  if (!layer) return;
 
-      const confettiEmojis = [
-        "🎉","🎊","✨","💥","💫","🌟","🔥","🤩","😎","🦄",
-        "🦊","🐸","🪐","🎲","🚀","🌵","🔮","🧊","🐙","🍄","🦴","🐢","🪼","🐍"
-      ];
+  const confettiEmojis = [
+    "🎉","🎊","✨","💥","💫","🌟","🔥","🤩","😎","🦄",
+    "🦊","🐸","🪐","🎲","🚀","🌵","🔮","🧊","🐙","🍄","🦴","🐢","🪼","🐍"
+  ];
 
-      const howMany = 60;
+  const howMany = 60;
 
-      for (let i = 0; i < howMany; i++) {
-        const piece = document.createElement("div");
-        piece.className = "confetti-emoji";
-        piece.textContent = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
+  for (let i = 0; i < howMany; i++) {
+    const piece = document.createElement("div");
+    piece.className = "confetti-emoji";
+    piece.textContent = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
 
-        const startXvw = 50;
-        const startYvh = 90 + Math.random()*4;
+    // start near bottom middle
+    const startXvw = 50;
+    const startYvh = 90 + Math.random() * 4; // a little jitter so it isn't one line
 
-        const angleDeg = -40 - Math.random()*100; // -40 to -140
-        const angleRad = angleDeg * Math.PI / 180;
+    // pick a launch angle leaning upward and outward
+    const angleDeg = -40 - Math.random() * 100; // -40 to -140
+    const angleRad = angleDeg * Math.PI / 180;
 
-        const distanceVh = 40 + Math.random()*30;
-        const dxVw = Math.cos(angleRad) * (distanceVh * 0.6);
-        const dyVh = Math.sin(angleRad) * distanceVh;
+    // how far it flies
+    const distanceVh = 40 + Math.random() * 30; // 40-70 vh-ish "speed"
+    const dxVw = Math.cos(angleRad) * (distanceVh * 0.6);
+    const dyVh = Math.sin(angleRad) * distanceVh;
 
-        const endXvw = startXvw + dxVw;
-        const endYvh = startYvh + dyVh;
+    const endXvw = startXvw + dxVw;
+    const endYvh = startYvh + dyVh;
 
-        const duration = 800 + Math.random()*700;
-        const delay    = Math.random()*100;
+    // duration / delay jitter
+    const duration = 800 + Math.random() * 700; // 0.8s - 1.5s
+    const delay    = Math.random() * 100;       // tiny stagger
 
-        piece.style.setProperty('--x-start', startXvw + 'vw');
-        piece.style.setProperty('--y-start', startYvh + 'vh');
-        piece.style.setProperty('--x-end',   endXvw  + 'vw');
-        piece.style.setProperty('--y-end',   endYvh  + 'vh');
+    // Position the element at the *end* point using translate()
+    // and at the *start* point using left/top.
+    //
+    // Trick:
+    // - We absolutely position at bottom center (left/top).
+    // - We set a transform that moves it outward to its final spot.
+    // - Then CSS animation "fade-spin" only handles spin+fade+shrink,
+    //   NOT movement. So visually they just "pop" outward instantly
+    //   and shimmer out like fireworks.
+    //
+    // If you want actual flying motion (arc), we can do per-piece keyframes,
+    // but this version is cheap and always renders.
 
-        piece.style.left = startXvw + "vw";
-        piece.style.top  = startYvh + "vh";
-        piece.style.animationName = "burst-fade";
-        piece.style.animationDuration = duration + "ms";
-        piece.style.animationDelay    = delay + "ms";
+    piece.style.left = startXvw + "vw";
+    piece.style.top  = startYvh + "vh";
 
-        layer.appendChild(piece);
+    piece.style.transform = `translate(${endXvw - startXvw}vw, ${endYvh - startYvh}vh)`;
 
-        setTimeout(() => {
-          piece.remove();
-        }, duration + delay + 200);
-      }
-    }
+    piece.style.animationDuration = duration + "ms";
+    piece.style.animationDelay    = delay + "ms";
+
+    layer.appendChild(piece);
+
+    // cleanup
+    setTimeout(() => {
+      piece.remove();
+    }, duration + delay + 200);
+  }
+}
 
     // -----------------------
     // 12. CHECK WIN

@@ -962,21 +962,35 @@ h2 {
 
 // We'll keep a single particle burst at a time.
 function launchConfetti() {
-  // still prevent double-fire on win unless forced by Test button
+  // block auto-repeat on win unless manually forced with Test Confetti
   if (hasCelebrated && !window._forceConfetti) return;
   hasCelebrated = true;
 
+  // 1. Show the big "YOU SOLVED IT!" message
+  const msg = document.getElementById("solvedMessage");
+  if (msg) {
+    // force it on
+    msg.classList.add("show");
+
+    // hide it after 2.5s
+    setTimeout(() => {
+      msg.classList.remove("show");
+    }, 2500);
+  }
+
+  // 2. Confetti canvas setup
   const canvas = document.getElementById("confettiCanvas");
   if (!canvas) return;
-
   const ctx = canvas.getContext("2d");
 
-  // match canvas to viewport pixels
   function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   }
   resizeCanvas();
+
+  // ... keep the rest of the particle code exactly as before ...
+
 
   // show "YOU SOLVED IT" message
 const msg = document.getElementById("solvedMessage");
@@ -994,8 +1008,8 @@ if (msg) {
 
   const EMOJIS = [
     "🎉","🎊","✨","💥","💫","🌟","🔥","🤩","😎","🦄",
-    "🦊","🐸","🪐","🎲","🚀","🌵","🔮","🧊","🐙","🍄",
-    "🦴","🐢","🪼","🐍"
+    "🦊","🐸","🪐","🎲","🚀","★","🔮","🧊","🐙","🌸",
+    "🦩","🐢","🪼","🐍", "🏵️"
   ];
 
   // We'll pre-render each emoji at a base size to its own tiny canvas.

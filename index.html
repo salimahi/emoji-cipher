@@ -274,18 +274,43 @@ h2 {
   transform: translate(-50%, -50%) scale(0.8);
   font-size: 6vw;
   font-weight: 800;
-  color: white;
+  font-family: system-ui, sans-serif;
+
+  background: linear-gradient(
+    90deg,
+    #ff005e 0%,
+    #ff8a00 16%,
+    #ffe600 32%,
+    #00d12b 48%,
+    #00c2ff 64%,
+    #7a00ff 80%,
+    #ff00c8 100%,
+    #ff005e 120%
+  );
+  background-size: 200% auto;        /* make it wider than the text */
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+
   text-shadow: 0 0 25px rgba(0,0,0,0.6);
+
   opacity: 0;
   z-index: 1000000;
   pointer-events: none;
   transition:
     opacity 0.4s ease,
     transform 0.4s ease;
+  animation: rainbowShift 2s linear infinite;
 }
+
 #solvedMessage.show {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
+}
+
+@keyframes rainbowShift {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: -200% 50%; }
 }
 
 
@@ -313,12 +338,6 @@ h2 {
       Next ▶
     </button>
   </div>
-
-  <div style="text-align:center; margin-top:.5rem;">
-  <button id="testConfettiBtn" style="padding:.5rem .75rem; font-size:.8rem; border-radius:.5rem; border:1px solid #aaa; background:#fff; cursor:pointer;">
-    🎉 Test Confetti
-  </button>
-</div>
 
   <div class="section-title">Decode the Phrase</div>
   <div class="phrase-wrapper" id="phraseArea"></div>
@@ -679,7 +698,6 @@ h2 {
   const prevBtn       = document.getElementById("prevBtn");
   const nextBtn       = document.getElementById("nextBtn");
   const puzzleLabel   = document.getElementById("puzzleLabel");
-  const testConfettiBtn = document.getElementById("testConfettiBtn");
 
   // -----------------------
   // helpers
@@ -948,8 +966,8 @@ h2 {
   // -----------------------
   function launchConfetti() {
     // gate unless forced
-    if (hasCelebrated && !window._forceConfetti) return;
-    hasCelebrated = true;
+    if (hasCelebrated) return;
+hasCelebrated = true;
 
     // show big message
     const msg = document.getElementById("solvedMessage");
@@ -1172,15 +1190,6 @@ h2 {
     if(nextBtn){
       nextBtn.addEventListener("click", ()=>{
         loadPuzzle(currentIndex + 1);
-      });
-    }
-
-    // test confetti button
-    if (testConfettiBtn){
-      testConfettiBtn.addEventListener("click", ()=>{
-        window._forceConfetti = true;
-        launchConfetti();
-        window._forceConfetti = false;
       });
     }
 

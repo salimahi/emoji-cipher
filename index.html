@@ -20,8 +20,8 @@
     h1, h2 { text-align: center; }
 
     .note-box {
-      background: #fff8db;
-      border: 1px solid #e6d78a;
+      background: #F6EAED;
+      border: 1px solid #36171D;
       border-radius: .5rem;
       padding: .75rem;
       margin-bottom: 1rem;
@@ -34,7 +34,7 @@
       margin:1.5rem 0 .5rem;
       text-transform:uppercase;
       letter-spacing:.03em;
-      color:#444;
+      color:#8C6737;
     }
 
     /* Phrase layout */
@@ -57,8 +57,7 @@
       align-items:flex-start;
     }
 
-    .word-top-row,
-    .word-bottom-row {
+    .word-top-row {
       display:flex;
       align-items:flex-start;
       gap:.6rem;
@@ -194,7 +193,7 @@
     .status-ok{color:#108a00;}
     .status-bad{color:#b00020;}
 
-    /* Solution key */
+    /* Solution key styling (currently hidden in HTML, but CSS can stay) */
     .solution-box {
       border:1px solid #ddd;
       border-radius:.5rem;
@@ -246,38 +245,38 @@
       color:#555;
       text-decoration:none;
     }
+
     /* celebration confetti */
-/* celebration confetti */
-#confettiLayer {
-  pointer-events: none;
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: visible;
-  z-index: 9999;
-}
+    #confettiLayer {
+      pointer-events: none;
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: visible;
+      z-index: 9999;
+    }
 
-.confetti-emoji {
-  position: absolute;
-  font-size: 2rem;
-  will-change: transform, opacity;
-  animation-timing-function: ease-out;
-  animation-iteration-count: 1;
-  animation-fill-mode: forwards;
-}
-@keyframes burst-fade {
-  0% {
-    opacity: 1;
-    transform: translate3d(var(--x-start), var(--y-start), 0) scale(1) rotate(0deg);
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(var(--x-end), var(--y-end), 0) scale(0.6) rotate(540deg);
-  }
-}
+    .confetti-emoji {
+      position: absolute;
+      font-size: 2rem;
+      will-change: transform, opacity;
+      animation-timing-function: ease-out;
+      animation-iteration-count: 1;
+      animation-fill-mode: forwards;
+    }
 
+    @keyframes burst-fade {
+      0% {
+        opacity: 1;
+        transform: translate3d(var(--x-start), var(--y-start), 0) scale(1) rotate(0deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate3d(var(--x-end), var(--y-end), 0) scale(0.6) rotate(540deg);
+      }
+    }
   </style>
 </head>
 <body>
@@ -292,16 +291,16 @@
   </div>
 
   <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem; gap:.5rem;">
-  <button id="prevBtn" style="flex:1; padding:.75rem 1rem; font-size:1rem; border-radius:.5rem; border:1px solid #999; background:#fff; cursor:pointer;">
-    ◀ Previous
-  </button>
-  <div id="puzzleLabel" style="flex:0; font-size:.9rem; font-weight:600; color:#555; text-align:center; white-space:nowrap;">
-    Puzzle 1 / 10
+    <button id="prevBtn" style="flex:1; padding:.75rem 1rem; font-size:1rem; border-radius:.5rem; border:1px solid #999; background:#fff; cursor:pointer;">
+      ◀ Previous
+    </button>
+    <div id="puzzleLabel" style="flex:0; font-size:.9rem; font-weight:600; color:#555; text-align:center; white-space:nowrap;">
+      Puzzle 1 / 10
+    </div>
+    <button id="nextBtn" style="flex:1; padding:.75rem 1rem; font-size:1rem; border-radius:.5rem; border:1px solid #999; background:#fff; cursor:pointer;">
+      Next ▶
+    </button>
   </div>
-  <button id="nextBtn" style="flex:1; padding:.75rem 1rem; font-size:1rem; border-radius:.5rem; border:1px solid #999; background:#fff; cursor:pointer;">
-    Next ▶
-  </button>
-</div>
 
   <div class="section-title">Decode the Phrase</div>
   <div class="phrase-wrapper" id="phraseArea"></div>
@@ -332,18 +331,9 @@
   <script>
   (function(){
 
-    // --- ALL 10 PUZZLES ----------------------------------------------------
-    // For each puzzle:
-    // - phrase: final solution text (used for win condition)
-    // - phraseWords: array of word-arrays (each entry is emojis for that word)
-    // - mapping: emoji -> {letter, number}
-    // - uniqueEmojis: list of all emojis used in that puzzle
-    // - equations: array of {left:[emoji,"+",emoji,...], target:number}
-    //
-    // Important: every letter in the phrase must have an emoji in phraseWords
-    // and that emoji must appear in mapping.
-    // Also we make sure each emoji appears in (or is inferable from) equations.
-
+    // -----------------------
+    // 1. PUZZLES
+    // -----------------------
     const PUZZLES = [
       // 1. COOL GAME BRO
       {
@@ -351,7 +341,7 @@
         phraseWords: [
           ["🦊","🪐","🪐","🐸"],        // COOL
           ["🚀","🌵","🎲","🔮"],        // GAME
-          ["🧊","🐙","🪐"]             // BRO (B R O)
+          ["🧊","🐙","🪐"]             // BRO
         ],
         mapping: {
           "🦊": { letter:"C", number:3 },
@@ -366,12 +356,12 @@
         },
         uniqueEmojis: ["🦊","🪐","🐸","🚀","🌵","🎲","🔮","🧊","🐙"],
         equations: [
-          { left:["🦊","+","🪐"], target:11 },              //3+8
-          { left:["🪐","+","🐸"], target:12 },              //8+4
-          { left:["🚀","+","🌵","+","🎲"], target:14 },     //7+1+6
-          { left:["🎲","+","🔮"], target:8 },              //6+2
-          { left:["🧊","+","🌵"], target:6 },              //5+1
-          { left:["🐙","+","🌵"], target:10 }              //9+1
+          { left:["🦊","+","🪐"], target:11 },
+          { left:["🪐","+","🐸"], target:12 },
+          { left:["🚀","+","🌵","+","🎲"], target:14 },
+          { left:["🎲","+","🔮"], target:8 },
+          { left:["🧊","+","🌵"], target:6 },
+          { left:["🐙","+","🌵"], target:10 }
         ]
       },
 
@@ -384,15 +374,6 @@
           ["🐙","🌵","🦊"],           // NAP
           ["🧊","🍄","🎲","🔮"]       // TIME
         ],
-        // We need coverage for I,T,I,S,N,A,P,T,I,M,E
-        // - 🍄 = I
-        // - 🧊 = T
-        // - 🐸 = S
-        // - 🐙 = N
-        // - 🌵 = A
-        // - 🦊 = P
-        // - 🎲 = M
-        // - 🔮 = E
         mapping: {
           "🍄": { letter:"I", number:4 },
           "🧊": { letter:"T", number:9 },
@@ -405,11 +386,11 @@
         },
         uniqueEmojis: ["🍄","🧊","🐸","🐙","🌵","🦊","🎲","🔮"],
         equations: [
-          { left:["🍄","+","🧊"], target:13 },     //4+9
-          { left:["🐸","+","🐙"], target:7 },      //2+5
-          { left:["🌵","+","🦊"], target:8 },      //1+7
-          { left:["🎲","+","🔮"], target:9 },      //6+3
-          { left:["🧊","+","🎲"], target:15 }      //9+6
+          { left:["🍄","+","🧊"], target:13 },
+          { left:["🐸","+","🐙"], target:7 },
+          { left:["🌵","+","🦊"], target:8 },
+          { left:["🎲","+","🔮"], target:9 },
+          { left:["🧊","+","🎲"], target:15 }
         ]
       },
 
@@ -422,7 +403,6 @@
           ["🦊","🔮","🌊","🚀","🌵","🐙"],  // VERBAL
           ["🧊","🔮","🌵"]                // TEA
         ],
-        // Letters needed: H E R B A L / O R / V E R B A L / T E A
         mapping: {
           "🪐": { letter:"H", number:4 },
           "🔮": { letter:"E", number:2 },
@@ -436,12 +416,12 @@
         },
         uniqueEmojis: ["🪐","🔮","🌊","🚀","🌵","🐙","🎲","🦊","🧊"],
         equations: [
-          { left:["🪐","+","🔮"], target:6 },              //4+2
-          { left:["🌊","+","🚀"], target:14 },             //9+5
-          { left:["🌵","+","🐙"], target:8 },              //1+7
-          { left:["🎲","+","🌊"], target:15 },             //6+9
-          { left:["🦊","+","🔮"], target:10 },             //8+2
-          { left:["🧊","+","🔮","+","🌵"], target:6 }       //3+2+1
+          { left:["🪐","+","🔮"], target:6 },
+          { left:["🌊","+","🚀"], target:14 },
+          { left:["🌵","+","🐙"], target:8 },
+          { left:["🎲","+","🌊"], target:15 },
+          { left:["🦊","+","🔮"], target:10 },
+          { left:["🧊","+","🔮","+","🌵"], target:6 }
         ]
       },
 
@@ -453,7 +433,6 @@
           ["🧊","🎲"],                             // TO
           ["🌊","🌵","🚀","🔮","🌵","🐸","🎲","🐙"]  // RAGEAHOL
         ],
-        // We need A D D I C T E D / T O / R A G E A H O L
         mapping: {
           "🌵": { letter:"A", number:1 },
           "🎲": { letter:"D", number:7 },
@@ -468,52 +447,51 @@
         },
         uniqueEmojis: ["🌵","🎲","🍄","🦊","🧊","🔮","🌊","🚀","🐸","🐙"],
         equations: [
-          { left:["🌵","+","🎲"], target:8 },              //1+7
-          { left:["🎲","+","🍄"], target:11 },             //7+4
-          { left:["🦊","+","🧊"], target:17 },             //8+9
-          { left:["🔮","+","🎲"], target:10 },             //3+7
-          { left:["🌊","+","🌵","+","🚀"], target:8 },      //5+1+2
-          { left:["🐸","+","🎲"], target:11 },             //4+7
-          { left:["🎲","+","🐙"], target:15 }              //7+8
+          { left:["🌵","+","🎲"], target:8 },
+          { left:["🎲","+","🍄"], target:11 },
+          { left:["🦊","+","🧊"], target:17 },
+          { left:["🔮","+","🎲"], target:10 },
+          { left:["🌊","+","🌵","+","🚀"], target:8 },
+          { left:["🐸","+","🎲"], target:11 },
+          { left:["🎲","+","🐙"], target:15 }
         ]
       },
 
-      // 5. I BARELY EVEN KNOW HER  (FIXED)
-{
-  phrase: "I BARELY EVEN KNOW HER",
-  phraseWords: [
-    ["🍄"],                                         // I
-    ["🚀","🌵","🌊","🔮","🐙","🧊"],                 // BARELY
-    ["🔮","🎲","🔮","🪐"],                           // EVEN
-    ["🦊","🪐","🐸","🦴"],                           // KNOW
-    ["🐢","🔮","🌊"]                                // HER
-  ],
-  mapping: {
-    "🍄": { letter:"I", number:4 },
-    "🚀": { letter:"B", number:6 },
-    "🌵": { letter:"A", number:1 },
-    "🌊": { letter:"R", number:9 },
-    "🔮": { letter:"E", number:2 },
-    "🐙": { letter:"L", number:7 },
-    "🧊": { letter:"Y", number:8 },
-    "🎲": { letter:"V", number:5 },
-    "🪐": { letter:"N", number:3 },
-    "🦊": { letter:"K", number:4 },
-    "🐸": { letter:"O", number:6 },
-    "🦴": { letter:"W", number:2 },
-    "🐢": { letter:"H", number:5 }
-  },
-  uniqueEmojis: ["🍄","🚀","🌵","🌊","🔮","🐙","🧊","🎲","🪐","🦊","🐸","🦴","🐢"],
-  equations: [
-    { left:["🍄","+","🚀"], target:10 },                 // 4+6
-    { left:["🌵","+","🌊"], target:10 },                 // 1+9
-    { left:["🔮","+","🐙","+","🧊"], target:17 },        // 2+7+8
-    { left:["🔮","+","🎲"], target:7 },                  // 2+5
-    { left:["🦊","+","🪐","+","🐸","+","🦴"], target:15 },// 4+3+6+2
-    { left:["🐢","+","🔮"], target:7 }                   // 5+2
-  ]
-},
-
+      // 5. I BARELY EVEN KNOW HER (FIXED)
+      {
+        phrase: "I BARELY EVEN KNOW HER",
+        phraseWords: [
+          ["🍄"],                                         // I
+          ["🚀","🌵","🌊","🔮","🐙","🧊"],                 // BARELY
+          ["🔮","🎲","🔮","🪐"],                           // EVEN
+          ["🦊","🪐","🐸","🦴"],                           // KNOW
+          ["🐢","🔮","🌊"]                                // HER
+        ],
+        mapping: {
+          "🍄": { letter:"I", number:4 },
+          "🚀": { letter:"B", number:6 },
+          "🌵": { letter:"A", number:1 },
+          "🌊": { letter:"R", number:9 },
+          "🔮": { letter:"E", number:2 },
+          "🐙": { letter:"L", number:7 },
+          "🧊": { letter:"Y", number:8 },
+          "🎲": { letter:"V", number:5 },
+          "🪐": { letter:"N", number:3 },
+          "🦊": { letter:"K", number:4 },
+          "🐸": { letter:"O", number:6 },
+          "🦴": { letter:"W", number:2 },
+          "🐢": { letter:"H", number:5 }
+        },
+        uniqueEmojis: ["🍄","🚀","🌵","🌊","🔮","🐙","🧊","🎲","🪐","🦊","🐸","🦴","🐢"],
+        equations: [
+          { left:["🍄","+","🚀"], target:10 },
+          { left:["🌵","+","🌊"], target:10 },
+          { left:["🔮","+","🐙","+","🧊"], target:17 },
+          { left:["🔮","+","🎲"], target:7 },
+          { left:["🦊","+","🪐","+","🐸","+","🦴"], target:15 },
+          { left:["🐢","+","🔮"], target:7 }
+        ]
+      },
 
       // 6. SEND MORE KITTENS
       {
@@ -523,20 +501,6 @@
           ["🚀","🔮","🌵","🐸"],               // MORE
           ["🧊","🍄","🦴","🦴","🐸","🪼","🐍"] // KITTENS
         ],
-        // We need S E N D / M O R E / K I T T E N S
-        // Map each:
-        // 🦊 S
-        // 🐸 E
-        // 🪐 N
-        // 🎲 D
-        // 🚀 M
-        // 🔮 O
-        // 🌵 R
-        // 🧊 K
-        // 🍄 I
-        // 🦴 T
-        // 🪼 N (again N, reuse 5)
-        // 🐍 S (again S, reuse 6)
         mapping: {
           "🦊": { letter:"S", number:6 },
           "🐸": { letter:"E", number:2 },
@@ -553,13 +517,13 @@
         },
         uniqueEmojis: ["🦊","🐸","🪐","🎲","🚀","🔮","🌵","🧊","🍄","🦴","🪼","🐍"],
         equations: [
-          { left:["🦊","+","🐸"], target:8 },                //6+2
-          { left:["🐸","+","🪐","+","🎲"], target:11 },      //2+5+4
-          { left:["🚀","+","🔮"], target:15 },              //7+8
-          { left:["🌵","+","🐸"], target:5 },               //3+2
-          { left:["🧊","+","🍄"], target:10 },              //9+1
-          { left:["🦴","+","🦴"], target:8 },               //4+4
-          { left:["🐸","+","🪼","+","🐍"], target:13 }       //2+5+6
+          { left:["🦊","+","🐸"], target:8 },
+          { left:["🐸","+","🪐","+","🎲"], target:11 },
+          { left:["🚀","+","🔮"], target:15 },
+          { left:["🌵","+","🐸"], target:5 },
+          { left:["🧊","+","🍄"], target:10 },
+          { left:["🦴","+","🦴"], target:8 },
+          { left:["🐸","+","🪼","+","🐍"], target:13 }
         ]
       },
 
@@ -571,7 +535,6 @@
           ["🐙"],                        // A
           ["🎲","🔮","🪐","🦴"]          // VIBE
         ],
-        // We need C A U G H T / A / V I B E
         mapping: {
           "🌵": { letter:"C", number:2 },
           "🐙": { letter:"A", number:1 },
@@ -586,12 +549,12 @@
         },
         uniqueEmojis: ["🌵","🐙","🚀","🦊","🐸","🧊","🎲","🔮","🪐","🦴"],
         equations: [
-          { left:["🌵","+","🐙"], target:3 },       //2+1
-          { left:["🚀","+","🦊"], target:13 },      //6+7
-          { left:["🐸","+","🧊"], target:13 },      //4+9
-          { left:["🎲","+","🔮"], target:11 },      //8+3
-          { left:["🪐","+","🦴"], target:7 },       //5+2
-          { left:["🐙","+","🎲"], target:9 }        //1+8
+          { left:["🌵","+","🐙"], target:3 },
+          { left:["🚀","+","🦊"], target:13 },
+          { left:["🐸","+","🧊"], target:13 },
+          { left:["🎲","+","🔮"], target:11 },
+          { left:["🪐","+","🦴"], target:7 },
+          { left:["🐙","+","🎲"], target:9 }
         ]
       },
 
@@ -604,7 +567,6 @@
           ["🪐","🐸","🎲"],                         // FOR
           ["🐙","🦴","🔮","🚀"]                     // ANTS
         ],
-        // We need A / C E N T E R / F O R / A N T S
         mapping: {
           "🐙": { letter:"A", number:1 },
           "🧊": { letter:"C", number:6 },
@@ -618,12 +580,12 @@
         },
         uniqueEmojis: ["🐙","🧊","🌵","🦴","🔮","🎲","🪐","🐸","🚀"],
         equations: [
-          { left:["🧊","+","🌵"], target:8 },                     //6+2
-          { left:["🦴","+","🔮"], target:14 },                   //5+9
-          { left:["🌵","+","🎲"], target:6 },                    //2+4
-          { left:["🪐","+","🐸"], target:15 },                   //7+8
-          { left:["🎲","+","🐙"], target:5 },                    //4+1
-          { left:["🐙","+","🦴","+","🔮","+","🚀"], target:18 }   //1+5+9+3
+          { left:["🧊","+","🌵"], target:8 },
+          { left:["🦴","+","🔮"], target:14 },
+          { left:["🌵","+","🎲"], target:6 },
+          { left:["🪐","+","🐸"], target:15 },
+          { left:["🎲","+","🐙"], target:5 },
+          { left:["🐙","+","🦴","+","🔮","+","🚀"], target:18 }
         ]
       },
 
@@ -637,7 +599,6 @@
           ["🚀","🌵","🪼","🔮"],     // MEAN
           ["🐙","🪐","🔮"]           // SON
         ],
-        // We need B Y / D O G / I / M E A N / S O N
         mapping: {
           "🧊": { letter:"B", number:4 },
           "🎲": { letter:"Y", number:7 },
@@ -653,12 +614,12 @@
         },
         uniqueEmojis: ["🧊","🎲","🐸","🪐","🦊","🍄","🚀","🌵","🪼","🔮","🐙"],
         equations: [
-          { left:["🧊","+","🎲"], target:11 },           //4+7
-          { left:["🐸","+","🪐"], target:14 },           //8+6
-          { left:["🦊","+","🍄"], target:8 },            //5+3
-          { left:["🚀","+","🌵"], target:11 },           //9+2
-          { left:["🪼","+","🔮"], target:5 },            //1+4
-          { left:["🐙","+","🪐","+","🔮"], target:16 }    //6+6+4
+          { left:["🧊","+","🎲"], target:11 },
+          { left:["🐸","+","🪐"], target:14 },
+          { left:["🦊","+","🍄"], target:8 },
+          { left:["🚀","+","🌵"], target:11 },
+          { left:["🪼","+","🔮"], target:5 },
+          { left:["🐙","+","🪐","+","🔮"], target:16 }
         ]
       },
 
@@ -671,7 +632,6 @@
           ["🐙","🐸"],                // SO
           ["🍄","🎲","🌵"]            // FAR
         ],
-        // We need G R E A T / W O R K / S O / F A R
         mapping: {
           "🦊": { letter:"G", number:8 },
           "🌵": { letter:"R", number:4 },
@@ -686,45 +646,45 @@
         },
         uniqueEmojis: ["🦊","🌵","🧊","🎲","🔮","🚀","🐸","🦴","🐙","🍄"],
         equations: [
-          { left:["🦊","+","🌵"], target:12 },         //8+4
-          { left:["🧊","+","🎲"], target:3 },          //2+1
-          { left:["🔮","+","🚀"], target:15 },         //9+6
-          { left:["🐸","+","🌵"], target:11 },         //7+4
-          { left:["🦴","+","🐙"], target:8 },          //5+3
-          { left:["🍄","+","🎲","+","🌵"], target:9 }   //4+1+4
+          { left:["🦊","+","🌵"], target:12 },
+          { left:["🧊","+","🎲"], target:3 },
+          { left:["🔮","+","🚀"], target:15 },
+          { left:["🐸","+","🌵"], target:11 },
+          { left:["🦴","+","🐙"], target:8 },
+          { left:["🍄","+","🎲","+","🌵"], target:9 }
         ]
       }
     ];
 
-    // Put Puzzles in Order
-    let currentIndex = 0; // start at puzzle 0
+    // -----------------------
+    // 2. GLOBAL STATE
+    // -----------------------
+    let currentIndex = 0;
     let currentPuzzle = PUZZLES[currentIndex];
 
-
-    // Track solve state for each emoji
-    // { "🦊": {letter:"", number:"", solved:false}, ... }
+    // per-emoji solve state for current puzzle
     const playerState = {};
     currentPuzzle.uniqueEmojis.forEach(em=>{
       playerState[em] = { letter:"", number:"", solved:false };
     });
 
+    // confetti state
     let hasCelebrated = false;
 
-    // DOM refs
+    // -----------------------
+    // 3. DOM REFS
+    // -----------------------
     const phraseArea    = document.getElementById("phraseArea");
     const equationsArea = document.getElementById("equationsArea");
-    const solutionLines = document.getElementById("solutionLines"); //may be null now
-    const winBox        = document.getElementById("winBox"); //may be null now
-    const prevBtn      = document.getElementById("prevBtn");
-    const nextBtn      = document.getElementById("nextBtn");
-    const puzzleLabel  = document.getElementById("puzzleLabel");
-    const confettiLayer = document.getElementById("confettiLayer");
+    const solutionLines = document.getElementById("solutionLines"); // may be null (hidden box)
+    const winBox        = document.getElementById("winBox");        // may be null (hidden box)
+    const prevBtn       = document.getElementById("prevBtn");
+    const nextBtn       = document.getElementById("nextBtn");
+    const puzzleLabel   = document.getElementById("puzzleLabel");
 
-    // Render PHRASE
-    // Each word:
-    // - top row: inputs per emoji
-    // - bottom row: emojis per emoji
-    // After each word (except last), insert a "/" separator visually in the wrapper.
+    // -----------------------
+    // 4. RENDER PHRASE
+    // -----------------------
     function renderPhrase(){
       phraseArea.innerHTML = "";
 
@@ -759,13 +719,6 @@
           topRow.appendChild(stack);
         });
 
-        // emoji row under it (visual reference)
-        wordArr.forEach(em=>{
-          const emSpan = document.createElement("div");
-          emSpan.className = "char-emoji";
-          emSpan.textContent = em;
-        });
-
         wordBlock.appendChild(topRow);
         phraseArea.appendChild(wordBlock);
 
@@ -778,9 +731,9 @@
       });
     }
 
-    // Render EQUATIONS
-    // Each equation is:
-    // [ num-input / emoji ] + [ num-input / emoji ] ... = target ✅/❌
+    // -----------------------
+    // 5. RENDER EQUATIONS
+    // -----------------------
     function renderEquations(){
       equationsArea.innerHTML = "";
 
@@ -839,23 +792,26 @@
       updateEquationsStatus();
     }
 
-    // Render SOLUTION KEY
-    // For each solved emoji, show "🦊 = C = 3"
+    // -----------------------
+    // 6. SOLUTION KEY (hidden UI-safe)
+    // -----------------------
     function renderSolutionBox(){
-  if (!solutionLines) return; // box hidden
-  solutionLines.innerHTML = "";
-  currentPuzzle.uniqueEmojis.forEach(em=>{
-    const st = playerState[em];
-    if(st.solved){
-      const line = document.createElement("div");
-      line.className = "solution-line-solved";
-      line.textContent = `${em} = ${st.letter} = ${st.number}`;
-      solutionLines.appendChild(line);
+      if (!solutionLines) return;
+      solutionLines.innerHTML = "";
+      currentPuzzle.uniqueEmojis.forEach(em=>{
+        const st = playerState[em];
+        if(st.solved){
+          const line = document.createElement("div");
+          line.className = "solution-line-solved";
+          line.textContent = `${em} = ${st.letter} = ${st.number}`;
+          solutionLines.appendChild(line);
+        }
+      });
     }
-  });
-}
-    
-     // Check equations to set ✅ / ❌
+
+    // -----------------------
+    // 7. EQUATIONS STATUS
+    // -----------------------
     function updateEquationsStatus(){
       currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
         let allKnown = true;
@@ -884,10 +840,9 @@
       });
     }
 
-    
-    // Build the solved phrase so far:
-    // For win check, we ONLY accept correct solved emojis.
-    // Unsolved positions count as "_".
+    // -----------------------
+    // 8. CURRENT SOLVED PHRASE STRING
+    // -----------------------
     function getCurrentSolvedPhrase(){
       const wordsSolved = currentPuzzle.phraseWords.map(wordArr => {
         return wordArr.map(em => {
@@ -900,15 +855,14 @@
       });
       return wordsSolved.join(" ");
     }
-    
-    // Handle guesses from any input:
-    // - phrase letter boxes (kind="letter")
-    // - equation number boxes (kind="number")
+
+    // -----------------------
+    // 9. HANDLE INPUT FROM USER
+    // -----------------------
     function handleGuessInput(e){
       const em   = e.target.dataset.emoji;
       const kind = e.target.dataset.kind;
 
-      // if it's already solved, just sync it back and ignore edits
       if(playerState[em].solved){
         syncSolvedEmojiEverywhere(em);
         updateEquationsStatus();
@@ -922,7 +876,6 @@
         val = val.toUpperCase().replace(/[^A-Z]/g,"").slice(0,1);
         e.target.value = val;
       } else {
-        // kind === "number"
         if(val !== ""){
           let n = parseInt(val,10);
           if(isNaN(n)) n = "";
@@ -940,14 +893,11 @@
       const solvedByNumber = (kind==="number" && val === correctNumber);
 
       if(solvedByLetter || solvedByNumber){
-        // Mark global solved
         playerState[em].solved  = true;
         playerState[em].letter  = correctLetter;
         playerState[em].number  = correctNumber;
-
         syncSolvedEmojiEverywhere(em);
       } else {
-        // Not solved yet, store partial guess
         if(kind === "letter"){
           playerState[em].letter = val;
         } else {
@@ -960,10 +910,9 @@
       checkWin();
     }
 
-    // Sync an emoji everywhere once it's solved:
-    // - fill and disable all phrase letter inputs for that emoji
-    // - fill and disable all number inputs for that emoji in equations
-    // - update solution box
+    // -----------------------
+    // 10. SYNC SOLVED EMOJI
+    // -----------------------
     function syncSolvedEmojiEverywhere(em){
       const correctLetter = currentPuzzle.mapping[em].letter;
       const correctNumber = String(currentPuzzle.mapping[em].number);
@@ -971,14 +920,12 @@
       playerState[em].letter  = correctLetter;
       playerState[em].number  = correctNumber;
 
-      // phrase inputs
       const phraseInputs = phraseArea.querySelectorAll(`.char-input[data-emoji="${em}"]`);
       phraseInputs.forEach(inp=>{
         inp.value = correctLetter;
         inp.disabled = true;
       });
 
-      // equation inputs
       const eqInputs = equationsArea.querySelectorAll(`.num-input[data-emoji="${em}"]`);
       eqInputs.forEach(inp=>{
         inp.value = correctNumber;
@@ -988,146 +935,140 @@
       renderSolutionBox();
     }
 
-
+    // -----------------------
+    // 11. CONFETTI
+    // -----------------------
     function launchConfetti() {
-  if (hasCelebrated) return;
-  hasCelebrated = true;
+      if (hasCelebrated) return;
+      hasCelebrated = true;
 
-  const layer = document.getElementById("confettiLayer");
-  if (!layer) return;
+      const layer = document.getElementById("confettiLayer");
+      if (!layer) return;
 
-  // MUCH larger pool, including puzzle-ish symbols and hype emojis
-  const confettiEmojis = [
-    "🎉","🎊","✨","💥","💫","🌟","🔥","🤩","😎","🦄",
-    "🦊","🐸","🪐","🎲","🚀","🌵","🔮","🧊","🐙","🍄","🦴","🐢","🪼","🐍"
-  ];
+      const confettiEmojis = [
+        "🎉","🎊","✨","💥","💫","🌟","🔥","🤩","😎","🦄",
+        "🦊","🐸","🪐","🎲","🚀","🌵","🔮","🧊","🐙","🍄","🦴","🐢","🪼","🐍"
+      ];
 
-  // Spawn more particles for bigger celebration
-  const howMany = 60;
+      const howMany = 60;
 
-  for (let i = 0; i < howMany; i++) {
-    const piece = document.createElement("div");
-    piece.className = "confetti-emoji";
-    piece.textContent = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
+      for (let i = 0; i < howMany; i++) {
+        const piece = document.createElement("div");
+        piece.className = "confetti-emoji";
+        piece.textContent = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
 
-    // Start near bottom center
-    // We'll express start position in viewport units so it scales
-    const startXvw = 50;                 // middle of screen
-    const startYvh = 90 + Math.random()*4; // around bottom (90-94vh)
+        const startXvw = 50;
+        const startYvh = 90 + Math.random()*4;
 
-    // Pick a launch angle and distance
-    // angle between, say, -75deg (up-left) to -105deg (up-right) gives narrow cone,
-    // but you asked "all corners", so let's go wide: -40deg (up-right-ish) to -140deg (up-left-ish)
-    const angleDeg = -40 - Math.random()*100; // -40 to -140
-    const angleRad = angleDeg * Math.PI / 180;
+        const angleDeg = -40 - Math.random()*100; // -40 to -140
+        const angleRad = angleDeg * Math.PI / 180;
 
-    // speed magnitude (how far it travels)
-    const distanceVh = 40 + Math.random()*30; // 40-70vh "height" of travel
-    // convert polar to x/y deltas in viewport units
-    const dxVw = Math.cos(angleRad) * (distanceVh * 0.6); // scale to vw-ish
-    const dyVh = Math.sin(angleRad) * distanceVh; // negative (goes up)
+        const distanceVh = 40 + Math.random()*30;
+        const dxVw = Math.cos(angleRad) * (distanceVh * 0.6);
+        const dyVh = Math.sin(angleRad) * distanceVh;
 
-    // end positions
-    const endXvw = startXvw + dxVw;
-    const endYvh = startYvh + dyVh; // should be much smaller vh (toward top)
+        const endXvw = startXvw + dxVw;
+        const endYvh = startYvh + dyVh;
 
-    // animation timing
-    const duration = 800 + Math.random()*700; // 0.8s - 1.5s
-    const delay    = Math.random()*100;       // up to 0.1s
+        const duration = 800 + Math.random()*700;
+        const delay    = Math.random()*100;
 
-    // feed the keyframe custom props
-    piece.style.setProperty('--x-start', startXvw + 'vw');
-    piece.style.setProperty('--y-start', startYvh + 'vh');
-    piece.style.setProperty('--x-end',   endXvw  + 'vw');
-    piece.style.setProperty('--y-end',   endYvh  + 'vh');
+        piece.style.setProperty('--x-start', startXvw + 'vw');
+        piece.style.setProperty('--y-start', startYvh + 'vh');
+        piece.style.setProperty('--x-end',   endXvw  + 'vw');
+        piece.style.setProperty('--y-end',   endYvh  + 'vh');
 
-    // hook into animation
-    piece.style.left = startXvw + "vw";
-    piece.style.top  = startYvh + "vh";
-    piece.style.animationName = "burst-fade";
-    piece.style.animationDuration = duration + "ms";
-    piece.style.animationDelay    = delay + "ms";
+        piece.style.left = startXvw + "vw";
+        piece.style.top  = startYvh + "vh";
+        piece.style.animationName = "burst-fade";
+        piece.style.animationDuration = duration + "ms";
+        piece.style.animationDelay    = delay + "ms";
 
-    layer.appendChild(piece);
+        layer.appendChild(piece);
 
-    // cleanup after it's done
-    setTimeout(() => {
-      piece.remove();
-    }, duration + delay + 200);
-  }
-}
-
-
-    // Check win:
-    // - phrase must be fully revealed AND match puzzle.phrase
-    // - all equations must show ✅
-    function checkWin(){
-  const finalPhrase = getCurrentSolvedPhrase();
-  const phraseDone = (finalPhrase === currentPuzzle.phrase);
-
-  let allEqCorrect = true;
-  currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
-    const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
-    if(!resDiv || !resDiv.classList.contains("status-ok")){
-      allEqCorrect = false;
+        setTimeout(() => {
+          piece.remove();
+        }, duration + delay + 200);
+      }
     }
-  });
 
-  if (phraseDone && allEqCorrect) {
-  if (winBox) {
-    winBox.style.display = "block";
-  }
-  launchConfetti();
-} else {
-  if (winBox) {
-    winBox.style.display = "none";
-  }
-}
+    // -----------------------
+    // 12. CHECK WIN
+    // -----------------------
+    function checkWin(){
+      const finalPhrase = getCurrentSolvedPhrase();
+      const phraseDone = (finalPhrase === currentPuzzle.phrase);
 
-      /*Load Puzzle */
-function loadPuzzle(index){
-  if (index < 0) index = 0;
-  if (index > PUZZLES.length - 1) index = PUZZLES.length - 1;
-  currentIndex = index;
-  currentPuzzle = PUZZLES[currentIndex];
-  hasCelebrated = false;
+      let allEqCorrect = true;
+      currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
+        const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
+        if(!resDiv || !resDiv.classList.contains("status-ok")){
+          allEqCorrect = false;
+        }
+      });
 
-  // reset state
-  for (const key of Object.keys(playerState)) {
-    delete playerState[key];
-  }
-  currentPuzzle.uniqueEmojis.forEach(em=>{
-    playerState[em] = { letter:"", number:"", solved:false };
-  });
+      if (phraseDone && allEqCorrect) {
+        if (winBox) {
+          winBox.style.display = "block";
+        }
+        launchConfetti();
+      } else {
+        if (winBox) {
+          winBox.style.display = "none";
+        }
+      }
+    }
 
-  // re-render
-  renderPhrase();
-  renderEquations();
-  renderSolutionBox();
+    // -----------------------
+    // 13. LOAD PUZZLE (Prev/Next)
+    // -----------------------
+    function loadPuzzle(index){
+      if (index < 0) index = 0;
+      if (index > PUZZLES.length - 1) index = PUZZLES.length - 1;
+      currentIndex = index;
+      currentPuzzle = PUZZLES[currentIndex];
+      hasCelebrated = false;
 
-  // update label
-  if (puzzleLabel) {
-    puzzleLabel.textContent = `Puzzle ${currentIndex+1} / ${PUZZLES.length}`;
-  }
-}
+      // reset playerState for new puzzle
+      for (const key of Object.keys(playerState)) {
+        delete playerState[key];
+      }
+      currentPuzzle.uniqueEmojis.forEach(em=>{
+        playerState[em] = { letter:"", number:"", solved:false };
+      });
 
-    // Init
+      // draw UI fresh
+      renderPhrase();
+      renderEquations();
+      renderSolutionBox();
+
+      // label
+      if (puzzleLabel) {
+        puzzleLabel.textContent = `Puzzle ${currentIndex+1} / ${PUZZLES.length}`;
+      }
+    }
+
+    // -----------------------
+    // 14. INIT
+    // -----------------------
     function init(){
-  loadPuzzle(0); // start on the first puzzle
-}
+      loadPuzzle(0); // show first puzzle on load
+    }
+
     init();
 
-      if (prevBtn) {
-  prevBtn.addEventListener("click", ()=>{
-    loadPuzzle(currentIndex - 1);
-  });
-}
-if (nextBtn) {
-  nextBtn.addEventListener("click", ()=>{
-    loadPuzzle(currentIndex + 1);
-  });
-}
+    // After init, hook up buttons
+    if (prevBtn) {
+      prevBtn.addEventListener("click", ()=>{
+        loadPuzzle(currentIndex - 1);
+      });
+    }
 
+    if (nextBtn) {
+      nextBtn.addEventListener("click", ()=>{
+        loadPuzzle(currentIndex + 1);
+      });
+    }
 
   })();
   </script>

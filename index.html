@@ -246,6 +246,37 @@
       color:#555;
       text-decoration:none;
     }
+    /* celebration confetti */
+#confettiLayer {
+  pointer-events: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.confetti-emoji {
+  position: absolute;
+  font-size: 2rem;
+  animation-name: fall-spin;
+  animation-timing-function: linear;
+  animation-iteration-count: 1;
+}
+
+@keyframes fall-spin {
+  0% {
+    transform: translate3d(var(--x-start), -10vh, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--x-end), 110vh, 0) rotate(720deg) scale(0.8);
+    opacity: 0;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -281,6 +312,8 @@
     Licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0 International</a>. <br>
     <a href="https://salimahismail.com" target="_blank">https://salimahismail.com</a> 
   </footer>
+
+  <div id="confettiLayer"></div>
 
   <script>
   (function(){
@@ -659,6 +692,8 @@
       playerState[em] = { letter:"", number:"", solved:false };
     });
 
+    let hasCelebrated = false;
+
     // DOM refs
     const phraseArea    = document.getElementById("phraseArea");
     const equationsArea = document.getElementById("equationsArea");
@@ -931,27 +966,75 @@
       return wordsSolved.join(" ");
     }
 
+    function launchConfetti() {
+  if (hasCelebrated) return; // don't run twice
+  hasCelebrated = true;
+
+  const layer = document.getElementById("confettiLayer");
+  if (!layer) return;
+
+  // pick some fun emojis for the celebration
+  const confettiEmojis = ["🎉","✨","🎊","💥","🌟","💫","🔥","😎","🤩","🦄"];
+
+  const howMany = 30; // number of pieces to drop
+  for (let i = 0; i < howMany; i++) {
+    const piece = document.createElement("div");
+    piece.className = "confetti-emoji";
+
+    // pick an emoji
+    piece.textContent = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
+
+    // random horizontal start position across viewport
+    const startXvw = Math.random() * 100; // 0 to 100vw
+    // give it a little horizontal drift so it doesn't fall straight down
+    const endXvw = startXvw + (Math.random()*20 - 10); // +/-10vw
+
+    // random fall duration (longer = slower float)
+    const duration = 1500 + Math.random() * 1500; // 1.5s - 3s
+
+    // custom properties for keyframes to use
+    piece.style.setProperty('--x-start', startXvw + 'vw');
+    piece.style.setProperty('--x-end', endXvw + 'vw');
+
+    // random delay so they don't all drop in the same exact millisecond
+    const delay = Math.random() * 300; // up to 0.3s
+
+    piece.style.left = startXvw + "vw";
+    piece.style.top = "-10vh";
+    piece.style.animationDuration = duration + "ms";
+    piece.style.animationDelay = delay + "ms";
+
+    layer.appendChild(piece);
+
+    // cleanup after animation so DOM doesn't fill forever
+    setTimeout(() => {
+      piece.remove();
+    }, duration + delay + 200);
+  }
+}
+
     // Check win:
     // - phrase must be fully revealed AND match puzzle.phrase
     // - all equations must show ✅
     function checkWin(){
-      const finalPhrase = getCurrentSolvedPhrase();
-      const phraseDone = (finalPhrase === currentPuzzle.phrase);
+  const finalPhrase = getCurrentSolvedPhrase();
+  const phraseDone = (finalPhrase === currentPuzzle.phrase);
 
-      let allEqCorrect = true;
-      currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
-        const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
-        if(!resDiv || !resDiv.classList.contains("status-ok")){
-          allEqCorrect = false;
-        }
-      });
-
-      if(phraseDone && allEqCorrect){
-        winBox.style.display = "block";
-      } else {
-        winBox.style.display = "none";
-      }
+  let allEqCorrect = true;
+  currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
+    const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
+    if(!resDiv || !resDiv.classList.contains("status-ok")){
+      allEqCorrect = false;
     }
+  });
+
+  if (phraseDone && allEqCorrect) {
+    winBox.style.display = "block";
+    launchConfetti();
+  } else {
+    winBox.style.display = "none";
+  }
+}
 
     // Init
     function init(){

@@ -256,7 +256,7 @@ h2 {
     }
 
     /* celebration confetti */
-    #confettiLayer {
+#confettiLayer {
   pointer-events: none;
   position: fixed;
   left: 0;
@@ -264,7 +264,7 @@ h2 {
   width: 100vw;
   height: 100vh;
   overflow: visible;
-  z-index: 999999; /* bump it absurdly high just in case */
+  z-index: 999999; /* make sure it's always on top */
 }
 
 .confetti-emoji {
@@ -272,22 +272,6 @@ h2 {
   font-size: 2rem;
   will-change: transform, opacity;
   pointer-events: none;
-  opacity: 1;
-  animation-name: fade-spin;
-  animation-timing-function: ease-out;
-  animation-iteration-count: 1;
-  animation-fill-mode: forwards;
-}
-
-@keyframes fade-spin {
-  0% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(0.6) rotate(540deg);
-  }
 }
 
   </style>
@@ -957,11 +941,9 @@ h2 {
     // -----------------------
     // 11. CONFETTI
     // -----------------------
-  function launchConfetti() {
-  // remove this "only once ever" guard for test button fun.
-  // you probably still want to block double-fire on win, so we’ll
-  // only gate inside the win logic, not here.
-  // if (hasCelebrated) return;
+ function launchConfetti() {
+  // prevent double-fire on win, but allow Test Confetti to work
+  if (hasCelebrated && !window._forceConfetti) return;
   hasCelebrated = true;
 
   const layer = document.getElementById("confettiLayer");
@@ -972,89 +954,111 @@ h2 {
     "🦊","🐸","🪐","🎲","🚀","🌵","🔮","🧊","🐙","🍄","🦴","🐢","🪼","🐍"
   ];
 
-  const howMany = 60;
+  const howMany = 80; // a little extra pop
+
+  // where they start (bottom center-ish in viewport units)
+  const startX = window.innerWidth * 0.5;
+  const startY = window.innerHeight * 0.9;
 
   for (let i = 0; i < howMany; i++) {
     const piece = document.createElement("div");
     piece.className = "confetti-emoji";
     piece.textContent = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
 
-    // start near bottom middle
-    const startXvw = 50;
-    const startYvh = 90 + Math.random() * 4; // a little jitter so it isn't one line
+    // random launch angle between ~straight up-left and up-right
+    // we'll bias mostly upward but also sideways
+    const angle = (-Math.PI / 2) + ( (Math.random() - 0.5) * Math.PI * 0.8 );
+    // base speed in pixels per second
+    const speed = 400 + Math.random() * 400; // 400-800 px/s
 
-    // pick a launch angle leaning upward and outward
-    const angleDeg = -40 - Math.random() * 100; // -40 to -140
-    const angleRad = angleDeg * Math.PI / 180;
+    // velocity components
+    const vx = Math.cos(angle) * speed;
+    const vy = Math.sin(angle) * speed; // this is negative (up)
 
-    // how far it flies
-    const distanceVh = 40 + Math.random() * 30; // 40-70 vh-ish "speed"
-    const dxVw = Math.cos(angleRad) * (distanceVh * 0.6);
-    const dyVh = Math.sin(angleRad) * distanceVh;
+    // spin speed
+    const spin = (Math.random() * 720 - 360); // -360 to +360 deg/sec
 
-    const endXvw = startXvw + dxVw;
-    const endYvh = startYvh + dyVh;
+    // how long this particle lives (ms)
+    const life = 1000 + Math.random() * 500; // 1.0s - 1.5s
 
-    // duration / delay jitter
-    const duration = 800 + Math.random() * 700; // 0.8s - 1.5s
-    const delay    = Math.random() * 100;       // tiny stagger
+    // scale start
+    const startScale = 1;
+    const endScale   = 0.5;
 
-    // Position the element at the *end* point using translate()
-    // and at the *start* point using left/top.
-    //
-    // Trick:
-    // - We absolutely position at bottom center (left/top).
-    // - We set a transform that moves it outward to its final spot.
-    // - Then CSS animation "fade-spin" only handles spin+fade+shrink,
-    //   NOT movement. So visually they just "pop" outward instantly
-    //   and shimmer out like fireworks.
-    //
-    // If you want actual flying motion (arc), we can do per-piece keyframes,
-    // but this version is cheap and always renders.
+    // we animate manually
+    const startTime = performance.now();
 
-    piece.style.left = startXvw + "vw";
-    piece.style.top  = startYvh + "vh";
+    function frame(now) {
+      const t = now - startTime;
+      const progress = t / life; // 0 -> 1
 
-    piece.style.transform = `translate(${endXvw - startXvw}vw, ${endYvh - startYvh}vh)`;
+      if (progress >= 1) {
+        piece.remove();
+        return;
+      }
 
-    piece.style.animationDuration = duration + "ms";
-    piece.style.animationDelay    = delay + "ms";
+      // simple physics: x = x0 + vx * (t/1000)
+      const x = startX + vx * (t / 1000);
+      // y has gravity so it arcs downward a bit after going up
+      const gravity = 800; // px/s^2 pulling down
+      const y = startY + (vy * (t / 1000)) + (0.5 * gravity * Math.pow(t/1000, 2));
+
+      // spin angle in degrees
+      const rotateDeg = spin * (t / 1000);
+
+      // scale down over time
+      const scale = startScale + (endScale - startScale) * progress;
+
+      // fade out over time
+      const opacity = 1 - progress;
+
+      piece.style.left = x + "px";
+      piece.style.top  = y + "px";
+      piece.style.opacity = opacity.toString();
+      piece.style.transform = `translate(-50%, -50%) scale(${scale}) rotate(${rotateDeg}deg)`;
+
+      requestAnimationFrame(frame);
+    }
+
+    // start it slightly jittered so they don't all come from SAME pixel
+    const jitterX = (Math.random() - 0.5) * 40; // +/-20px
+    const jitterY = (Math.random() - 0.5) * 20; // +/-10px
+    piece.style.left = (startX + jitterX) + "px";
+    piece.style.top  = (startY + jitterY) + "px";
 
     layer.appendChild(piece);
-
-    // cleanup
-    setTimeout(() => {
-      piece.remove();
-    }, duration + delay + 200);
+    requestAnimationFrame(frame);
   }
 }
 
     // -----------------------
     // 12. CHECK WIN
     // -----------------------
-    function checkWin(){
-      const finalPhrase = getCurrentSolvedPhrase();
-      const phraseDone = (finalPhrase === currentPuzzle.phrase);
+   function checkWin(){
+  const finalPhrase = getCurrentSolvedPhrase();
+  const phraseDone = (finalPhrase === currentPuzzle.phrase);
 
-      let allEqCorrect = true;
-      currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
-        const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
-        if(!resDiv || !resDiv.classList.contains("status-ok")){
-          allEqCorrect = false;
-        }
-      });
-
-      if (phraseDone && allEqCorrect) {
-        if (winBox) {
-          winBox.style.display = "block";
-        }
-        launchConfetti();
-      } else {
-        if (winBox) {
-          winBox.style.display = "none";
-        }
-      }
+  let allEqCorrect = true;
+  currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
+    const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
+    if(!resDiv || !resDiv.classList.contains("status-ok")){
+      allEqCorrect = false;
     }
+  });
+
+  if (phraseDone && allEqCorrect) {
+    if (winBox) {
+      winBox.style.display = "block";
+    }
+    if (!hasCelebrated) {
+      launchConfetti();
+    }
+  } else {
+    if (winBox) {
+      winBox.style.display = "none";
+    }
+  }
+}
 
     // -----------------------
     // 13. LOAD PUZZLE (Prev/Next)
@@ -1094,10 +1098,12 @@ h2 {
 
     init();
 
-    const testConfettiBtn = document.getElementById("testConfettiBtn");
+const testConfettiBtn = document.getElementById("testConfettiBtn");
 if (testConfettiBtn) {
   testConfettiBtn.addEventListener("click", () => {
+    window._forceConfetti = true;
     launchConfetti();
+    window._forceConfetti = false;
   });
 }
 

@@ -942,7 +942,7 @@ h2 {
     // 11. CONFETTI
     // -----------------------
  function launchConfetti() {
-  // prevent double-fire on win, but allow Test Confetti to work
+  // still prevent double-fire on puzzle win
   if (hasCelebrated && !window._forceConfetti) return;
   hasCelebrated = true;
 
@@ -951,82 +951,96 @@ h2 {
 
   const confettiEmojis = [
     "🎉","🎊","✨","💥","💫","🌟","🔥","🤩","😎","🦄",
-    "🦊","🐸","🪐","🎲","🚀","🌵","🔮","🧊","🐙","🍄","🦴","🐢","🪼","🐍"
+    "🦊","🐸","🪐","🎲","🚀","🌵","🔮","🧊","🐙","🍄",
+    "🦴","🐢","🪼","🐍"
   ];
 
-  const howMany = 80; // a little extra pop
+  const howMany = 80;
 
-  // where they start (bottom center-ish in viewport units)
-  const startX = window.innerWidth * 0.5;
-  const startY = window.innerHeight * 0.9;
+  // firework origin: bottom center of the viewport
+  const originX = window.innerWidth * 0.5;
+  const originY = window.innerHeight * 0.9;
 
   for (let i = 0; i < howMany; i++) {
     const piece = document.createElement("div");
     piece.className = "confetti-emoji";
     piece.textContent = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
 
-    // random launch angle between ~straight up-left and up-right
-    // we'll bias mostly upward but also sideways
-    const angle = (-Math.PI / 2) + ( (Math.random() - 0.5) * Math.PI * 0.8 );
-    // base speed in pixels per second
-    const speed = 400 + Math.random() * 400; // 400-800 px/s
+    // --- TRAJECTORY ---
+    // angle: mostly upward, fanning wide left/right
+    // range: from -150deg to -30deg (in radians), so nothing shoots downward
+    const angleDeg = -150 + Math.random() * 120; // -150 .. -30
+    const angleRad = angleDeg * Math.PI / 180;
 
-    // velocity components
-    const vx = Math.cos(angle) * speed;
-    const vy = Math.sin(angle) * speed; // this is negative (up)
+    // strong speed so it reaches across screen
+    const speed = 500 + Math.random() * 400; // px/sec
 
-    // spin speed
-    const spin = (Math.random() * 720 - 360); // -360 to +360 deg/sec
+    // velocity components (no gravity later)
+    const vx = Math.cos(angleRad) * speed;
+    const vy = Math.sin(angleRad) * speed; // negative = up
 
-    // how long this particle lives (ms)
-    const life = 1000 + Math.random() * 500; // 1.0s - 1.5s
+    // spin speed (deg/sec)
+    const spinSpeed = (Math.random() * 720 - 360);
 
-    // scale start
+    // scale over life
     const startScale = 1;
-    const endScale   = 0.5;
+    const endScale   = 0.4;
 
-    // we animate manually
+    // how long we keep particle visible
+    const lifeMs = 2500 + Math.random() * 500; // 2.5s - 3.0s (longer!)
+
+    // small jitter so they don't all start on same pixel
+    const jitterX = (Math.random() - 0.5) * 30;
+    const jitterY = (Math.random() - 0.5) * 15;
+
+    // set initial position
+    let startX = originX + jitterX;
+    let startY = originY + jitterY;
+
+    piece.style.left = startX + "px";
+    piece.style.top  = startY + "px";
+
+    layer.appendChild(piece);
+
     const startTime = performance.now();
 
     function frame(now) {
       const t = now - startTime;
-      const progress = t / life; // 0 -> 1
+      const progress = t / lifeMs; // 0 -> 1
 
       if (progress >= 1) {
         piece.remove();
         return;
       }
 
-      // simple physics: x = x0 + vx * (t/1000)
+      // position: straight-line motion, no gravity pull-down
       const x = startX + vx * (t / 1000);
-      // y has gravity so it arcs downward a bit after going up
-      const gravity = 800; // px/s^2 pulling down
-      const y = startY + (vy * (t / 1000)) + (0.5 * gravity * Math.pow(t/1000, 2));
+      const y = startY + vy * (t / 1000);
 
-      // spin angle in degrees
-      const rotateDeg = spin * (t / 1000);
+      // rotation
+      const rot = spinSpeed * (t / 1000); // deg
 
-      // scale down over time
+      // scale shrinks over time
       const scale = startScale + (endScale - startScale) * progress;
 
-      // fade out over time
-      const opacity = 1 - progress;
+      // fade out slowly toward the end only
+      // stays mostly opaque, then disappears
+      let opacity;
+      if (progress < 0.7) {
+        opacity = 1;
+      } else {
+        const tail = (progress - 0.7) / 0.3; // 0 -> 1 over last 30%
+        opacity = 1 - tail;
+      }
 
       piece.style.left = x + "px";
       piece.style.top  = y + "px";
       piece.style.opacity = opacity.toString();
-      piece.style.transform = `translate(-50%, -50%) scale(${scale}) rotate(${rotateDeg}deg)`;
+      piece.style.transform = `translate(-50%, -50%) scale(${scale}) rotate(${rot}deg)`;
 
       requestAnimationFrame(frame);
     }
 
-    // start it slightly jittered so they don't all come from SAME pixel
-    const jitterX = (Math.random() - 0.5) * 40; // +/-20px
-    const jitterY = (Math.random() - 0.5) * 20; // +/-10px
-    piece.style.left = (startX + jitterX) + "px";
-    piece.style.top  = (startY + jitterY) + "px";
-
-    layer.appendChild(piece);
     requestAnimationFrame(frame);
   }
 }

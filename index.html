@@ -255,23 +255,15 @@ h2 {
       text-decoration:none;
     }
 
-    /* celebration confetti */
-#confettiLayer {
-  pointer-events: none;
+    /* celebration confetti canvas */
+#confettiCanvas {
   position: fixed;
   left: 0;
   top: 0;
   width: 100vw;
   height: 100vh;
-  overflow: visible;
-  z-index: 999999; /* make sure it's always on top */
-}
-
-.confetti-emoji {
-  position: absolute;
-  font-size: 2rem;
-  will-change: transform, opacity;
   pointer-events: none;
+  z-index: 999999; /* keep it above the puzzle */
 }
 
   </style>
@@ -329,7 +321,7 @@ h2 {
     <a href="https://salimahismail.com" target="_blank">https://salimahismail.com</a> 
   </footer>
 
-  <div id="confettiLayer"></div>
+  <canvas id="confettiCanvas"></canvas>
 
   <script>
   (function(){
@@ -941,109 +933,146 @@ h2 {
     // -----------------------
     // 11. CONFETTI
     // -----------------------
- function launchConfetti() {
-  // still prevent double-fire on puzzle win
+// ---------- CONFETTI ENGINE (canvas-based) ----------
+
+// We'll keep a single particle burst at a time.
+function launchConfetti() {
+  // stop double-fire on win, but allow manual test to override
   if (hasCelebrated && !window._forceConfetti) return;
   hasCelebrated = true;
 
-  const layer = document.getElementById("confettiLayer");
-  if (!layer) return;
+  const canvas = document.getElementById("confettiCanvas");
+  if (!canvas) return;
 
-  const confettiEmojis = [
+  const ctx = canvas.getContext("2d");
+
+  // make sure canvas matches the viewport in actual pixels
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+
+  // emojis to fling
+  const EMOJIS = [
     "🎉","🎊","✨","💥","💫","🌟","🔥","🤩","😎","🦄",
     "🦊","🐸","🪐","🎲","🚀","🌵","🔮","🧊","🐙","🍄",
     "🦴","🐢","🪼","🐍"
   ];
 
-  const howMany = 80;
+  // create particle objects
+  const particles = [];
+  const COUNT = 80;
 
-  // firework origin: bottom center of the viewport
-  const originX = window.innerWidth * 0.5;
-  const originY = window.innerHeight * 0.9;
+  // firework origin = bottom center
+  const originX = canvas.width * 0.5;
+  const originY = canvas.height * 0.9;
 
-  for (let i = 0; i < howMany; i++) {
-    const piece = document.createElement("div");
-    piece.className = "confetti-emoji";
-    piece.textContent = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
+  for (let i = 0; i < COUNT; i++) {
+    // pick an emoji
+    const emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
 
-    // --- TRAJECTORY ---
-    // angle: mostly upward, fanning wide left/right
-    // range: from -150deg to -30deg (in radians), so nothing shoots downward
+    // launch angle between straight-up-left and straight-up-right,
+    // but never downward
     const angleDeg = -150 + Math.random() * 120; // -150 .. -30
     const angleRad = angleDeg * Math.PI / 180;
 
-    // strong speed so it reaches across screen
-    const speed = 500 + Math.random() * 400; // px/sec
+    // base speed (pixels/sec)
+    const speed = 500 + Math.random() * 400; // 500-900
 
-    // velocity components (no gravity later)
     const vx = Math.cos(angleRad) * speed;
     const vy = Math.sin(angleRad) * speed; // negative = up
 
-    // spin speed (deg/sec)
+    // lifespan in ms
+    const life = 2500 + Math.random() * 700; // 2.5s - 3.2s
+
+    // spin speed in deg/sec
     const spinSpeed = (Math.random() * 720 - 360);
 
-    // scale over life
-    const startScale = 1;
-    const endScale   = 0.4;
+    // slight positional jitter so they don't all come from 1 pixel
+    const startX = originX + (Math.random() - 0.5) * 30;
+    const startY = originY + (Math.random() - 0.5) * 15;
 
-    // how long we keep particle visible
-    const lifeMs = 2500 + Math.random() * 500; // 2.5s - 3.0s (longer!)
+    particles.push({
+      emoji,
+      startX,
+      startY,
+      vx,
+      vy,
+      spinSpeed,
+      size: 32 + Math.random() * 8, // font size in px
+      life,
+      born: performance.now(),
+      dead: false
+    });
+  }
 
-    // small jitter so they don't all start on same pixel
-    const jitterX = (Math.random() - 0.5) * 30;
-    const jitterY = (Math.random() - 0.5) * 15;
+  let running = true;
 
-    // set initial position
-    let startX = originX + jitterX;
-    let startY = originY + jitterY;
+  function drawFrame(now) {
+    if (!running) return;
 
-    piece.style.left = startX + "px";
-    piece.style.top  = startY + "px";
+    // clear whole canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    layer.appendChild(piece);
+    let aliveCount = 0;
 
-    const startTime = performance.now();
+    particles.forEach(p => {
+      if (p.dead) return;
 
-    function frame(now) {
-      const t = now - startTime;
-      const progress = t / lifeMs; // 0 -> 1
-
-      if (progress >= 1) {
-        piece.remove();
+      const t = now - p.born;      // ms since birth
+      const prog = t / p.life;     // 0..1
+      if (prog >= 1) {
+        p.dead = true;
         return;
       }
 
-      // position: straight-line motion, no gravity pull-down
-      const x = startX + vx * (t / 1000);
-      const y = startY + vy * (t / 1000);
+      aliveCount++;
 
-      // rotation
-      const rot = spinSpeed * (t / 1000); // deg
+      // no gravity (so nothing falls back down to sit at the bottom)
+      const x = p.startX + p.vx * (t / 1000);
+      const y = p.startY + p.vy * (t / 1000);
 
-      // scale shrinks over time
-      const scale = startScale + (endScale - startScale) * progress;
+      // rotate
+      const rotDeg = p.spinSpeed * (t / 1000);
 
-      // fade out slowly toward the end only
-      // stays mostly opaque, then disappears
-      let opacity;
-      if (progress < 0.7) {
-        opacity = 1;
+      // scale shrinks a bit over time
+      const scale = 1 - 0.5 * prog; // 1 -> 0.5
+
+      // fade only near the end so they stay visible
+      let alpha;
+      if (prog < 0.7) {
+        alpha = 1;
       } else {
-        const tail = (progress - 0.7) / 0.3; // 0 -> 1 over last 30%
-        opacity = 1 - tail;
+        alpha = 1 - ((prog - 0.7) / 0.3);
+        if (alpha < 0) alpha = 0;
       }
 
-      piece.style.left = x + "px";
-      piece.style.top  = y + "px";
-      piece.style.opacity = opacity.toString();
-      piece.style.transform = `translate(-50%, -50%) scale(${scale}) rotate(${rot}deg)`;
+      // draw the emoji
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rotDeg * Math.PI / 180);
+      ctx.globalAlpha = alpha;
+      ctx.font = `${p.size * scale}px sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(p.emoji, 0, 0);
+      ctx.restore();
+    });
 
-      requestAnimationFrame(frame);
+    if (aliveCount === 0) {
+      // all particles are gone, stop the loop + clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      running = false;
+      return;
     }
 
-    requestAnimationFrame(frame);
+    requestAnimationFrame(drawFrame);
   }
+
+  requestAnimationFrame(drawFrame);
 }
+
 
     // -----------------------
     // 12. CHECK WIN

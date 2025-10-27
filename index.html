@@ -791,6 +791,8 @@
   // DOM refs
   const phraseArea    = document.getElementById("phraseArea");
   const equationsArea = document.getElementById("equationsArea");
+  const solutionLines = document.getElementById("solutionLines"); // may be null
+  const winBox = document.getElementById("winBox"); // may be null
   const prevBtn       = document.getElementById("prevBtn");
   const nextBtn       = document.getElementById("nextBtn");
   const puzzleLabel   = document.getElementById("puzzleLabel");
@@ -1252,13 +1254,13 @@
   if (phraseDone && allEqCorrect) {
     // mark solved
     solvedPuzzles[currentIndex] = true;
-    saveProgressToStorage();
-    updateProgressLabel();
 
-    // celebration (rainbow text + confetti blast)
+    if (winBox) { winBox.style.display = "block"; }
     if (!hasCelebrated) {
       launchConfetti();
     }
+  } else {
+    if (winBox) { winBox.style.display = "none"; }
   }
 }
 
@@ -1387,22 +1389,20 @@
 // FEEDBACK BUTTON (EMAILJS VERSION)
 // -----------------------
 function initFeedback(){
-  // Grab elements
   const sendFeedbackBtn = document.getElementById("sendFeedbackBtn");
   const feedbackStatus  = document.getElementById("feedbackStatus");
-  const msgEl           = document.getElementById("feedbackText");
-  const emailEl         = document.getElementById("feedbackEmail");
 
-  // If the feedback UI is not on the page, bail safely.
-  // This prevents runtime crashes that stop the rest of the game logic.
-  if (!sendFeedbackBtn || !feedbackStatus || !msgEl || !emailEl) {
+  if (!sendFeedbackBtn || !feedbackStatus) {
+    // no feedback UI on page, don't do anything, don't crash
     return;
   }
 
   sendFeedbackBtn.addEventListener("click", ()=>{
+    const msgEl   = document.getElementById("feedbackText");
+    const emailEl = document.getElementById("feedbackEmail");
 
-    const msgRaw   = msgEl.value || "";
-    const emailRaw = emailEl.value || "";
+    const msgRaw   = msgEl?.value || "";
+    const emailRaw = emailEl?.value || "";
 
     const cleanMsg   = msgRaw.trim();
     const cleanEmail = emailRaw.trim();
@@ -1424,12 +1424,11 @@ function initFeedback(){
       puzzle_index: `Puzzle ${currentIndex+1} of ${totalCount}`
     };
 
-    // Make sure emailjs is available before calling it
+    // SAFETY: if emailjs is missing, don't crash the app
     if (typeof emailjs === "undefined") {
-      // graceful fallback: don't kill the app
       feedbackStatus.style.display = "block";
       feedbackStatus.style.color = "#b00020";
-      feedbackStatus.textContent = "Feedback form is offline right now.";
+      feedbackStatus.textContent = "Feedback is offline right now.";
       console.error("EmailJS is not defined.");
       return;
     }
@@ -1439,9 +1438,7 @@ function initFeedback(){
         feedbackStatus.style.display = "block";
         feedbackStatus.style.color = "#108a00";
         feedbackStatus.textContent = "Thanks! Your feedback was sent ✅";
-
-        msgEl.value = "";
-        // leave their email so they don't have to retype
+        if (msgEl) msgEl.value = "";
       })
       .catch((err) => {
         feedbackStatus.style.display = "block";
@@ -1472,6 +1469,7 @@ function initFeedback(){
   }
 
   init();
+  initFeedback();
 
 })(); // end IIFE
 </script>

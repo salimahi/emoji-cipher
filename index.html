@@ -1238,30 +1238,29 @@
   // CHECK WIN
   // -----------------------
   function checkWin(){
-    const finalPhrase = getCurrentSolvedPhrase();
-    const phraseDone = (finalPhrase === currentPuzzle.phrase);
+  const finalPhrase = getCurrentSolvedPhrase();
+  const phraseDone = (finalPhrase === currentPuzzle.phrase);
 
-    let allEqCorrect = true;
-    currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
-      const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
-      if(!resDiv || !resDiv.classList.contains("status-ok")){
-        allEqCorrect = false;
-      }
-    });
+  let allEqCorrect = true;
+  currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
+    const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
+    if(!resDiv || !resDiv.classList.contains("status-ok")){
+      allEqCorrect = false;
+    }
+  });
 
-    if (phraseDone && allEqCorrect) {
-      solvedPuzzles[currentIndex] = true;
-      saveProgressToStorage();
-      updateProgressLabel();
+  if (phraseDone && allEqCorrect) {
+    // mark solved
+    solvedPuzzles[currentIndex] = true;
+    saveProgressToStorage();
+    updateProgressLabel();
 
-      if (winBox) { winBox.style.display = "block"; }
-      if (!hasCelebrated) {
-        launchConfetti();
-      }
-    } else {
-      if (winBox) { winBox.style.display = "none"; }
+    // celebration (rainbow text + confetti blast)
+    if (!hasCelebrated) {
+      launchConfetti();
     }
   }
+}
 
   // -----------------------
   // RESTORE PUZZLE STATE IF ALREADY SOLVED

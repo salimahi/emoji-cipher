@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emoji Cipher™ – A New Puzzle!</title>
+  <title>Emoji Cipher™ – A New Puzzle Game by Salimah!</title>
   <meta name="description" content="Emoji Cipher™ is an original logic puzzle by Salimah Ismail. Decode the emojis to reveal the hidden phrase and balance the equations.">
   <meta name="author" content="Salimah Ismail">
   <meta name="copyright" content="© 2025 Salimah Ismail. Licensed under CC BY-NC-ND 4.0 International.">
@@ -324,6 +324,7 @@ h2 {
     Each emoji hides a secret <b>LETTER</b> and <b>NUMBER</b>.<br>
     Every letter is unique, <i>but numbers can repeat.</i> <br>
     Unlock one and you'll get the other. <br>
+    There are no penalties for guessing. <br>
     Good Luck!
   </div>
 
@@ -394,12 +395,14 @@ h2 {
       },
       uniqueEmojis: ["🦊","🪐","🐸","🚀","🌵","🎲","🔮","🧊","🐙"],
       equations: [
-        { left:["🦊","+","🪐"], target:11 },
-        { left:["🪐","+","🐸"], target:12 },
-        { left:["🚀","+","🌵","+","🎲"], target:14 },
+        { left:["🚀","+","🪐"], target:15 },
+        { left:["🪐","+","🧊"], target:13 },
+        { left:["🦊","+","🌵","+","🎲"], target:10 },
         { left:["🎲","+","🔮"], target:8 },
-        { left:["🧊","+","🌵"], target:6 },
-        { left:["🐙","+","🌵"], target:10 }
+        { left:["🐸","+","🚀"], target:11 },
+        { left:["🧊","+","🐙"], target:14 },
+        { left:["🐙","+","🌵"], target:10 },
+        { left:["🚀","+","🦊","+","🐸"], target:14 }
       ]
     },
     {

@@ -1,7 +1,7 @@
 # 🎮 Emoji Cipher™
 
 **Emoji Cipher™** is an original browser-based puzzle game by **Salimah Ismail**.  
-Each emoji stands for one **letter** and one **number** — decode one or the other to reveal the secret phrase *and* make every equation true.
+Each emoji stands for one **letter** and one **number**. Decode one or the other to reveal the secret phrase *and* make every equation true.
 
 ---
 
@@ -15,7 +15,7 @@ Emoji Cipher™ is a puzzle logic game blending math and wordplay.
 Each emoji hides a secret LETTER and NUMBER.
 Every letter is unique, but numbers can repeat.
 Unlock one and you'll get the other.
-There are ten randomly generated puzzles (for now).
+There are no penalties for guessing.
 Good Luck!
 
 Built with pure **HTML + CSS + JavaScript** — no libraries, no backend.

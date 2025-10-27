@@ -244,6 +244,68 @@ h2 {
       box-shadow:0 4px 10px rgb(0 0 0 / .08);
     }
 
+    <div style="
+  margin-top:2rem;
+  border:1px solid #ddd;
+  border-radius:.5rem;
+  background:#fff;
+  box-shadow:0 1px 2px rgb(0 0 0 / .05);
+  padding:1rem;
+  font-size:.9rem;">
+  
+  <div style="font-weight:600; color:#8C6737; margin-bottom:.5rem;">
+    Feedback
+  </div>
+
+  <label style="display:block; font-size:.8rem; color:#444; margin-bottom:.25rem;">
+    Tell me what you liked, what was confusing, or if you want more levels 👇
+  </label>
+  <textarea id="feedbackText" rows="3" style="
+    width:100%;
+    box-sizing:border-box;
+    border:1.5px solid #bbb;
+    border-radius:.5rem;
+    padding:.5rem;
+    font-family:inherit;
+    font-size:.9rem;
+    line-height:1.4;
+    resize:vertical;
+    " placeholder="I would likw more levels! Also can you make it so that..."></textarea>
+
+  <label style="display:block; font-size:.8rem; color:#444; margin:.75rem 0 .25rem;">
+    Your email:
+  </label>
+  <input id="feedbackEmail" type="email" style="
+    width:100%;
+    box-sizing:border-box;
+    border:1.5px solid #bbb;
+    border-radius:.5rem;
+    padding:.5rem;
+    font-family:inherit;
+    font-size:.9rem;
+    line-height:1.4;
+  " placeholder="name@email.com">
+
+  <button id="sendFeedbackBtn" style="
+    margin-top:1rem;
+    width:100%;
+    padding:.75rem 1rem;
+    font-size:1rem;
+    border-radius:.5rem;
+    border:1px solid #999;
+    background:#F6EAED;
+    color:#36171D;
+    cursor:pointer;
+    font-weight:600;">
+    ✉ Send Feedback
+  </button>
+
+  <div id="feedbackStatus" style="font-size:.8rem; color:#108a00; margin-top:.5rem; display:none;">
+    Thanks! Your message is ready to send.
+  </div>
+</div>
+
+
     footer{
       margin-top:2rem;
       font-size:.8rem;
@@ -339,6 +401,19 @@ h2 {
       Next ▶
     </button>
   </div>
+
+  <div style="margin-top:1rem; display:flex; gap:.5rem; flex-wrap:wrap;">
+  <button id="shareBtn"
+    style="flex:1; padding:.75rem 1rem; font-size:1rem; border-radius:.5rem; border:1px solid #999; background:#fff; cursor:pointer;">
+    🔗 Share
+  </button>
+
+  <div id="shareStatus"
+    style="flex:1; font-size:.8rem; color:#555; line-height:1.2; display:none;">
+    Copied!
+  </div>
+</div>
+
 
   <div class="section-title">Decode the Phrase</div>
   <div class="phrase-wrapper" id="phraseArea"></div>
@@ -705,6 +780,9 @@ h2 {
   // -----------------------
   let currentIndex = 0;
   let currentPuzzle = PUZZLES[currentIndex];
+
+  // which puzzles have been solved
+  let solvedPuzzles = Array(PUZZLES.length).fill(false);
 
   let hasCelebrated = false; // confetti lock
 
@@ -1154,27 +1232,30 @@ hasCelebrated = true;
   // -----------------------
   // 12. CHECK WIN
   // -----------------------
-  function checkWin(){
-    const finalPhrase = getCurrentSolvedPhrase();
-    const phraseDone = (finalPhrase === currentPuzzle.phrase);
+ function checkWin(){
+  const finalPhrase = getCurrentSolvedPhrase();
+  const phraseDone = (finalPhrase === currentPuzzle.phrase);
 
-    let allEqCorrect = true;
-    currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
-      const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
-      if(!resDiv || !resDiv.classList.contains("status-ok")){
-        allEqCorrect = false;
-      }
-    });
-
-    if (phraseDone && allEqCorrect) {
-      if (winBox) { winBox.style.display = "block"; }
-      if (!hasCelebrated) {
-        launchConfetti();
-      }
-    } else {
-      if (winBox) { winBox.style.display = "none"; }
+  let allEqCorrect = true;
+  currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
+    const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
+    if(!resDiv || !resDiv.classList.contains("status-ok")){
+      allEqCorrect = false;
     }
+  });
+
+  if (phraseDone && allEqCorrect) {
+    // mark solved
+    solvedPuzzles[currentIndex] = true;
+
+    if (winBox) { winBox.style.display = "block"; }
+    if (!hasCelebrated) {
+      launchConfetti();
+    }
+  } else {
+    if (winBox) { winBox.style.display = "none"; }
   }
+}
 
   // -----------------------
   // 13. LOAD PUZZLE INDEX
@@ -1219,6 +1300,102 @@ hasCelebrated = true;
 
     loadPuzzle(0);
   }
+
+  // SHARE BUTTON
+const shareBtn = document.getElementById("shareBtn");
+const shareStatus = document.getElementById("shareStatus");
+
+if (shareBtn){
+  shareBtn.addEventListener("click", async () => {
+    const solvedCount = solvedPuzzles.filter(x => x).length;
+    const totalCount = PUZZLES.length;
+
+    const shareText = `I solved ${solvedCount} / ${totalCount} Emoji Cipher puzzles by Salimah 🤓🔐 Try it: https://salimahi.github.io/emoji-cipher/`;
+
+    if (navigator.share){
+      try {
+        await navigator.share({
+          title: "Emoji Cipher",
+          text: shareText,
+          url: "https://salimahi.github.io/emoji-cipher/"
+        });
+      } catch(err){
+        console.log("Share canceled/failed", err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareText);
+        if (shareStatus){
+          shareStatus.textContent = "Copied your score to clipboard ✔";
+          shareStatus.style.display = "block";
+          setTimeout(()=>{ shareStatus.style.display = "none"; }, 3000);
+        }
+      } catch(err){
+        if (shareStatus){
+          shareStatus.textContent = "Copy failed — you can paste manually 😅";
+          shareStatus.style.display = "block";
+        }
+      }
+    }
+  });
+}
+
+  const sendFeedbackBtn = document.getElementById("sendFeedbackBtn");
+const feedbackStatus  = document.getElementById("feedbackStatus");
+
+if (sendFeedbackBtn){
+  sendFeedbackBtn.addEventListener("click", ()=>{
+    const msg = document.getElementById("feedbackText")?.value || "";
+    const email = document.getElementById("feedbackEmail")?.value || "";
+
+    // basic sanitizing / trimming
+    const cleanMsg = msg.trim();
+    const cleanEmail = email.trim();
+
+    if (!cleanMsg){
+      // no message? nudge them
+      if (feedbackStatus){
+        feedbackStatus.style.display = "block";
+        feedbackStatus.style.color = "#b00020";
+        feedbackStatus.textContent = "Please tell me something first 🙂";
+      }
+      return;
+    }
+
+    // build email body
+    // include how many puzzles they've solved so you see difficulty feedback in context
+    const solvedCount = solvedPuzzles.filter(x => x).length;
+    const totalCount = PUZZLES.length;
+
+    const bodyLines = [
+      "Emoji Cipher feedback:",
+      cleanMsg,
+      "",
+      "Player info:",
+      `Solved: ${solvedCount} / ${totalCount} puzzles`,
+      cleanEmail ? `Reply to me at: ${cleanEmail}` : "(no email given)"
+    ];
+
+    const mailtoLink =
+      "mailto:salimahismail@gmail.com"
+      + "?subject=" + encodeURIComponent("Emoji Cipher feedback")
+      + "&body=" + encodeURIComponent(bodyLines.join("\n"));
+
+    // open their email client
+    window.location.href = mailtoLink;
+
+    // visual confirmation
+    if (feedbackStatus){
+      feedbackStatus.style.display = "block";
+      feedbackStatus.style.color = "#108a00";
+      feedbackStatus.textContent = "Your feedback draft just opened in email ✨";
+    }
+
+    // optional: clear the box
+    const fbBox = document.getElementById("feedbackText");
+    if (fbBox) fbBox.value = "";
+  });
+}
 
   // kick it off
   init();

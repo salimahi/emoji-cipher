@@ -1317,43 +1317,87 @@ hasCelebrated = true;
   }
 
   // SHARE BUTTON
-const shareBtn = document.getElementById("shareBtn");
-const shareStatus = document.getElementById("shareStatus");
+(function(){
+  const shareBtn = document.getElementById("shareBtn");
+  const shareStatus = document.getElementById("shareStatus");
 
-if (shareBtn){
-  shareBtn.addEventListener("click", async () => {
-    const solvedCount = solvedPuzzles.filter(x => x).length;
-    const totalCount = PUZZLES.length;
+  function getShareUrl() {
+    // Clean canonical URL (no duplicate, no querystring unless you really want it)
+    const origin = window.location.origin;
+    const path = window.location.pathname;
+    return origin + path;
+  }
 
-    const shareText = `I solved ${solvedCount} / ${totalCount} Emoji Cipher puzzles by Salimah 🤓🔐 Try it: https://salimahi.github.io/emoji-cipher/`;
+  async function copyToClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (err) {
+      // fallback if clipboard API is blocked
+      const temp = document.createElement("textarea");
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(temp);
+      return ok;
+    }
+  }
 
-    if (navigator.share){
+  async function doShare() {
+    const url = getShareUrl();
+    const message = `I solved Emoji Cipher™! Try it: ${url}`;
+
+    // 1. Try native share (mobile mostly)
+    if (navigator.share) {
       try {
         await navigator.share({
-          title: "Emoji Cipher",
-          text: shareText,
-          url: "https://salimahi.github.io/emoji-cipher/"
+          title: "Emoji Cipher™",
+          text: "I solved Emoji Cipher™! Try it:",
+          url: url
         });
-      } catch(err){
-        console.log("Share canceled/failed", err);
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(shareText);
-        if (shareStatus){
-          shareStatus.textContent = "Copied your score to clipboard ✔";
-          shareStatus.style.display = "block";
-          setTimeout(()=>{ shareStatus.style.display = "none"; }, 3000);
-        }
-      } catch(err){
-        if (shareStatus){
-          shareStatus.textContent = "Copy failed — you can paste manually 😅";
-          shareStatus.style.display = "block";
-        }
+
+        // If it didn't throw, treat it like success
+        showCopiedUI("Link ready to share!");
+        return;
+      } catch (err) {
+        // If user cancels or browser blocks, fall back to copy
+        // no return here, continue to clipboard
       }
     }
-  });
+
+    // 2. Desktop / fallback: copy to clipboard
+    const ok = await copyToClipboard(message);
+
+    if (ok) {
+      showCopiedUI("Copied!");
+    } else {
+      showCopiedUI("Copy manually ↓");
+      // worst case we can also just reveal the URL for manual copy
+      shareStatus.textContent = url;
+    }
+  }
+
+  function showCopiedUI(statusText){
+    // Update button text
+    const originalBtnText = shareBtn.textContent;
+    shareBtn.textContent = "Copied!";
+
+    // Update status div and show it
+    shareStatus.textContent = statusText || "Copied!";
+    shareStatus.style.display = "block";
+
+    // After 2 seconds, reset button + hide status
+    setTimeout(() => {
+      shareBtn.textContent = originalBtnText;
+      shareStatus.style.display = "none";
+    }, 2000);
+  }
+
+  shareBtn.addEventListener("click", doShare);
+})();
 }
+
 
   const sendFeedbackBtn = document.getElementById("sendFeedbackBtn");
 const feedbackStatus  = document.getElementById("feedbackStatus");

@@ -447,6 +447,13 @@
 <script>
 (function(){
 
+  // 0. INIT EMAILJS
+  // replace THESE with your real values from EmailJS setup
+  const EMAILJS_SERVICE_ID  = "service_ushj1og";     // <-- your service_id
+  const EMAILJS_TEMPLATE_ID = "template_4hvk2cf";    // <-- your template_id
+  const EMAILJS_PUBLIC_KEY  = "LZgAKmmu1I5HBbyJy";   // <-- your public key
+
+  emailjs.init(EMAILJS_PUBLIC_KEY);
   // -----------------------
   // 1. PUZZLES
   // -----------------------
@@ -777,7 +784,7 @@
   ];
 
   // -----------------------
-  // 2. GLOBAL STATE
+ // 2. GLOBAL STATE
   // -----------------------
   let currentIndex = 0;
   let currentPuzzle = PUZZLES[currentIndex];
@@ -813,7 +820,7 @@
         solvedPuzzles = arr.map(x=>!!x);
       }
     } catch(e){
-      // ignore parse errors
+      // ignore
     }
   }
 
@@ -821,7 +828,7 @@
     try {
       localStorage.setItem("emojiCipherSolved", JSON.stringify(solvedPuzzles));
     } catch(e){
-      // ignore quota/etc
+      // ignore
     }
   }
 
@@ -833,7 +840,7 @@
   }
 
   // -----------------------
-  // helpers
+// helpers
   // -----------------------
   function initPlayerState() {
     playerState = {};
@@ -954,7 +961,7 @@
   }
 
   // -----------------------
-  // SOLUTION BOX (if visible)
+  // SOLUTION BOX (optional UI)
   // -----------------------
   function renderSolutionBox(){
     if (!solutionLines) return;
@@ -971,7 +978,7 @@
   }
 
   // -----------------------
-  // UPDATE EQUATIONS STATUS
+   // UPDATE EQUATIONS STATUS
   // -----------------------
   function updateEquationsStatus(){
     currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
@@ -1024,7 +1031,6 @@
     const em   = e.target.dataset.emoji;
     const kind = e.target.dataset.kind;
 
-    // If already solved, just sync UI
     if(playerState[em].solved){
       syncSolvedEmojiEverywhere(em);
       updateEquationsStatus();
@@ -1032,13 +1038,12 @@
       return;
     }
 
-    // clean input
     let val = e.target.value;
 
     if(kind === "letter"){
       val = val.toUpperCase().replace(/[^A-Z]/g,"").slice(0,1);
       e.target.value = val;
-    } else { // number
+    } else { 
       if(val !== ""){
         let n = parseInt(val,10);
         if(isNaN(n)) n = "";
@@ -1049,7 +1054,6 @@
       }
     }
 
-    // check against correct mapping
     const correctLetter = currentPuzzle.mapping[em].letter;
     const correctNumber = currentPuzzle.mapping[em].number.toString();
 
@@ -1063,7 +1067,6 @@
       playerState[em].solved = true;
     }
 
-    // sync UI if solved
     if(playerState[em].solved){
       syncSolvedEmojiEverywhere(em);
       updateEquationsStatus();
@@ -1080,13 +1083,11 @@
     const solvedLetter = playerState[em].letter;
     const solvedNumber = playerState[em].number;
 
-    // all phrase inputs with this emoji
     phraseArea.querySelectorAll(`.char-stack[data-emoji="${em}"] .char-input`).forEach(inp=>{
       inp.value = solvedLetter;
       inp.disabled = true;
     });
 
-    // all equation inputs with this emoji
     equationsArea.querySelectorAll(`.eq-stack[data-emoji="${em}"] .num-input`).forEach(inp=>{
       inp.value = solvedNumber;
       inp.disabled = true;
@@ -1100,14 +1101,12 @@
     if (hasCelebrated) return;
     hasCelebrated = true;
 
-    // show big message
     const msg = document.getElementById("solvedMessage");
     if (msg) {
       msg.classList.add("show");
       setTimeout(()=>{ msg.classList.remove("show"); }, 2500);
     }
 
-    // canvas setup
     const canvas = document.getElementById("confettiCanvas");
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -1121,7 +1120,6 @@
       "🦩","🐢","🪼","🐍","🏵️","🎈","🥳","🪻","💐"
     ];
 
-    // pre-render sprite
     function makeEmojiSprite(char, sizePx) {
       const off = document.createElement("canvas");
       const offCtx = off.getContext("2d");
@@ -1153,12 +1151,12 @@
       const angleDeg = -150 + Math.random() * 120;
       const angleRad = angleDeg * Math.PI / 180;
 
-      const speed = 550 + Math.random() * 450; // px/sec
+      const speed = 550 + Math.random() * 450;
       const vx = Math.cos(angleRad) * speed;
       const vy = Math.sin(angleRad) * speed;
 
-      const spinSpeed = (Math.random() * 720 - 360); // deg/sec
-      const life = 2200 + Math.random() * 400;       // ms
+      const spinSpeed = (Math.random() * 720 - 360);
+      const life = 2200 + Math.random() * 400;
 
       const startX = originX + (Math.random() - 0.5) * 30;
       const startY = originY + (Math.random() - 0.5) * 15;
@@ -1202,19 +1200,15 @@
         }
         aliveCount++;
 
-        const tNorm = p.age / p.life; // 0..1
+        const tNorm = p.age / p.life;
 
-        // move
         p.x += p.vx * (dt / 1000);
         p.y += p.vy * (dt / 1000);
 
-        // spin
         p.spin += p.spinSpeed * (dt / 1000);
 
-        // scale
         const scale = p.scaleStart + (p.scaleEnd - p.scaleStart) * tNorm;
 
-        // fade
         let alpha;
         if (tNorm < 0.7) {
           alpha = 1;
@@ -1225,7 +1219,6 @@
         }
         p.alpha = alpha;
 
-        // draw
         ctx.save();
         ctx.globalAlpha = p.alpha;
         ctx.translate(p.x, p.y);
@@ -1269,7 +1262,6 @@
     });
 
     if (phraseDone && allEqCorrect) {
-      // mark solved
       solvedPuzzles[currentIndex] = true;
       saveProgressToStorage();
       updateProgressLabel();
@@ -1289,14 +1281,12 @@
   function autofillIfSolved(){
     if (!solvedPuzzles[currentIndex]) return;
 
-    // mark all emojis solved in playerState
     currentPuzzle.uniqueEmojis.forEach(em=>{
       playerState[em].solved = true;
       playerState[em].letter = currentPuzzle.mapping[em].letter;
       playerState[em].number = currentPuzzle.mapping[em].number.toString();
     });
 
-    // sync all UI fields
     currentPuzzle.uniqueEmojis.forEach(em=>{
       syncSolvedEmojiEverywhere(em);
     });
@@ -1307,10 +1297,9 @@
   }
 
   // -----------------------
-  // LOAD PUZZLE INDEX
+ // LOAD PUZZLE INDEX
   // -----------------------
   function loadPuzzle(newIndex){
-    // clamp
     if(newIndex < 0) newIndex = 0;
     if(newIndex > PUZZLES.length-1) newIndex = PUZZLES.length-1;
 
@@ -1318,16 +1307,13 @@
     currentPuzzle = PUZZLES[currentIndex];
     initPlayerState();
 
-    // render everything fresh
     renderPhrase();
     renderEquations();
     renderSolutionBox();
     updateEquationsStatus();
 
-    // autofill if solved in past
     autofillIfSolved();
 
-    // labels
     if (puzzleLabel){
       puzzleLabel.textContent = `Puzzle ${currentIndex+1} / ${PUZZLES.length}`;
     }
@@ -1352,7 +1338,6 @@
         await navigator.clipboard.writeText(text);
         return true;
       } catch (err) {
-        // fallback if clipboard API is blocked
         const temp = document.createElement("textarea");
         temp.value = text;
         document.body.appendChild(temp);
@@ -1368,7 +1353,6 @@
       const solvedCount = solvedPuzzles.filter(x=>x).length;
       const message = `I solved ${solvedCount}/${PUZZLES.length} Emoji Cipher™ puzzles! Try it out: ${url}`;
 
-      // native share first
       if (navigator.share) {
         try {
           await navigator.share({
@@ -1379,11 +1363,10 @@
           showCopiedUI("Link ready to share!");
           return;
         } catch (err) {
-          // fall through to clipboard
+          // fall through
         }
       }
 
-      // fallback to clipboard
       const ok = await copyToClipboard(message);
 
       if (ok) {
@@ -1414,7 +1397,7 @@
   }
 
   // -----------------------
-  // FEEDBACK BUTTON
+  // FEEDBACK BUTTON (EMAILJS VERSION)
   // -----------------------
   function initFeedback(){
     const sendFeedbackBtn = document.getElementById("sendFeedbackBtn");
@@ -1422,13 +1405,14 @@
 
     if (!sendFeedbackBtn) return;
     sendFeedbackBtn.addEventListener("click", ()=>{
-      const msgEl = document.getElementById("feedbackText");
+
+      const msgEl   = document.getElementById("feedbackText");
       const emailEl = document.getElementById("feedbackEmail");
 
-      const msg = msgEl?.value || "";
+      const msg   = msgEl?.value || "";
       const email = emailEl?.value || "";
 
-      const cleanMsg = msg.trim();
+      const cleanMsg   = msg.trim();
       const cleanEmail = email.trim();
 
       if (!cleanMsg){
@@ -1441,31 +1425,36 @@
       }
 
       const solvedCount = solvedPuzzles.filter(x => x).length;
-      const totalCount = PUZZLES.length;
+      const totalCount  = PUZZLES.length;
 
-      const bodyLines = [
-        "Emoji Cipher feedback:",
-        cleanMsg,
-        "",
-        "Player info:",
-        `Solved: ${solvedCount} / ${totalCount} puzzles`,
-        cleanEmail ? `Reply to me at: ${cleanEmail}` : "(no email given)"
-      ];
+      // Build the payload for EmailJS. These keys MUST match the template fields you created.
+      const templateParams = {
+        message: cleanMsg,
+        player_email: cleanEmail || "(no email given)",
+        solve_progress: `${solvedCount} / ${totalCount}`,
+        puzzle_index: `Puzzle ${currentIndex+1} of ${totalCount}`
+      };
 
-      const mailtoLink =
-        "mailto:salimahismail@gmail.com"
-        + "?subject=" + encodeURIComponent("Emoji Cipher feedback")
-        + "&body=" + encodeURIComponent(bodyLines.join("\n"));
-
-      window.location.href = mailtoLink;
-
-      if (feedbackStatus){
-        feedbackStatus.style.display = "block";
-        feedbackStatus.style.color = "#108a00";
-        feedbackStatus.textContent = "Your feedback draft just opened in email ✨";
-      }
-
-      if (msgEl) msgEl.value = "";
+      // Send via EmailJS
+      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+        .then(() => {
+          if (feedbackStatus){
+            feedbackStatus.style.display = "block";
+            feedbackStatus.style.color = "#108a00";
+            feedbackStatus.textContent = "Thanks! Your feedback was sent ✅";
+          }
+          if (msgEl)   msgEl.value = "";
+          // don't wipe their email unless you want to:
+          // if (emailEl) emailEl.value = "";
+        })
+        .catch((err) => {
+          if (feedbackStatus){
+            feedbackStatus.style.display = "block";
+            feedbackStatus.style.color = "#b00020";
+            feedbackStatus.textContent = "Something went wrong. Try again?";
+          }
+          console.error("EmailJS error:", err);
+        });
     });
   }
 
@@ -1473,10 +1462,8 @@
   // INIT / EVENT LISTENERS
   // -----------------------
   function init(){
-    // load saved progress
     loadProgressFromStorage();
 
-    // wire nav buttons
     if(prevBtn){
       prevBtn.addEventListener("click", ()=>{ loadPuzzle(currentIndex - 1); });
     }
@@ -1487,11 +1474,9 @@
     initShare();
     initFeedback();
 
-    // first puzzle
     loadPuzzle(0);
   }
 
-  // kick it off safely inside IIFE
   init();
 
 })(); // end IIFE

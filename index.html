@@ -401,18 +401,6 @@
   <div class="section-title">Crack the Math</div>
   <div class="equations-wrapper" id="equationsArea"></div>
 
-  <!-- Hidden helpers (optional UI to bring back later)
-  <div class="section-title">Solution Key (auto-fills as you solve)</div>
-  <div class="solution-box" id="solutionBox">
-    <div class="solution-hint">Solve any letter or number to unlock its pair:</div>
-    <div id="solutionLines"></div>
-  </div>
-
-  <div class="win-box" id="winBox">
-    ✅ You solved it!
-  </div>
-  -->
-
   <div class="feedback-card">
     <div class="feedback-card-title">Feedback</div>
 
@@ -443,6 +431,8 @@
 
   <canvas id="confettiCanvas"></canvas>
   <div id="solvedMessage">YAY! YOU SOLVED IT!</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <script>
 (function(){
@@ -801,8 +791,6 @@
   // DOM refs
   const phraseArea    = document.getElementById("phraseArea");
   const equationsArea = document.getElementById("equationsArea");
-  const solutionLines = document.getElementById("solutionLines"); // optional
-  const winBox        = document.getElementById("winBox");        // optional
   const prevBtn       = document.getElementById("prevBtn");
   const nextBtn       = document.getElementById("nextBtn");
   const puzzleLabel   = document.getElementById("puzzleLabel");

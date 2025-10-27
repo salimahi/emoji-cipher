@@ -1383,67 +1383,74 @@
     }
   }
 
-  // -----------------------
-  // FEEDBACK BUTTON (EMAILJS VERSION)
-  // -----------------------
-  function initFeedback(){
-    const sendFeedbackBtn = document.getElementById("sendFeedbackBtn");
-    const feedbackStatus  = document.getElementById("feedbackStatus");
+// -----------------------
+// FEEDBACK BUTTON (EMAILJS VERSION)
+// -----------------------
+function initFeedback(){
+  // Grab elements
+  const sendFeedbackBtn = document.getElementById("sendFeedbackBtn");
+  const feedbackStatus  = document.getElementById("feedbackStatus");
+  const msgEl           = document.getElementById("feedbackText");
+  const emailEl         = document.getElementById("feedbackEmail");
 
-    if (!sendFeedbackBtn) return;
-    sendFeedbackBtn.addEventListener("click", ()=>{
-
-      const msgEl   = document.getElementById("feedbackText");
-      const emailEl = document.getElementById("feedbackEmail");
-
-      const msg   = msgEl?.value || "";
-      const email = emailEl?.value || "";
-
-      const cleanMsg   = msg.trim();
-      const cleanEmail = email.trim();
-
-      if (!cleanMsg){
-        if (feedbackStatus){
-          feedbackStatus.style.display = "block";
-          feedbackStatus.style.color = "#b00020";
-          feedbackStatus.textContent = "Please tell me something first 🙂";
-        }
-        return;
-      }
-
-      const solvedCount = solvedPuzzles.filter(x => x).length;
-      const totalCount  = PUZZLES.length;
-
-      // Build the payload for EmailJS. These keys MUST match the template fields you created.
-      const templateParams = {
-        message: cleanMsg,
-        player_email: cleanEmail || "(no email given)",
-        solve_progress: `${solvedCount} / ${totalCount}`,
-        puzzle_index: `Puzzle ${currentIndex+1} of ${totalCount}`
-      };
-
-      // Send via EmailJS
-      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
-        .then(() => {
-          if (feedbackStatus){
-            feedbackStatus.style.display = "block";
-            feedbackStatus.style.color = "#108a00";
-            feedbackStatus.textContent = "Thanks! Your feedback was sent ✅";
-          }
-          if (msgEl)   msgEl.value = "";
-          // don't wipe their email unless you want to:
-          // if (emailEl) emailEl.value = "";
-        })
-        .catch((err) => {
-          if (feedbackStatus){
-            feedbackStatus.style.display = "block";
-            feedbackStatus.style.color = "#b00020";
-            feedbackStatus.textContent = "Something went wrong. Try again?";
-          }
-          console.error("EmailJS error:", err);
-        });
-    });
+  // If the feedback UI is not on the page, bail safely.
+  // This prevents runtime crashes that stop the rest of the game logic.
+  if (!sendFeedbackBtn || !feedbackStatus || !msgEl || !emailEl) {
+    return;
   }
+
+  sendFeedbackBtn.addEventListener("click", ()=>{
+
+    const msgRaw   = msgEl.value || "";
+    const emailRaw = emailEl.value || "";
+
+    const cleanMsg   = msgRaw.trim();
+    const cleanEmail = emailRaw.trim();
+
+    if (!cleanMsg){
+      feedbackStatus.style.display = "block";
+      feedbackStatus.style.color = "#b00020";
+      feedbackStatus.textContent = "Please tell me something first 🙂";
+      return;
+    }
+
+    const solvedCount = solvedPuzzles.filter(x => x).length;
+    const totalCount  = PUZZLES.length;
+
+    const templateParams = {
+      message: cleanMsg,
+      player_email: cleanEmail || "(no email given)",
+      solve_progress: `${solvedCount} / ${totalCount}`,
+      puzzle_index: `Puzzle ${currentIndex+1} of ${totalCount}`
+    };
+
+    // Make sure emailjs is available before calling it
+    if (typeof emailjs === "undefined") {
+      // graceful fallback: don't kill the app
+      feedbackStatus.style.display = "block";
+      feedbackStatus.style.color = "#b00020";
+      feedbackStatus.textContent = "Feedback form is offline right now.";
+      console.error("EmailJS is not defined.");
+      return;
+    }
+
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+      .then(() => {
+        feedbackStatus.style.display = "block";
+        feedbackStatus.style.color = "#108a00";
+        feedbackStatus.textContent = "Thanks! Your feedback was sent ✅";
+
+        msgEl.value = "";
+        // leave their email so they don't have to retype
+      })
+      .catch((err) => {
+        feedbackStatus.style.display = "block";
+        feedbackStatus.style.color = "#b00020";
+        feedbackStatus.textContent = "Something went wrong. Try again?";
+        console.error("EmailJS error:", err);
+      });
+  });
+}
 
   // -----------------------
   // INIT / EVENT LISTENERS

@@ -8,6 +8,7 @@
   <meta name="author" content="Salimah Ismail">
   <meta name="copyright" content="© 2025 Salimah Ismail. Licensed under CC BY-NC-ND 4.0 International.">
   <meta name="license" content="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+
   <style>
     body {
       font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
@@ -20,13 +21,8 @@
 
     h1, h2 { text-align: center; }
 
-    h1 {
-      color: #8C6737;
-    }
-    h2 {
-      color: #36171D;
-      font-weight: 500;
-    }
+    h1 { color: #8C6737; }
+    h2 { color: #36171D; font-weight: 500; }
 
     .note-box {
       background: #F6EAED;
@@ -92,10 +88,7 @@
       box-shadow:0 1px 2px rgb(0 0 0 / 0.05);
       font-family:inherit;
     }
-    .char-input::placeholder {
-      color:#999;
-      font-weight:400;
-    }
+    .char-input::placeholder { color:#999; font-weight:400; }
     .char-input:focus{
       outline:none;
       border-color:#000;
@@ -168,10 +161,7 @@
       box-shadow:0 1px 2px rgb(0 0 0 / 0.05);
       font-family:inherit;
     }
-    .num-input::placeholder{
-      color:#999;
-      font-weight:400;
-    }
+    .num-input::placeholder{ color:#999; font-weight:400; }
     .num-input:focus{
       outline:none;
       border-color:#000;
@@ -190,9 +180,7 @@
       align-self:center;
     }
 
-    .eq-target {
-      font-weight:600;
-    }
+    .eq-target { font-weight:600; }
 
     .eq-result {
       font-weight:600;
@@ -276,9 +264,7 @@
       font-size:.9rem;
       line-height:1.4;
     }
-    .feedback-input {
-      resize:vertical;
-    }
+    .feedback-input { resize:vertical; }
 
     .feedback-button {
       margin-top:1rem;
@@ -353,9 +339,7 @@
       opacity: 0;
       z-index: 1000000;
       pointer-events: none;
-      transition:
-        opacity 0.4s ease,
-        transform 0.4s ease;
+      transition: opacity 0.4s ease, transform 0.4s ease;
       animation: rainbowShift 2s linear infinite;
     }
 
@@ -376,9 +360,9 @@
 
   <div class="note-box">
     Each emoji hides a secret <b>LETTER</b> and <b>NUMBER</b>.<br>
-    Unlock one and you'll get the other. <br>
-    Every letter is unique, <i>but numbers can repeat.</i> <br>
-    There are no penalties for guessing. <br>
+    Unlock one and you'll get the other.<br>
+    Every letter is unique, <i>but numbers can repeat.</i><br>
+    There are no penalties for guessing.<br>
     Good Luck!
   </div>
 
@@ -394,12 +378,17 @@
     </div>
   </div>
 
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem; gap:.5rem;">
+  <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; margin-top:1rem; gap:.5rem;">
     <button id="prevBtn" style="flex:1; padding:.75rem 1rem; font-size:1rem; border-radius:.5rem; border:1px solid #999; background:#fff; cursor:pointer;">
       ◀ Previous
     </button>
-    <div id="puzzleLabel" style="flex:0; font-size:.9rem; font-weight:600; color:#555; text-align:center; white-space:nowrap;">
-      Puzzle 1 / 10
+    <div style="flex:2; text-align:center; line-height:1.2;">
+      <div id="puzzleLabel" style="font-size:.9rem; font-weight:600; color:#555; white-space:nowrap;">
+        Puzzle 1 / 10
+      </div>
+      <div id="progressLabel" style="font-size:.8rem; color:#777;">
+        Solved 0 / 10
+      </div>
     </div>
     <button id="nextBtn" style="flex:1; padding:.75rem 1rem; font-size:1rem; border-radius:.5rem; border:1px solid #999; background:#fff; cursor:pointer;">
       Next ▶
@@ -412,7 +401,7 @@
   <div class="section-title">Crack the Math</div>
   <div class="equations-wrapper" id="equationsArea"></div>
 
-  <!-- (Solution box + winBox still hidden for now)
+  <!-- Hidden helpers (optional UI to bring back later)
   <div class="section-title">Solution Key (auto-fills as you solve)</div>
   <div class="solution-box" id="solutionBox">
     <div class="solution-hint">Solve any letter or number to unlock its pair:</div>
@@ -424,11 +413,8 @@
   </div>
   -->
 
-  <!-- FEEDBACK CARD (moved into body, not style) -->
   <div class="feedback-card">
-    <div class="feedback-card-title">
-      Feedback
-    </div>
+    <div class="feedback-card-title">Feedback</div>
 
     <label for="feedbackText" class="feedback-label">
       Tell me what you liked, what was confusing, or if you want more levels 👇
@@ -457,7 +443,7 @@
 
   <canvas id="confettiCanvas"></canvas>
   <div id="solvedMessage">YAY! YOU SOLVED IT!</div>
-  
+
 <script>
 (function(){
 
@@ -644,8 +630,8 @@
         "🧊": { letter:"K", number:9 },
         "🍄": { letter:"I", number:1 },
         "🦴": { letter:"T", number:4 }
-              },
-      uniqueEmojis: ["🦊","🐸","🪐","🎲","🚀","🔮","🌵","🧊","🍄","🦴","🐍"],
+      },
+      uniqueEmojis: ["🦊","🐸","🪐","🎲","🚀","🔮","🌵","🧊","🍄","🦴"],
       equations: [
         { left:["🦊","+","🐸"], target:8 },
         { left:["🐸","+","🪐","+","🎲"], target:11 },
@@ -796,25 +782,55 @@
   let currentIndex = 0;
   let currentPuzzle = PUZZLES[currentIndex];
 
-  // which puzzles have been solved
+  // solvedPuzzles[i] = true/false
   let solvedPuzzles = Array(PUZZLES.length).fill(false);
 
-  let hasCelebrated = false; // confetti lock
-
-  // each emoji's current guessed state in THIS puzzle
+  // per-puzzle emoji guess state
   let playerState = {};
-  initPlayerState();
 
-  // -----------------------
-  // 3. DOM REFS
-  // -----------------------
+  // celebration lock
+  let hasCelebrated = false;
+
+  // DOM refs
   const phraseArea    = document.getElementById("phraseArea");
   const equationsArea = document.getElementById("equationsArea");
-  const solutionLines = document.getElementById("solutionLines"); // may be null
-  const winBox        = document.getElementById("winBox");        // may be null
+  const solutionLines = document.getElementById("solutionLines"); // optional
+  const winBox        = document.getElementById("winBox");        // optional
   const prevBtn       = document.getElementById("prevBtn");
   const nextBtn       = document.getElementById("nextBtn");
   const puzzleLabel   = document.getElementById("puzzleLabel");
+  const progressLabel = document.getElementById("progressLabel");
+
+  // -----------------------
+  // 3. PERSISTENCE
+  // -----------------------
+  function loadProgressFromStorage(){
+    try {
+      const raw = localStorage.getItem("emojiCipherSolved");
+      if(!raw) return;
+      const arr = JSON.parse(raw);
+      if(Array.isArray(arr) && arr.length === PUZZLES.length){
+        solvedPuzzles = arr.map(x=>!!x);
+      }
+    } catch(e){
+      // ignore parse errors
+    }
+  }
+
+  function saveProgressToStorage(){
+    try {
+      localStorage.setItem("emojiCipherSolved", JSON.stringify(solvedPuzzles));
+    } catch(e){
+      // ignore quota/etc
+    }
+  }
+
+  function updateProgressLabel(){
+    const solvedCount = solvedPuzzles.filter(x=>x).length;
+    if(progressLabel){
+      progressLabel.textContent = `Solved ${solvedCount} / ${PUZZLES.length}`;
+    }
+  }
 
   // -----------------------
   // helpers
@@ -828,7 +844,7 @@
   }
 
   // -----------------------
-  // 4. RENDER PHRASE
+  // RENDER PHRASE
   // -----------------------
   function renderPhrase(){
     phraseArea.innerHTML = "";
@@ -877,7 +893,7 @@
   }
 
   // -----------------------
-  // 5. RENDER EQUATIONS
+  // RENDER EQUATIONS
   // -----------------------
   function renderEquations(){
     equationsArea.innerHTML = "";
@@ -938,7 +954,7 @@
   }
 
   // -----------------------
-  // 6. SOLUTION BOX (if visible)
+  // SOLUTION BOX (if visible)
   // -----------------------
   function renderSolutionBox(){
     if (!solutionLines) return;
@@ -955,7 +971,7 @@
   }
 
   // -----------------------
-  // 7. UPDATE EQUATIONS STATUS
+  // UPDATE EQUATIONS STATUS
   // -----------------------
   function updateEquationsStatus(){
     currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
@@ -986,7 +1002,7 @@
   }
 
   // -----------------------
-  // 8. RETURN CURRENT PHRASE AS USER HAS SOLVED SO FAR
+  // GET CURRENT PHRASE AS SOLVED
   // -----------------------
   function getCurrentSolvedPhrase(){
     const wordsSolved = currentPuzzle.phraseWords.map(wordArr => {
@@ -1002,7 +1018,7 @@
   }
 
   // -----------------------
-  // 9. INPUT HANDLER
+  // INPUT HANDLER
   // -----------------------
   function handleGuessInput(e){
     const em   = e.target.dataset.emoji;
@@ -1038,7 +1054,6 @@
     const correctNumber = currentPuzzle.mapping[em].number.toString();
 
     if(kind === "letter" && val === correctLetter){
-      // lock it in
       playerState[em].letter = correctLetter;
       playerState[em].number = correctNumber;
       playerState[em].solved = true;
@@ -1059,7 +1074,7 @@
   }
 
   // -----------------------
-  // 10. SYNC SOLVED VALUES EVERYWHERE
+  // SYNC SOLVED VALUES EVERYWHERE
   // -----------------------
   function syncSolvedEmojiEverywhere(em){
     const solvedLetter = playerState[em].letter;
@@ -1079,12 +1094,11 @@
   }
 
   // -----------------------
-  // 11. CONFETTI + "YOU SOLVED IT"
+  // CONFETTI + "YOU SOLVED IT"
   // -----------------------
   function launchConfetti() {
-    // gate unless forced
     if (hasCelebrated) return;
-hasCelebrated = true;
+    hasCelebrated = true;
 
     // show big message
     const msg = document.getElementById("solvedMessage");
@@ -1104,10 +1118,10 @@ hasCelebrated = true;
     const EMOJIS = [
       "🎉","🎊","✨","💥","💫","🌟","🔥","🤩","😎","🦄",
       "🦊","🐸","🪐","🎲","🚀","★","🔮","🧊","🐙","🌸",
-      "🦩","🐢","🪼","🐍","🏵️","🎈","🥳","🪻", "💐"  
+      "🦩","🐢","🪼","🐍","🏵️","🎈","🥳","🪻","💐"
     ];
 
-    // pre-render sprites for perf
+    // pre-render sprite
     function makeEmojiSprite(char, sizePx) {
       const off = document.createElement("canvas");
       const offCtx = off.getContext("2d");
@@ -1118,11 +1132,7 @@ hasCelebrated = true;
       offCtx.textAlign = "center";
       offCtx.textBaseline = "middle";
       offCtx.fillText(char, off.width / 2, off.height / 2);
-      return {
-        canvas: off,
-        w: off.width,
-        h: off.height
-      };
+      return { canvas: off, w: off.width, h: off.height };
     }
 
     const SPRITES = [];
@@ -1140,7 +1150,6 @@ hasCelebrated = true;
     for (let i = 0; i < COUNT; i++) {
       const sprite = SPRITES[Math.floor(Math.random() * SPRITES.length)];
 
-      // upward fanburst angle: -150deg..-30deg
       const angleDeg = -150 + Math.random() * 120;
       const angleRad = angleDeg * Math.PI / 180;
 
@@ -1205,7 +1214,7 @@ hasCelebrated = true;
         // scale
         const scale = p.scaleStart + (p.scaleEnd - p.scaleStart) * tNorm;
 
-        // fade near end only
+        // fade
         let alpha;
         if (tNorm < 0.7) {
           alpha = 1;
@@ -1245,35 +1254,60 @@ hasCelebrated = true;
   }
 
   // -----------------------
-  // 12. CHECK WIN
+  // CHECK WIN
   // -----------------------
- function checkWin(){
-  const finalPhrase = getCurrentSolvedPhrase();
-  const phraseDone = (finalPhrase === currentPuzzle.phrase);
+  function checkWin(){
+    const finalPhrase = getCurrentSolvedPhrase();
+    const phraseDone = (finalPhrase === currentPuzzle.phrase);
 
-  let allEqCorrect = true;
-  currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
-    const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
-    if(!resDiv || !resDiv.classList.contains("status-ok")){
-      allEqCorrect = false;
+    let allEqCorrect = true;
+    currentPuzzle.equations.forEach((eqObj, eqIndex)=>{
+      const resDiv = equationsArea.querySelector(`.eq-result[data-eq-index="${eqIndex}"]`);
+      if(!resDiv || !resDiv.classList.contains("status-ok")){
+        allEqCorrect = false;
+      }
+    });
+
+    if (phraseDone && allEqCorrect) {
+      // mark solved
+      solvedPuzzles[currentIndex] = true;
+      saveProgressToStorage();
+      updateProgressLabel();
+
+      if (winBox) { winBox.style.display = "block"; }
+      if (!hasCelebrated) {
+        launchConfetti();
+      }
+    } else {
+      if (winBox) { winBox.style.display = "none"; }
     }
-  });
-
-  if (phraseDone && allEqCorrect) {
-    // mark solved
-    solvedPuzzles[currentIndex] = true;
-
-    if (winBox) { winBox.style.display = "block"; }
-    if (!hasCelebrated) {
-      launchConfetti();
-    }
-  } else {
-    if (winBox) { winBox.style.display = "none"; }
   }
-}
 
   // -----------------------
-  // 13. LOAD PUZZLE INDEX
+  // RESTORE PUZZLE STATE IF ALREADY SOLVED
+  // -----------------------
+  function autofillIfSolved(){
+    if (!solvedPuzzles[currentIndex]) return;
+
+    // mark all emojis solved in playerState
+    currentPuzzle.uniqueEmojis.forEach(em=>{
+      playerState[em].solved = true;
+      playerState[em].letter = currentPuzzle.mapping[em].letter;
+      playerState[em].number = currentPuzzle.mapping[em].number.toString();
+    });
+
+    // sync all UI fields
+    currentPuzzle.uniqueEmojis.forEach(em=>{
+      syncSolvedEmojiEverywhere(em);
+    });
+
+    updateEquationsStatus();
+    renderSolutionBox();
+    checkWin();
+  }
+
+  // -----------------------
+  // LOAD PUZZLE INDEX
   // -----------------------
   function loadPuzzle(newIndex){
     // clamp
@@ -1289,177 +1323,178 @@ hasCelebrated = true;
     renderEquations();
     renderSolutionBox();
     updateEquationsStatus();
-    checkWin();
 
-    // label
+    // autofill if solved in past
+    autofillIfSolved();
+
+    // labels
     if (puzzleLabel){
       puzzleLabel.textContent = `Puzzle ${currentIndex+1} / ${PUZZLES.length}`;
     }
+    updateProgressLabel();
   }
 
   // -----------------------
-  // 14. INIT / EVENT LISTENERS
+  // SHARE BUTTON WIRING
   // -----------------------
-  function init(){
-    // wire nav buttons
-    if(prevBtn){
-      prevBtn.addEventListener("click", ()=>{
-        loadPuzzle(currentIndex - 1);
-      });
-    }
-    if(nextBtn){
-      nextBtn.addEventListener("click", ()=>{
-        loadPuzzle(currentIndex + 1);
-      });
+  function initShare(){
+    const shareBtn = document.getElementById("shareBtn");
+    const shareStatus = document.getElementById("shareStatus");
+
+    function getShareUrl() {
+      const origin = window.location.origin;
+      const path = window.location.pathname;
+      return origin + path;
     }
 
+    async function copyToClipboard(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (err) {
+        // fallback if clipboard API is blocked
+        const temp = document.createElement("textarea");
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(temp);
+        return ok;
+      }
+    }
+
+    async function doShare() {
+      const url = getShareUrl();
+      const solvedCount = solvedPuzzles.filter(x=>x).length;
+      const message = `I solved ${solvedCount}/${PUZZLES.length} Emoji Cipher™ puzzles! Try it: ${url}`;
+
+      // native share first
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: "Emoji Cipher™",
+            text: `I solved ${solvedCount}/${PUZZLES.length} Emoji Cipher™ puzzles! Try it:`,
+            url: url
+          });
+          showCopiedUI("Link ready to share!");
+          return;
+        } catch (err) {
+          // fall through to clipboard
+        }
+      }
+
+      // fallback to clipboard
+      const ok = await copyToClipboard(message);
+
+      if (ok) {
+        showCopiedUI("Copied!");
+      } else {
+        showCopiedUI("Copy manually ↓");
+        shareStatus.textContent = url;
+      }
+    }
+
+    function showCopiedUI(statusText){
+      if(!shareBtn || !shareStatus) return;
+      const originalBtnText = shareBtn.textContent;
+      shareBtn.textContent = "Copied!";
+
+      shareStatus.textContent = statusText || "Copied!";
+      shareStatus.style.display = "block";
+
+      setTimeout(() => {
+        shareBtn.textContent = originalBtnText;
+        shareStatus.style.display = "none";
+      }, 2000);
+    }
+
+    if (shareBtn){
+      shareBtn.addEventListener("click", doShare);
+    }
+  }
+
+  // -----------------------
+  // FEEDBACK BUTTON
+  // -----------------------
+  function initFeedback(){
+    const sendFeedbackBtn = document.getElementById("sendFeedbackBtn");
+    const feedbackStatus  = document.getElementById("feedbackStatus");
+
+    if (!sendFeedbackBtn) return;
+    sendFeedbackBtn.addEventListener("click", ()=>{
+      const msgEl = document.getElementById("feedbackText");
+      const emailEl = document.getElementById("feedbackEmail");
+
+      const msg = msgEl?.value || "";
+      const email = emailEl?.value || "";
+
+      const cleanMsg = msg.trim();
+      const cleanEmail = email.trim();
+
+      if (!cleanMsg){
+        if (feedbackStatus){
+          feedbackStatus.style.display = "block";
+          feedbackStatus.style.color = "#b00020";
+          feedbackStatus.textContent = "Please tell me something first 🙂";
+        }
+        return;
+      }
+
+      const solvedCount = solvedPuzzles.filter(x => x).length;
+      const totalCount = PUZZLES.length;
+
+      const bodyLines = [
+        "Emoji Cipher feedback:",
+        cleanMsg,
+        "",
+        "Player info:",
+        `Solved: ${solvedCount} / ${totalCount} puzzles`,
+        cleanEmail ? `Reply to me at: ${cleanEmail}` : "(no email given)"
+      ];
+
+      const mailtoLink =
+        "mailto:salimahismail@gmail.com"
+        + "?subject=" + encodeURIComponent("Emoji Cipher feedback")
+        + "&body=" + encodeURIComponent(bodyLines.join("\n"));
+
+      window.location.href = mailtoLink;
+
+      if (feedbackStatus){
+        feedbackStatus.style.display = "block";
+        feedbackStatus.style.color = "#108a00";
+        feedbackStatus.textContent = "Your feedback draft just opened in email ✨";
+      }
+
+      if (msgEl) msgEl.value = "";
+    });
+  }
+
+  // -----------------------
+  // INIT / EVENT LISTENERS
+  // -----------------------
+  function init(){
+    // load saved progress
+    loadProgressFromStorage();
+
+    // wire nav buttons
+    if(prevBtn){
+      prevBtn.addEventListener("click", ()=>{ loadPuzzle(currentIndex - 1); });
+    }
+    if(nextBtn){
+      nextBtn.addEventListener("click", ()=>{ loadPuzzle(currentIndex + 1); });
+    }
+
+    initShare();
+    initFeedback();
+
+    // first puzzle
     loadPuzzle(0);
   }
 
-  // SHARE BUTTON
-(function(){
-  const shareBtn = document.getElementById("shareBtn");
-  const shareStatus = document.getElementById("shareStatus");
-
-  function getShareUrl() {
-    // Clean canonical URL (no duplicate, no querystring unless you really want it)
-    const origin = window.location.origin;
-    const path = window.location.pathname;
-    return origin + path;
-  }
-
-  async function copyToClipboard(text) {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch (err) {
-      // fallback if clipboard API is blocked
-      const temp = document.createElement("textarea");
-      temp.value = text;
-      document.body.appendChild(temp);
-      temp.select();
-      const ok = document.execCommand("copy");
-      document.body.removeChild(temp);
-      return ok;
-    }
-  }
-
-  async function doShare() {
-    const url = getShareUrl();
-    const message = `I solved Emoji Cipher™! Try it: ${url}`;
-
-    // 1. Try native share (mobile mostly)
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "Emoji Cipher™",
-          text: "I solved Emoji Cipher™! Try it:",
-          url: url
-        });
-
-        // If it didn't throw, treat it like success
-        showCopiedUI("Link ready to share!");
-        return;
-      } catch (err) {
-        // If user cancels or browser blocks, fall back to copy
-        // no return here, continue to clipboard
-      }
-    }
-
-    // 2. Desktop / fallback: copy to clipboard
-    const ok = await copyToClipboard(message);
-
-    if (ok) {
-      showCopiedUI("Copied!");
-    } else {
-      showCopiedUI("Copy manually ↓");
-      // worst case we can also just reveal the URL for manual copy
-      shareStatus.textContent = url;
-    }
-  }
-
-  function showCopiedUI(statusText){
-    // Update button text
-    const originalBtnText = shareBtn.textContent;
-    shareBtn.textContent = "Copied!";
-
-    // Update status div and show it
-    shareStatus.textContent = statusText || "Copied!";
-    shareStatus.style.display = "block";
-
-    // After 2 seconds, reset button + hide status
-    setTimeout(() => {
-      shareBtn.textContent = originalBtnText;
-      shareStatus.style.display = "none";
-    }, 2000);
-  }
-
-  shareBtn.addEventListener("click", doShare);
-})();
-}
-
-
-  const sendFeedbackBtn = document.getElementById("sendFeedbackBtn");
-const feedbackStatus  = document.getElementById("feedbackStatus");
-
-if (sendFeedbackBtn){
-  sendFeedbackBtn.addEventListener("click", ()=>{
-    const msg = document.getElementById("feedbackText")?.value || "";
-    const email = document.getElementById("feedbackEmail")?.value || "";
-
-    // basic sanitizing / trimming
-    const cleanMsg = msg.trim();
-    const cleanEmail = email.trim();
-
-    if (!cleanMsg){
-      // no message? nudge them
-      if (feedbackStatus){
-        feedbackStatus.style.display = "block";
-        feedbackStatus.style.color = "#b00020";
-        feedbackStatus.textContent = "Please tell me something first 🙂";
-      }
-      return;
-    }
-
-    // build email body
-    // include how many puzzles they've solved so you see difficulty feedback in context
-    const solvedCount = solvedPuzzles.filter(x => x).length;
-    const totalCount = PUZZLES.length;
-
-    const bodyLines = [
-      "Emoji Cipher feedback:",
-      cleanMsg,
-      "",
-      "Player info:",
-      `Solved: ${solvedCount} / ${totalCount} puzzles`,
-      cleanEmail ? `Reply to me at: ${cleanEmail}` : "(no email given)"
-    ];
-
-    const mailtoLink =
-      "mailto:salimahismail@gmail.com"
-      + "?subject=" + encodeURIComponent("Emoji Cipher feedback")
-      + "&body=" + encodeURIComponent(bodyLines.join("\n"));
-
-    // open their email client
-    window.location.href = mailtoLink;
-
-    // visual confirmation
-    if (feedbackStatus){
-      feedbackStatus.style.display = "block";
-      feedbackStatus.style.color = "#108a00";
-      feedbackStatus.textContent = "Your feedback draft just opened in email ✨";
-    }
-
-    // optional: clear the box
-    const fbBox = document.getElementById("feedbackText");
-    if (fbBox) fbBox.value = "";
-  });
-}
-
-  // kick it off
+  // kick it off safely inside IIFE
   init();
 
-})(); 
+})(); // end IIFE
 </script>
 
 </body>

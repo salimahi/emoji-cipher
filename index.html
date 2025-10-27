@@ -17,16 +17,16 @@
       color: #222;
       background: #fdfdfd;
     }
+
     h1, h2 { text-align: center; }
 
     h1 {
-  color: #8C6737; /* pick your color here */
-}
-h2 {
-  color: #36171D; /* match, or choose a different accent */
-  font-weight: 500;
-}
-
+      color: #8C6737;
+    }
+    h2 {
+      color: #36171D;
+      font-weight: 500;
+    }
 
     .note-box {
       background: #F6EAED;
@@ -202,7 +202,7 @@ h2 {
     .status-ok{color:#108a00;}
     .status-bad{color:#b00020;}
 
-    /* Solution key styling (currently hidden in HTML, but CSS can stay) */
+    /* Solution key styling (still unused/hidden) */
     .solution-box {
       border:1px solid #ddd;
       border-radius:.5rem;
@@ -244,67 +244,61 @@ h2 {
       box-shadow:0 4px 10px rgb(0 0 0 / .08);
     }
 
-    <div style="
-  margin-top:2rem;
-  border:1px solid #ddd;
-  border-radius:.5rem;
-  background:#fff;
-  box-shadow:0 1px 2px rgb(0 0 0 / .05);
-  padding:1rem;
-  font-size:.9rem;">
-  
-  <div style="font-weight:600; color:#8C6737; margin-bottom:.5rem;">
-    Feedback
-  </div>
+    /* FEEDBACK CARD */
+    .feedback-card {
+      margin-top:2rem;
+      border:1px solid #ddd;
+      border-radius:.5rem;
+      background:#fff;
+      box-shadow:0 1px 2px rgb(0 0 0 / .05);
+      padding:1rem;
+      font-size:.9rem;
+    }
+    .feedback-card-title {
+      font-weight:600;
+      color:#8C6737;
+      margin-bottom:.5rem;
+    }
+    .feedback-label {
+      display:block;
+      font-size:.8rem;
+      color:#444;
+      margin-bottom:.25rem;
+    }
+    .feedback-input,
+    .feedback-email {
+      width:100%;
+      box-sizing:border-box;
+      border:1.5px solid #bbb;
+      border-radius:.5rem;
+      padding:.5rem;
+      font-family:inherit;
+      font-size:.9rem;
+      line-height:1.4;
+    }
+    .feedback-input {
+      resize:vertical;
+    }
 
-  <label style="display:block; font-size:.8rem; color:#444; margin-bottom:.25rem;">
-    Tell me what you liked, what was confusing, or if you want more levels 👇
-  </label>
-  <textarea id="feedbackText" rows="3" style="
-    width:100%;
-    box-sizing:border-box;
-    border:1.5px solid #bbb;
-    border-radius:.5rem;
-    padding:.5rem;
-    font-family:inherit;
-    font-size:.9rem;
-    line-height:1.4;
-    resize:vertical;
-    " placeholder="I would likw more levels! Also can you make it so that..."></textarea>
+    .feedback-button {
+      margin-top:1rem;
+      width:100%;
+      padding:.75rem 1rem;
+      font-size:1rem;
+      border-radius:.5rem;
+      border:1px solid #999;
+      background:#F6EAED;
+      color:#36171D;
+      cursor:pointer;
+      font-weight:600;
+    }
 
-  <label style="display:block; font-size:.8rem; color:#444; margin:.75rem 0 .25rem;">
-    Your email:
-  </label>
-  <input id="feedbackEmail" type="email" style="
-    width:100%;
-    box-sizing:border-box;
-    border:1.5px solid #bbb;
-    border-radius:.5rem;
-    padding:.5rem;
-    font-family:inherit;
-    font-size:.9rem;
-    line-height:1.4;
-  " placeholder="name@email.com">
-
-  <button id="sendFeedbackBtn" style="
-    margin-top:1rem;
-    width:100%;
-    padding:.75rem 1rem;
-    font-size:1rem;
-    border-radius:.5rem;
-    border:1px solid #999;
-    background:#F6EAED;
-    color:#36171D;
-    cursor:pointer;
-    font-weight:600;">
-    ✉ Send Feedback
-  </button>
-
-  <div id="feedbackStatus" style="font-size:.8rem; color:#108a00; margin-top:.5rem; display:none;">
-    Thanks! Your message is ready to send.
-  </div>
-</div>
-
+    .feedback-status {
+      font-size:.8rem;
+      color:#108a00;
+      margin-top:.5rem;
+      display:none;
+    }
 
     footer{
       margin-top:2rem;
@@ -318,64 +312,62 @@ h2 {
     }
 
     /* celebration confetti canvas */
-#confettiCanvas {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 999999; /* keep it above the puzzle */
-}
+    #confettiCanvas {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 999999;
+    }
 
     /* full-screen win text */
-#solvedMessage {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.8);
-  font-size: 6vw;
-  font-weight: 800;
-  font-family: system-ui, sans-serif;
+    #solvedMessage {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      font-size: 6vw;
+      font-weight: 800;
+      font-family: system-ui, sans-serif;
 
-  background: linear-gradient(
-    90deg,
-    #ff005e 0%,
-    #ff8a00 16%,
-    #ffe600 32%,
-    #00d12b 48%,
-    #00c2ff 64%,
-    #7a00ff 80%,
-    #ff00c8 100%,
-    #ff005e 120%
-  );
-  background-size: 200% auto;        /* make it wider than the text */
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+      background: linear-gradient(
+        90deg,
+        #ff005e 0%,
+        #ff8a00 16%,
+        #ffe600 32%,
+        #00d12b 48%,
+        #00c2ff 64%,
+        #7a00ff 80%,
+        #ff00c8 100%,
+        #ff005e 120%
+      );
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
 
-  text-shadow: 0 0 25px rgba(0,0,0,0.6);
+      text-shadow: 0 0 25px rgba(0,0,0,0.6);
 
-  opacity: 0;
-  z-index: 1000000;
-  pointer-events: none;
-  transition:
-    opacity 0.4s ease,
-    transform 0.4s ease;
-  animation: rainbowShift 2s linear infinite;
-}
+      opacity: 0;
+      z-index: 1000000;
+      pointer-events: none;
+      transition:
+        opacity 0.4s ease,
+        transform 0.4s ease;
+      animation: rainbowShift 2s linear infinite;
+    }
 
-#solvedMessage.show {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-}
+    #solvedMessage.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
 
-@keyframes rainbowShift {
-  0%   { background-position: 0% 50%; }
-  100% { background-position: -200% 50%; }
-}
-
-
+    @keyframes rainbowShift {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: -200% 50%; }
+    }
   </style>
 </head>
 <body>
@@ -390,17 +382,17 @@ h2 {
     Good Luck!
   </div>
 
-    <div style="margin-top:1rem; display:flex; gap:.5rem; flex-wrap:wrap;">
-  <button id="shareBtn"
-    style="flex:1; padding:.75rem 1rem; font-size:1rem; border-radius:.5rem; border:1px solid #999; background:#fff; cursor:pointer;">
-    🔗 Share
-  </button>
+  <div style="margin-top:1rem; display:flex; gap:.5rem; flex-wrap:wrap;">
+    <button id="shareBtn"
+      style="flex:1; padding:.75rem 1rem; font-size:1rem; border-radius:.5rem; border:1px solid #999; background:#fff; cursor:pointer;">
+      🔗 Share
+    </button>
 
-  <div id="shareStatus"
-    style="flex:1; font-size:.8rem; color:#555; line-height:1.2; display:none;">
-    Copied!
+    <div id="shareStatus"
+      style="flex:1; font-size:.8rem; color:#555; line-height:1.2; display:none;">
+      Copied!
+    </div>
   </div>
-</div>
 
   <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem; gap:.5rem;">
     <button id="prevBtn" style="flex:1; padding:.75rem 1rem; font-size:1rem; border-radius:.5rem; border:1px solid #999; background:#fff; cursor:pointer;">
@@ -420,7 +412,7 @@ h2 {
   <div class="section-title">Crack the Math</div>
   <div class="equations-wrapper" id="equationsArea"></div>
 
-  <!--
+  <!-- (Solution box + winBox still hidden for now)
   <div class="section-title">Solution Key (auto-fills as you solve)</div>
   <div class="solution-box" id="solutionBox">
     <div class="solution-hint">Solve any letter or number to unlock its pair:</div>
@@ -432,16 +424,40 @@ h2 {
   </div>
   -->
 
+  <!-- FEEDBACK CARD (moved into body, not style) -->
+  <div class="feedback-card">
+    <div class="feedback-card-title">
+      Feedback
+    </div>
+
+    <label for="feedbackText" class="feedback-label">
+      Tell me what you liked, what was confusing, or if you want more levels 👇
+    </label>
+    <textarea id="feedbackText" rows="3" class="feedback-input" placeholder="I would like more levels! Also can you make it so that..."></textarea>
+
+    <label for="feedbackEmail" class="feedback-label" style="margin-top:.75rem;">
+      Your email:
+    </label>
+    <input id="feedbackEmail" type="email" class="feedback-email" placeholder="name@email.com">
+
+    <button id="sendFeedbackBtn" class="feedback-button">
+      ✉ Send Feedback
+    </button>
+
+    <div id="feedbackStatus" class="feedback-status">
+      Thanks! Your message is ready to send.
+    </div>
+  </div>
+
   <footer>
     Emoji Cipher™ © 2025 Salimah Ismail.<br>
-    Licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0 International</a>. <br>
-    <a href="https://salimahismail.com" target="_blank">https://salimahismail.com</a> 
+    Licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0 International</a>.<br>
+    <a href="https://salimahismail.com" target="_blank">https://salimahismail.com</a>
   </footer>
 
   <canvas id="confettiCanvas"></canvas>
-
   <div id="solvedMessage">YAY! YOU SOLVED IT!</div>
-
+  
 <script>
 (function(){
 

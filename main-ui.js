@@ -66,6 +66,13 @@ function renderModeUI() {
   hardBtn.style.background = isEasy ? "#fff" : "#F6EAED";
   easyBtn.style.borderColor = isEasy ? "#36171D" : "#999";
   hardBtn.style.borderColor = isEasy ? "#36171D" : "#999";
+
+  // Add extra hard bar
+    const hardBar = document.getElementById("hardBar");
+  if (hardBar) {
+    hardBar.style.display = (currentMode === MODES.HARD) ? "flex" : "none";
+  }
+
 }
 
 function initModeSelector() {

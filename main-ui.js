@@ -557,8 +557,12 @@ hardBtn.addEventListener("click", () => {
 
     if (phraseDone && allEqCorrect) {
       // mark solved in GameEngine as Easy completion
-      GameEngine.completePuzzleEasy(currentPuzzle.id);
-
+      if (currentMode === MODES.HARD) {
+  const result = GameEngine.submitGuessHard(currentPuzzle.id);
+  // result contains { solved, finalScore, stars, ... } when solved
+} else {
+  GameEngine.completePuzzleEasy(currentPuzzle.id);
+}
       if (winBox) {
         winBox.style.display = "block";
       }
@@ -605,6 +609,14 @@ hardBtn.addEventListener("click", () => {
 
     currentIndex  = newIndex;
     currentPuzzle = PUZZLES[currentIndex];
+
+        const bestHardLabel = document.getElementById("bestHardLabel");
+    if (bestHardLabel) {
+      const ps = GameEngine.getProfile().puzzles[currentPuzzle.id] || {};
+      const best = (typeof ps.bestScore === "number") ? ps.bestScore : null;
+      const stars = (typeof ps.bestStars === "number") ? ps.bestStars : 0;
+      bestHardLabel.textContent = best === null ? "Best: ." : `Best: ${best} (${stars}★)`;
+    }
 
     initPlayerState();
     renderPhrase();

@@ -49,6 +49,7 @@ function setMode(mode) {
   currentMode = mode;
   GameEngine.setMode(mode); // persists to profile
   renderModeUI();
+  renderLives();
 }
 
 function renderModeUI() {

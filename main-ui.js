@@ -631,6 +631,34 @@ hardBtn.addEventListener("click", () => {
     checkWin();
   }
 
+  function applyHardSavedStateToUI() {
+  const view = GameEngine.getHardViewState(currentPuzzle.id);
+  if (!view) return;
+
+  // solvedLetters/solvedNumbers can be an object or array depending on engine version
+  const solvedL = view.solvedLetters || {};
+  const solvedN = view.solvedNumbers || {};
+
+  const isSolved = (em) => {
+    const a = Array.isArray(solvedL) ? solvedL.includes(em) : !!solvedL[em];
+    const b = Array.isArray(solvedN) ? solvedN.includes(em) : !!solvedN[em];
+    return a && b;
+  };
+
+  currentPuzzle.uniqueEmojis.forEach(em => {
+    if (isSolved(em)) {
+      const def = currentPuzzle.mapping[em];
+      playerState[em].solved = true;
+      playerState[em].letter = def.letter;
+      playerState[em].number = String(def.number);
+      syncSolvedEmojiEverywhere(em);
+    }
+  });
+
+  updateEquationsStatus();
+  renderSolutionBox();
+}
+
   // -----------------------
   // LOAD PUZZLE
   // -----------------------
@@ -666,7 +694,9 @@ renderPhrase();
     renderSolutionBox();
     updateEquationsStatus();
     autofillIfSolved();
-
+    if (currentMode === MODES.HARD) {
+  applyHardSavedStateToUI();
+}
     if (puzzleLabel) {
       puzzleLabel.textContent = `Puzzle ${currentIndex + 1} / ${PUZZLES.length}`;
     }

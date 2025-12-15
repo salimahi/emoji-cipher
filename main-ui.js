@@ -336,23 +336,6 @@ hardBtn.addEventListener("click", () => {
     const em   = e.target.dataset.emoji;
     const kind = e.target.dataset.kind;
 
-      if (currentMode === MODES.HARD) {
-    const result = GameEngine.submitGuessHard(currentPuzzle.id, {
-      emoji: em,
-      kind,
-      value: e.target.value,
-      confirm: false // confirm/brutal logic comes later
-    });
-
-       if (currentMode === MODES.HARD) {
-  renderLives();
-}
-
-    if (result && result.failed) {
-      return;
-    }
-  }
-
     if (playerState[em].solved) {
       syncSolvedEmojiEverywhere(em);
       updateEquationsStatus();
@@ -373,6 +356,21 @@ hardBtn.addEventListener("click", () => {
         if (n > 9) n = 9;
         e.target.value = n === "" ? "" : String(n);
         val = e.target.value;
+      }
+    }
+
+        if (currentMode === MODES.HARD) {
+      const result = GameEngine.submitGuessHard(currentPuzzle.id, {
+        emoji: em,
+        kind,
+        value: val,
+        confirm: false
+      });
+
+      renderLives();
+
+      if (result && result.failed) {
+        return;
       }
     }
 

@@ -79,7 +79,7 @@ function renderModeUI() {
   const livesIcons = document.getElementById("livesIcons");
   if (!livesIcons) return;
 
-  const hardState = GameEngine.getHardState(currentPuzzle.id);
+  const hardState = GameEngine.getHardViewState(currentPuzzle.id);
   if (!hardState) return;
 
   const total = hardState.livesStart || 5;

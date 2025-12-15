@@ -758,6 +758,11 @@ function initModeSelector() {
   // INIT
   // -----------------------
   function init() {
+    console.log("INIT CHECK", {
+  phraseArea: document.getElementById("phraseArea"),
+  equationsArea: document.getElementById("equationsArea"),
+  puzzlesDataKeys: Object.keys(window).filter(k => k.toLowerCase().includes("puzzle")),
+});
     if (prevBtn) {
       prevBtn.addEventListener("click", () => {
         loadPuzzle(currentIndex - 1);

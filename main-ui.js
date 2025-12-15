@@ -650,8 +650,18 @@ hardBtn.addEventListener("click", () => {
     }
 
     initPlayerState();
-    renderLives();
-    renderPhrase();
+
+// IMPORTANT. ensure the hard state exists for THIS puzzle before drawing hearts
+if (currentMode === MODES.HARD) {
+  GameEngine.resumeHardRun(currentPuzzle.id);
+  renderLives();
+} else {
+  const livesIcons = document.getElementById("livesIcons");
+  if (livesIcons) livesIcons.textContent = "";
+}
+
+renderPhrase();
+
     renderEquations();
     renderSolutionBox();
     updateEquationsStatus();

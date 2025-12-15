@@ -75,6 +75,24 @@ function renderModeUI() {
 
 }
 
+  function renderLives() {
+  const livesIcons = document.getElementById("livesIcons");
+  if (!livesIcons) return;
+
+  const hardState = GameEngine.getHardState(currentPuzzle.id);
+  if (!hardState) return;
+
+  const total = hardState.livesStart || 5;
+  const left = hardState.livesLeft;
+
+  let out = "";
+  for (let i = 0; i < total; i++) {
+    out += i < left ? "❤️" : "💀";
+  }
+  livesIcons.textContent = out;
+}
+
+
 function initModeSelector() {
   const easyBtn = document.getElementById("modeEasy");
   const hardBtn = document.getElementById("modeHard");
@@ -325,6 +343,10 @@ hardBtn.addEventListener("click", () => {
       value: e.target.value,
       confirm: false // confirm/brutal logic comes later
     });
+
+       if (currentMode === MODES.HARD) {
+  renderLives();
+}
 
     if (result && result.failed) {
       return;
@@ -629,6 +651,7 @@ hardBtn.addEventListener("click", () => {
     }
 
     initPlayerState();
+    renderLives();
     renderPhrase();
     renderEquations();
     renderSolutionBox();

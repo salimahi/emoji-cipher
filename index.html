@@ -356,7 +356,10 @@
      /* Easy/Hard Mode */
     .mode-bar { display:flex; align-items:center; gap:12px; margin:12px 0; }
     .mode-toggle { display:flex; gap:8px; }
-    .mode-toggle button[aria-pressed="true"] { font-weight:700; }
+    .mode-toggle button[aria-pressed="true"]{
+  background:#F6EAED;
+  border-color:#36171D;
+}
   </style>
 </head>
 <body>
@@ -389,8 +392,16 @@
   <section id="modeBar" class="mode-bar">
   <span class="mode-label">Mode</span>
   <div class="mode-toggle" role="group" aria-label="Select mode">
-    <button id="modeEasy" type="button">Easy</button>
-    <button id="modeHard" type="button">Hard</button>
+    <button id="modeEasy" type="button"
+  style="padding:.75rem 1rem; font-size:1rem; border-radius:.5rem; border:1px solid #999; background:#fff; cursor:pointer; font-weight:600;">
+  Easy
+</button>
+
+<button id="modeHard" type="button"
+  style="padding:.75rem 1rem; font-size:1rem; border-radius:.5rem; border:1px solid #999; background:#fff; cursor:pointer; font-weight:600;">
+  Hard
+</button>
+
   </div>
 </section>
 
@@ -453,9 +464,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
  <!-- Game modules -->
-  <script src="puzzlesData.js"></script>
-  <script src="gameEngine.js"></script>
-  <script src="main-ui.js"></script>
+<script src="puzzlesData.js" defer></script>
+<script src="gameEngine.js" defer></script>
+<script src="main-ui.js" defer></script>
 
 </body>
 </html>

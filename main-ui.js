@@ -364,7 +364,7 @@ hardBtn.addEventListener("click", () => {
         emoji: em,
         kind,
         value: val,
-        confirm: false
+        confirm: true
       });
 
       renderLives();

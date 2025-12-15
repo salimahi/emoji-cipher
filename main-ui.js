@@ -71,8 +71,15 @@ function renderModeUI() {
   if (!easyBtn || !hardBtn) return;
 
   const isEasy = currentMode === MODES.EASY;
-  easyBtn.setAttribute("aria-pressed", String(isEasy));
-  hardBtn.setAttribute("aria-pressed", String(!isEasy));
+
+  easyBtn.setAttribute("aria-pressed", isEasy ? "true" : "false");
+  hardBtn.setAttribute("aria-pressed", isEasy ? "false" : "true");
+
+  // force visual fill even if other styles override
+  easyBtn.style.background = isEasy ? "#F6EAED" : "#fff";
+  hardBtn.style.background = isEasy ? "#fff" : "#F6EAED";
+  easyBtn.style.borderColor = isEasy ? "#36171D" : "#999";
+  hardBtn.style.borderColor = isEasy ? "#36171D" : "#999";
 }
 
 function initModeSelector() {

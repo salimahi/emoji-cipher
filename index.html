@@ -352,12 +352,18 @@
       0%   { background-position: 0% 50%; }
       100% { background-position: -200% 50%; }
     }
+
+     /* Easy/Hard Mode */
+    .mode-bar { display:flex; align-items:center; gap:12px; margin:12px 0; }
+    .mode-toggle { display:flex; gap:8px; }
+    .mode-toggle button[aria-pressed="true"] { font-weight:700; }
   </style>
 </head>
 <body>
   <h1>Emoji Cipher™</h1>
   <h2>A New Puzzle Game by <a href="https://salimahismail.com">Salimah!</a></h2>
 
+ <!-- Instructions -->
   <div class="note-box">
     Each emoji hides a secret <b>LETTER</b> and <b>NUMBER</b>.<br>
     Unlock one and you'll get the other.<br>
@@ -366,6 +372,7 @@
     Good Luck!
   </div>
 
+   <!-- Share Button -->
   <div style="margin-top:1rem; display:flex; gap:.5rem; flex-wrap:wrap;">
     <button id="shareBtn"
       style="flex:1; padding:.75rem 1rem; font-size:1rem; border-radius:.5rem; border:1px solid #999; background:#fff; cursor:pointer;">
@@ -378,6 +385,16 @@
     </div>
   </div>
 
+   <!-- Easy / Hard Mode-->
+  <section id="modeBar" class="mode-bar">
+  <span class="mode-label">Mode</span>
+  <div class="mode-toggle" role="group" aria-label="Select mode">
+    <button id="modeEasy" type="button">Easy</button>
+    <button id="modeHard" type="button">Hard</button>
+  </div>
+</section>
+
+ <!-- Progress Buttons -->
   <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; margin-top:1rem; gap:.5rem;">
     <button id="prevBtn" style="flex:1; padding:.75rem 1rem; font-size:1rem; border-radius:.5rem; border:1px solid #999; background:#fff; cursor:pointer;">
       ◀ Previous

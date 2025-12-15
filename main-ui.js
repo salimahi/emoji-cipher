@@ -7,6 +7,20 @@
   const PuzzlesData = global.PuzzlesData;
   const GameEngine  = global.GameEngine;
 
+  ///Easy/Hard Mode wiring
+  const MODE_KEY = "emojiCipher.mode";
+const MODES = { EASY: "easy", HARD: "hard" };
+
+function loadMode() {
+  const saved = localStorage.getItem(MODE_KEY);
+  return saved === MODES.HARD ? MODES.HARD : MODES.EASY;
+}
+
+function saveMode(mode) {
+  localStorage.setItem(MODE_KEY, mode);
+}
+
+
   // EmailJS constants. same as before
   const EMAILJS_SERVICE_ID  = "service_ushj1og";
   const EMAILJS_TEMPLATE_ID = "template_4hvk2cf";
@@ -38,6 +52,39 @@
   const nextBtn       = document.getElementById("nextBtn");
   const puzzleLabel   = document.getElementById("puzzleLabel");
   const progressLabel = document.getElementById("progressLabel");
+
+  let currentMode = loadMode();
+
+function setMode(mode) {
+  currentMode = mode;
+  saveMode(mode);
+  renderModeUI();
+
+  // Later, we will call into the engine here to apply mode rules.
+  // Example for next step: engine.setMode(currentMode);
+  // For now, just keep UI and persistence correct.
+}
+
+function renderModeUI() {
+  const easyBtn = document.getElementById("modeEasy");
+  const hardBtn = document.getElementById("modeHard");
+  if (!easyBtn || !hardBtn) return;
+
+  const isEasy = currentMode === MODES.EASY;
+  easyBtn.setAttribute("aria-pressed", String(isEasy));
+  hardBtn.setAttribute("aria-pressed", String(!isEasy));
+}
+
+function initModeSelector() {
+  const easyBtn = document.getElementById("modeEasy");
+  const hardBtn = document.getElementById("modeHard");
+  if (!easyBtn || !hardBtn) return;
+
+  easyBtn.addEventListener("click", () => setMode(MODES.EASY));
+  hardBtn.addEventListener("click", () => setMode(MODES.HARD));
+
+  renderModeUI();
+}
 
   // -----------------------
   // PROFILE HELPERS
@@ -552,7 +599,7 @@
     currentIndex  = newIndex;
     currentPuzzle = PUZZLES[currentIndex];
 
-    initPlayerState();
+    PlayerState();
     renderPhrase();
     renderEquations();
     renderSolutionBox();
@@ -722,6 +769,7 @@
       });
     }
 
+    initModeSelector();
     initShare();
     initFeedback();
     loadPuzzle(0);

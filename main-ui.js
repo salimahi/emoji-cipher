@@ -557,10 +557,7 @@ hardBtn.addEventListener("click", () => {
 
     if (phraseDone && allEqCorrect) {
       // mark solved in GameEngine as Easy completion
-      if (currentMode === MODES.HARD) {
-  const result = GameEngine.submitGuessHard(currentPuzzle.id);
-  // result contains { solved, finalScore, stars, ... } when solved
-} else {
+     if (currentMode !== MODES.HARD) {
   GameEngine.completePuzzleEasy(currentPuzzle.id);
 }
       if (winBox) {

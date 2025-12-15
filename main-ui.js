@@ -599,7 +599,7 @@ function initModeSelector() {
     currentIndex  = newIndex;
     currentPuzzle = PUZZLES[currentIndex];
 
-    PlayerState();
+    initPlayerState();
     renderPhrase();
     renderEquations();
     renderSolutionBox();

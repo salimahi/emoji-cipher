@@ -80,8 +80,15 @@ function initModeSelector() {
   const hardBtn = document.getElementById("modeHard");
   if (!easyBtn || !hardBtn) return;
 
-  easyBtn.addEventListener("click", () => setMode(MODES.EASY));
-  hardBtn.addEventListener("click", () => setMode(MODES.HARD));
+  easyBtn.addEventListener("click", () => {
+  console.log("mode click: easy");
+  setMode(MODES.EASY);
+});
+
+hardBtn.addEventListener("click", () => {
+  console.log("mode click: hard");
+  setMode(MODES.HARD);
+});
 
   renderModeUI();
 }

@@ -8,17 +8,7 @@
   const GameEngine  = global.GameEngine;
 
   ///Easy/Hard Mode wiring
-  const MODE_KEY = "emojiCipher.mode";
-const MODES = { EASY: "easy", HARD: "hard" };
-
-function loadMode() {
-  const saved = localStorage.getItem(MODE_KEY);
-  return saved === MODES.HARD ? MODES.HARD : MODES.EASY;
-}
-
-function saveMode(mode) {
-  localStorage.setItem(MODE_KEY, mode);
-}
+  const MODES = { EASY: "easy", HARD: "hard" };
 
 
   // EmailJS constants. same as before
@@ -53,16 +43,12 @@ function saveMode(mode) {
   const puzzleLabel   = document.getElementById("puzzleLabel");
   const progressLabel = document.getElementById("progressLabel");
 
-  let currentMode = loadMode();
+  let currentMode = GameEngine.getCurrentMode(); // persisted by GameEngine
 
 function setMode(mode) {
   currentMode = mode;
-  saveMode(mode);
+  GameEngine.setMode(mode); // persists to profile
   renderModeUI();
-
-  // Later, we will call into the engine here to apply mode rules.
-  // Example for next step: engine.setMode(currentMode);
-  // For now, just keep UI and persistence correct.
 }
 
 function renderModeUI() {

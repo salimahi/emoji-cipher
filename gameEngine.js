@@ -194,6 +194,21 @@
   hard.lastTickMs = now;
 }
 
+  function pauseHardRun(puzzleId) {
+  const pState = ensurePuzzleProfile(puzzleId);
+  const hard = pState.savedHardState;
+  if (!hard) return null;
+
+  // accumulate up to now, then stop counting
+  tickHardTimer(hard);
+  hard.timerRunning = false;
+  hard.lastTickMs = null;
+
+  saveProfile(profile);
+  return getHardViewState(puzzleId);
+}
+
+
   function getHardViewState(puzzleId) {
     const puzzle = global.PuzzlesData.getPuzzleById(puzzleId);
     const pState = ensurePuzzleProfile(puzzleId);
@@ -496,6 +511,7 @@ hard.endedAtMs = Date.now();
     resumeHardRun,
     getHardViewState,
     submitGuessHard,
+    pauseHardRun,
     abandonHardPuzzle,
     grantExtraLife,
 

@@ -736,6 +736,9 @@ hardBtn.addEventListener("click", () => {
   // LOAD PUZZLE
   // -----------------------
   function loadPuzzle(newIndex) {
+    if (currentMode === MODES.HARD && currentPuzzle && currentPuzzle.id) {
+  GameEngine.pauseHardRun(currentPuzzle.id);
+}
     if (newIndex < 0) newIndex = 0;
     if (newIndex > PUZZLES.length - 1) newIndex = PUZZLES.length - 1;
 
@@ -744,6 +747,7 @@ hardBtn.addEventListener("click", () => {
 
     if (currentMode === MODES.HARD) {
   GameEngine.resumeHardRun(currentPuzzle.id);
+      renderLives();
   startHardTimerUI();
 } else {
   stopHardTimerUI();

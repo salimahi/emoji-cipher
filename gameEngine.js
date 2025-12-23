@@ -150,6 +150,10 @@
   solvedLetters: {},    // emoji -> true
   solvedNumbers: {},    // emoji -> true
 
+  //OLD timer fields (Option A) 
+  startedAtMs: Date.now(),
+  endedAtMs: null,
+
   // NEW timer fields (Option B)
   elapsedMs: 0,         // total active play time
   timerRunning: false,  // starts after first guess
@@ -194,13 +198,6 @@
     const puzzle = global.PuzzlesData.getPuzzleById(puzzleId);
     const pState = ensurePuzzleProfile(puzzleId);
     const hard = pState.savedHardState;
-
-    // start timer on first interaction
-if (!hard.timerRunning) {
-  hard.timerRunning = true;
-  hard.lastTickMs = Date.now();
-}
-
     if (!hard) return null;
 
     const solvedLetters = Object.assign({}, hard.solvedLetters);
@@ -284,6 +281,14 @@ if (!hard.timerRunning) {
     }
     const hard = pState.savedHardState;
 
+    // start timer on first guess
+if (!hard.timerRunning) {
+  hard.timerRunning = true;
+  hard.lastTickMs = Date.now();
+}
+
+    tickHardTimer(hard);
+
     const emoji = params.emoji;
     const kind = params.kind === "number" ? "number" : "letter";
     const value = params.value;
@@ -305,7 +310,11 @@ if (!hard.timerRunning) {
         lifeLost = true;
         if (hard.livesLeft <= 0) {
           hard.failed = true;
-          hard.endedAtMs = Date.now();
+          tickHardTimer(hard);
+hard.timerRunning = false;
+hard.lastTickMs = null;
+hard.endedAtMs = Date.now();
+
         }
       }
     }
@@ -314,10 +323,14 @@ if (!hard.timerRunning) {
     let solvedState = null;
 
     if (solvedNow) {
-      hard.endedAtMs = Date.now();
+      tickHardTimer(hard);
+hard.timerRunning = false;
+hard.lastTickMs = null;
+hard.endedAtMs = Date.now();
+
       pState.hasIncompleteHard = false;
 
-      const elapsedSeconds = Math.max(0, Math.floor((hard.endedAtMs - hard.startedAtMs) / 1000));
+      const elapsedSeconds = Math.max(0, Math.floor((hard.elapsedMs || 0) / 1000));
       const scoreInfo = computeScoreAndStars(hard, elapsedSeconds);
       updateBestHardStats(pState, hard, elapsedSeconds, scoreInfo);
       unlockNextPuzzles(puzzleId);

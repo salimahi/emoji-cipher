@@ -173,6 +173,23 @@
     return getHardViewState(puzzleId);
   }
 
+  function tickHardTimer(hard) {
+  if (!hard.timerRunning) return;
+
+  const now = Date.now();
+
+  // first tick after starting
+  if (hard.lastTickMs == null) {
+    hard.lastTickMs = now;
+    return;
+  }
+
+  const dt = now - hard.lastTickMs;
+  if (dt > 0) hard.elapsedMs += dt;
+
+  hard.lastTickMs = now;
+}
+
   function getHardViewState(puzzleId) {
     const puzzle = global.PuzzlesData.getPuzzleById(puzzleId);
     const pState = ensurePuzzleProfile(puzzleId);
@@ -183,9 +200,8 @@
     const solvedLetters = Object.assign({}, hard.solvedLetters);
     const solvedNumbers = Object.assign({}, hard.solvedNumbers);
 
-    const nowMs = Date.now();
-    const effectiveEnd = hard.endedAtMs || nowMs;
-    const elapsedSeconds = Math.max(0, Math.floor((effectiveEnd - hard.startedAtMs) / 1000));
+    tickHardTimer(hard);
+    const elapsedSeconds = Math.max(0, Math.floor((hard.elapsedMs || 0) / 1000));
 
     return {
       puzzleId,

@@ -33,8 +33,8 @@
   //       bestTimeSeconds,
   //       bestLivesLeft,
   //       bestWasBrutalMode,
-  //       hasIncompleteHard,
-  //       savedHardState: {...}
+  //       hasIncomplete,
+  //       savedState: {...}
   //     }
   //   }
   // }
@@ -149,7 +149,12 @@
       livesLeft: EFFECTIVE_LIVES_START,
       solvedLetters: {},    // emoji -> true
       solvedNumbers: {},    // emoji -> true
+
       startedAtMs: Date.now(),
+      timerStartedAt: null,   // ms timestamp when timer first starts
+      elapsedMs: 0,           // accumulated time when paused/saved
+      timerRunning: false     // whether timer is currently running
+      
       endedAtMs: null,
       abandoned: false,
       failed: false

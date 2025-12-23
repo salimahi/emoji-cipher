@@ -142,23 +142,23 @@
     const brutal = opts && opts.brutalMode != null ? !!opts.brutalMode : profile.brutalModeOn;
 
     pState.savedHardState = {
-      puzzleId,
-      brutalMode: brutal,
-      livesStart: EFFECTIVE_LIVES_START,
-      livesGranted: 0,
-      livesLeft: EFFECTIVE_LIVES_START,
-      solvedLetters: {},    // emoji -> true
-      solvedNumbers: {},    // emoji -> true
+  puzzleId,
+  brutalMode: brutal,
+  livesStart: EFFECTIVE_LIVES_START,
+  livesGranted: 0,
+  livesLeft: EFFECTIVE_LIVES_START,
+  solvedLetters: {},    // emoji -> true
+  solvedNumbers: {},    // emoji -> true
 
-      startedAtMs: Date.now(),
-      timerStartedAt: null,   // ms timestamp when timer first starts
-      elapsedMs: 0,           // accumulated time when paused/saved
-      timerRunning: false     // whether timer is currently running
-      
-      endedAtMs: null,
-      abandoned: false,
-      failed: false
-    };
+  // NEW timer fields (Option B)
+  elapsedMs: 0,         // total active play time
+  timerRunning: false,  // starts after first guess
+  lastTickMs: null,     // used to accumulate elapsedMs
+
+  abandoned: false,
+  failed: false
+};
+
     pState.hasIncompleteHard = true;
     saveProfile(profile);
 

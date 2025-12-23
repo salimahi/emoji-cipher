@@ -195,6 +195,12 @@
     const pState = ensurePuzzleProfile(puzzleId);
     const hard = pState.savedHardState;
 
+    // start timer on first interaction
+if (!hard.timerRunning) {
+  hard.timerRunning = true;
+  hard.lastTickMs = Date.now();
+}
+
     if (!hard) return null;
 
     const solvedLetters = Object.assign({}, hard.solvedLetters);

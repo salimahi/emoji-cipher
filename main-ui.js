@@ -32,6 +32,15 @@
   let currentPuzzle  = PUZZLES[currentIndex];
   let playerState    = {};  // per puzzle, emoji -> { letter, number, solved }
   let hasCelebrated  = false;
+  let TimerInterval = null;
+
+function formatTime(seconds) {
+  const s = Math.max(0, seconds | 0);
+  const mm = String(Math.floor(s / 60)).padStart(2, "0");
+  const ss = String(s % 60).padStart(2, "0");
+  return `${mm}:${ss}`;
+}
+
 
   // DOM refs
   const phraseArea    = document.getElementById("phraseArea");
@@ -45,11 +54,51 @@
 
   let currentMode = GameEngine.getCurrentMode(); // persisted by GameEngine
 
+  let hardTimerInterval = null;
+
+function formatTime(seconds) {
+  const s = Math.max(0, seconds | 0);
+  const mm = String(Math.floor(s / 60)).padStart(2, "0");
+  const ss = String(s % 60).padStart(2, "0");
+  return `${mm}:${ss}`;
+}
+
+function stopHardTimerUI() {
+  if (hardTimerInterval) {
+    clearInterval(hardTimerInterval);
+    hardTimerInterval = null;
+  }
+}
+
+function startHardTimerUI() {
+  stopHardTimerUI();
+
+  hardTimerInterval = setInterval(() => {
+    if (currentMode !== MODES.HARD) return;
+
+    const timeEl = document.getElementById("timerLabel");
+    if (!timeEl) return;
+
+    const hv = GameEngine.getHardViewState(currentPuzzle.id);
+    if (!hv) return;
+
+    timeEl.textContent = `Time: ${formatTime(hv.elapsedSeconds)}`;
+  }, 250);
+}
+
+
 function setMode(mode) {
   currentMode = mode;
-  GameEngine.setMode(mode); // persists to profile
+  GameEngine.setMode(mode);
   renderModeUI();
-  renderLives();
+
+  if (currentMode === MODES.HARD) {
+    GameEngine.resumeHardRun(currentPuzzle.id);
+    renderLives();
+    startHardTimerUI();
+  } else {
+    stopHardTimerUI();
+  }
 }
 
 function renderModeUI() {
@@ -91,6 +140,30 @@ function renderModeUI() {
     out += i < left ? "❤️" : "💀";
   }
   livesIcons.textContent = out;
+}
+
+  function stopHardTimerUI() {
+  if (hardTimerInterval) {
+    clearInterval(hardTimerInterval);
+    hardTimerInterval = null;
+  }
+}
+
+function startHardTimerUI() {
+  stopHardTimerUI();
+
+  hardTimerInterval = setInterval(() => {
+    if (currentMode !== MODES.HARD) return;
+
+    const timeEl = document.getElementById("timerLabel");
+    if (!timeEl) return;
+
+    const hv = GameEngine.getHardViewState(currentPuzzle.id);
+    if (!hv) return;
+
+    // show elapsed even if not started yet (00:00)
+    timeEl.textContent = `Time: ${formatTime(hv.elapsedSeconds)}`;
+  }, 250);
 }
 
 
@@ -668,6 +741,13 @@ hardBtn.addEventListener("click", () => {
 
     currentIndex  = newIndex;
     currentPuzzle = PUZZLES[currentIndex];
+
+    if (currentMode === MODES.HARD) {
+  GameEngine.resumeHardRun(currentPuzzle.id);
+  startHardTimerUI();
+} else {
+  stopHardTimerUI();
+}
 
         const bestHardLabel = document.getElementById("bestHardLabel");
     if (bestHardLabel) {

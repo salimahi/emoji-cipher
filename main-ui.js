@@ -1055,6 +1055,23 @@ renderPhrase();
     });
   }
 
+  function initModeSelector() {
+  const easyBtn = document.getElementById("modeEasy");
+  const hardBtn = document.getElementById("modeHard");
+  if (!easyBtn || !hardBtn) return;
+
+  // initial paint
+  renderModeUI();
+
+  easyBtn.addEventListener("click", () => {
+    if (currentMode !== MODES.EASY) setMode(MODES.EASY);
+  });
+
+  hardBtn.addEventListener("click", () => {
+    if (currentMode !== MODES.HARD) setMode(MODES.HARD);
+  });
+}
+
   // -----------------------
   // INIT
   // -----------------------

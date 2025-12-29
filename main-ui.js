@@ -462,7 +462,11 @@ function persistEasyEntries() {
   }
 
   // Hard mode guess submission (life loss happens here)
-  if (currentMode === MODES.HARD) {
+    if (currentMode === MODES.HARD) {
+    // Only submit complete inputs in Hard mode
+    if (kind === "letter" && (val.length !== 1)) return;
+    if (kind === "number" && (val.length !== 1)) return;
+
     const result = GameEngine.submitGuessHard(currentPuzzle.id, {
       emoji: em,
       kind,

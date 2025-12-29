@@ -445,6 +445,15 @@ function persistEasyEntries() {
     }
   }
 
+      // HARD MODE GUARD. Do not submit a guess on backspace or empty input.
+  if (currentMode === MODES.HARD) {
+    const isEmpty = (e.target.value == null) || String(e.target.value).trim() === "";
+    if (isEmpty) {
+      // just a clear or backspace. do not penalize
+      return;
+    }
+  }
+
   // Easy mode. Persist whatever is typed (even if wrong)
   if (currentMode === MODES.EASY) {
     if (kind === "letter") playerState[em].letter = val || "";

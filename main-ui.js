@@ -762,10 +762,9 @@ if (phraseDone && allEqCorrect) {
     const result = GameEngine.finalizeHardIfSolved(currentPuzzle.id);
 
         if (result.solved) {
-      alert(`Solved. Score: ${result.finalScore}. Stars: ${result.stars}★. Time: ${formatTime(result.elapsedSeconds)}. Lives left: ${result.livesLeft}.`);
-      updateHardHUD();       // refresh best score label immediately
-      stopHardTimerUI();     // stop the ticking once solved
-    }
+  console.log("Hard solved:", result.finalScore, result.stars);
+  alert(`Solved! Score: ${result.finalScore} (${result.stars}★). Time: ${formatTime(result.elapsedSeconds)}.`);
+}
 
   } else {
     GameEngine.completePuzzleEasy(currentPuzzle.id);

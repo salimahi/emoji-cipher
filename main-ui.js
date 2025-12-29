@@ -145,9 +145,7 @@ function renderModeUI() {
     const ss = String(secs % 60).padStart(2, "0");
     timerLabel.textContent = `Time: ${mm}:${ss}`;
   }
-
- 
-
+  }
 
   function stopHardTimerUI() {
   if (hardTimerInterval) {

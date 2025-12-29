@@ -589,6 +589,22 @@ function useHardRefillCredit() {
     saveProfile(profile);
     return getProfileSnapshot();
   }
+  
+function getSolvedCount() {
+  let count = 0;
+
+  const puzzles = profile.puzzles || {};
+  for (const pid of Object.keys(puzzles)) {
+    const ps = puzzles[pid];
+    if (!ps) continue;
+
+    if (ps.completedEasy || ps.completedHard) {
+      count++;
+    }
+  }
+
+  return count;
+}
 
   function resetProfileForDebug() {
     profile = getDefaultProfile();
@@ -621,6 +637,7 @@ useHardRefillCredit,
     useHint,
     addPaidHints,
 
+    getSolvedCount,
     resetProfileForDebug
   };
 

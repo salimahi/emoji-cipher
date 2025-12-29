@@ -416,9 +416,13 @@ hard.endedAtMs = Date.now();
   const elapsedSeconds = Math.max(0, Math.floor((hard.elapsedMs || 0) / 1000));
   const scoreInfo = computeScoreAndStars(hard, elapsedSeconds);
 
-  updateBestHardStats(pState, hard, elapsedSeconds, scoreInfo);
+   updateBestHardStats(pState, hard, elapsedSeconds, scoreInfo);
   unlockNextPuzzles(puzzleId);
+
+  pState.completedHard = true;
+
   saveProfile(profile);
+
 
   return {
     solved: true,

@@ -146,15 +146,7 @@ function renderModeUI() {
     timerLabel.textContent = `Time: ${mm}:${ss}`;
   }
 
-  // best label
-  const bestHardLabel = document.getElementById("bestHardLabel");
-  if (bestHardLabel) {
-    const ps = GameEngine.getProfile().puzzles[currentPuzzle.id] || {};
-    const best = (typeof ps.bestScore === "number") ? ps.bestScore : null;
-    const stars = (typeof ps.bestStars === "number") ? ps.bestStars : 0;
-    bestHardLabel.textContent = best === null ? "Best: ." : `Best: ${best} (${stars}★)`;
-  }
-}
+ 
 
 
   function stopHardTimerUI() {
@@ -271,7 +263,7 @@ hardBtn.addEventListener("click", () => {
     let count = 0;
     for (const p of PUZZLES) {
       const ps = profile.puzzles[p.id];
-      if (ps && (ps.completedEasy || (ps.bestStars && ps.bestStars > 0))) {
+      if (ps && (ps.completedEasy || ps.completedHard)) {
         count++;
       }
     }
@@ -987,14 +979,6 @@ function persistEasyEntries() {
 } else {
   stopHardTimerUI();
 }
-
-        const bestHardLabel = document.getElementById("bestHardLabel");
-    if (bestHardLabel) {
-      const ps = GameEngine.getProfile().puzzles[currentPuzzle.id] || {};
-      const best = (typeof ps.bestScore === "number") ? ps.bestScore : null;
-      const stars = (typeof ps.bestStars === "number") ? ps.bestStars : 0;
-      bestHardLabel.textContent = best === null ? "Best: ." : `Best: ${best} (${stars}★)`;
-    }
 
     initPlayerState();
 

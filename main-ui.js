@@ -524,118 +524,121 @@ function persistEasyEntries() {
   // INPUT HANDLER
   // -----------------------
   function handleGuessInput(e) {
-    const em   = e.target.dataset.emoji;
-    const kind = e.target.dataset.kind;
+  const em = e.target.dataset.emoji;
+  const kind = e.target.dataset.kind;
 
-    if (playerState[em].solved) {
-      syncSolvedEmojiEverywhere(em);
-      updateEquationsStatus();
-      checkWin();
-      return;
-    }
-
-    let val = e.target.value;
-
-    if (kind === "letter") {
-      val = val.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 1);
-      e.target.value = val;
-    } else {
-      if (val !== "") {
-        let n = parseInt(val, 10);
-        if (isNaN(n)) n = "";
-        if (n < 0) n = 0;
-        if (n > 9) n = 9;
-        e.target.value = n === "" ? "" : String(n);
-        val = e.target.value;
-      }
-
-    if (currentMode === MODES.EASY) {
-      if (kind === "letter") playerState[em].letter = val || "";
-      if (kind === "number") playerState[em].number = val || "";
-      persistEasyEntries();
-    }
-
-     if (currentMode === MODES.HARD) {
-  const result = GameEngine.submitGuessHard(currentPuzzle.id, {
-    emoji: em,
-    kind,
-    value: val,
-    confirm: true
-  });
-
-  renderLives();
-  updateHardHUD();
-
-  if (result && result.failed) {
-  stopHardTimerUI();
-
- const refill = GameEngine.useHardRefillCredit();
-
-if (!refill.ok) {
-  showEndBox({
-    title: "Out of Lives. Try Again!",
-    body: "You are out of refills. Next step is to watch an ad or buy lives to continue.",
-    buttonText: "OK",
-    onButton: () => {
-      hideEndBox();
-    }
-  });
-  return;
-}
-
-showEndBox({
-  title: "Out of Lives. Try Again!",
-  body: `Restarting uses 1 refill. Refills left: ${refill.balance}.`,
-  buttonText: "Restart",
-  onButton: () => {
-    GameEngine.startHardRun(currentPuzzle.id);
-
-    initPlayerState();
-    renderPhrase();
-    renderEquations();
-    renderSolutionBox();
+  // If already solved, keep everything synced and ignore input
+  if (playerState[em]?.solved) {
+    syncSolvedEmojiEverywhere(em);
     updateEquationsStatus();
+    checkWin();
+    return;
+  }
+
+  let val = e.target.value;
+
+  // Sanitize input
+  if (kind === "letter") {
+    val = val.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 1);
+    e.target.value = val;
+  } else {
+    // number
+    if (val !== "") {
+      let n = parseInt(val, 10);
+      if (isNaN(n)) n = "";
+      if (n < 0) n = 0;
+      if (n > 9) n = 9;
+      e.target.value = n === "" ? "" : String(n);
+      val = e.target.value;
+    }
+  }
+
+  // Easy mode. Persist whatever is typed (even if wrong)
+  if (currentMode === MODES.EASY) {
+    if (kind === "letter") playerState[em].letter = val || "";
+    if (kind === "number") playerState[em].number = val || "";
+    if (typeof persistEasyEntries === "function") persistEasyEntries();
+  }
+
+  // Hard mode guess submission (life loss happens here)
+  if (currentMode === MODES.HARD) {
+    const result = GameEngine.submitGuessHard(currentPuzzle.id, {
+      emoji: em,
+      kind,
+      value: val,
+      confirm: true
+    });
 
     renderLives();
     updateHardHUD();
 
-    startHardTimerUI();
-    hideEndBox();
-  }
-});
+    if (result && result.failed) {
+      stopHardTimerUI();
 
-
-  return;
-}
-
-}
-
-    const correctLetter = currentPuzzle.mapping[em].letter;
-    const correctNumber = currentPuzzle.mapping[em].number.toString();
-
-    if (kind === "letter" && val === correctLetter) {
-      playerState[em].letter = correctLetter;
-      playerState[em].number = correctNumber;
-      playerState[em].solved = true;
-    } else if (kind === "number" && val === correctNumber) {
-      playerState[em].letter = correctLetter;
-      playerState[em].number = correctNumber;
-      playerState[em].solved = true;
-    }
-
-       if (playerState[em].solved) {
-      syncSolvedEmojiEverywhere(em);
-      updateEquationsStatus();
-      renderSolutionBox();
-
-      if (currentMode === MODES.EASY) {
-        persistEasyEntries();
+      const refill = GameEngine.useHardRefillCredit?.();
+      if (!refill || !refill.ok) {
+        showEndBox({
+          title: "Out of Lives. Try Again!",
+          body: "You are out of refills. Next step is to watch an ad or buy lives to continue.",
+          buttonText: "OK",
+          onButton: () => hideEndBox()
+        });
+        return;
       }
+
+      showEndBox({
+        title: "Out of Lives. Try Again!",
+        body: `Restarting uses 1 refill. Refills left: ${refill.balance}.`,
+        buttonText: "Restart",
+        onButton: () => {
+          GameEngine.startHardRun(currentPuzzle.id);
+
+          initPlayerState();
+          renderPhrase();
+          renderEquations();
+          renderSolutionBox();
+          updateEquationsStatus();
+
+          renderLives();
+          updateHardHUD();
+
+          startHardTimerUI();
+          hideEndBox();
+        }
+      });
+
+      return;
     }
 
+    // In hard mode, solved pairs come from the engine. We do not mark solved here.
     checkWin();
-
+    return;
   }
+
+  // Easy mode correctness check. Marks solved when correct.
+  const correctLetter = currentPuzzle.mapping[em].letter;
+  const correctNumber = String(currentPuzzle.mapping[em].number);
+
+  if (kind === "letter" && val === correctLetter) {
+    playerState[em].letter = correctLetter;
+    playerState[em].number = correctNumber;
+    playerState[em].solved = true;
+  } else if (kind === "number" && val === correctNumber) {
+    playerState[em].letter = correctLetter;
+    playerState[em].number = correctNumber;
+    playerState[em].solved = true;
+  }
+
+  if (playerState[em].solved) {
+    syncSolvedEmojiEverywhere(em);
+    updateEquationsStatus();
+    renderSolutionBox();
+    if (typeof persistEasyEntries === "function") persistEasyEntries();
+  }
+
+  checkWin();
+}
+
 
   // -----------------------
   // SYNC SOLVED EMOJI

@@ -397,22 +397,6 @@ function persistEasyEntries() {
     });
     return wordsSolved.join(" ");
   }
-
-  function persistEasyEntries() {
-  if (currentMode !== MODES.EASY) return;
-
-  const entries = {};
-  currentPuzzle.uniqueEmojis.forEach(em => {
-    const st = playerState[em] || {};
-    entries[em] = {
-      letter: st.letter || "",
-      number: st.number || "",
-      solved: !!st.solved
-    };
-  });
-
-  GameEngine.saveEasyState(currentPuzzle.id, { entries });
-}
   
   // -----------------------
   // INPUT HANDLER

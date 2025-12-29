@@ -85,6 +85,18 @@ if (parsed.puzzles && typeof parsed.puzzles === "object") {
     }
   }
 }
+// Backfill puzzle flags for older saved profiles
+if (parsed.puzzles && typeof parsed.puzzles === "object") {
+  for (const pid of Object.keys(parsed.puzzles)) {
+    const ps = parsed.puzzles[pid];
+    if (!ps || typeof ps !== "object") continue;
+
+    if (typeof ps.completedEasy !== "boolean") ps.completedEasy = false;
+    if (typeof ps.completedHard !== "boolean") {
+      ps.completedHard = (typeof ps.bestStars === "number" && ps.bestStars > 0);
+    }
+  }
+}
 
 return parsed;
     } catch (e) {

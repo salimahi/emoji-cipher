@@ -91,6 +91,12 @@ function setMode(mode) {
   } else {
     stopHardTimerUI();
   }
+
+    // Always refresh stars visibility and value when mode changes
+  if (currentPuzzle && currentPuzzle.id) {
+    renderStarsForPuzzle(currentPuzzle.id);
+  }
+
 }
 
 function renderModeUI() {

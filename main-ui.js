@@ -548,11 +548,6 @@ function persistEasyEntries() {
         e.target.value = n === "" ? "" : String(n);
         val = e.target.value;
       }
-          if (kind === "letter") {
-      ...
-    } else {
-      ...
-    }
 
     if (currentMode === MODES.EASY) {
       if (kind === "letter") playerState[em].letter = val || "";

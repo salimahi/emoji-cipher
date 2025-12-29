@@ -572,6 +572,19 @@ function persistEasyEntries() {
     renderLives();
     updateHardHUD();
 
+        // NEW. If the guess was correct, reflect it in the UI immediately.
+    if (result && result.correct) {
+      const def = currentPuzzle.mapping[em];
+      if (def) {
+        playerState[em].solved = true;
+        playerState[em].letter = def.letter;
+        playerState[em].number = String(def.number);
+        syncSolvedEmojiEverywhere(em);
+        updateEquationsStatus();
+        renderSolutionBox();
+      }
+    }
+
     if (result && result.failed) {
       stopHardTimerUI();
 

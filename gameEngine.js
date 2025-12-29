@@ -73,6 +73,19 @@ if (typeof parsed.hardRefillsBalance !== "number") parsed.hardRefillsBalance = 1
 
 if (!parsed.selectedMode) parsed.selectedMode = "easy";
 if (typeof parsed.brutalModeOn !== "boolean") parsed.brutalModeOn = false;
+
+      // Backfill per-puzzle fields for older saved profiles
+if (parsed.puzzles && typeof parsed.puzzles === "object") {
+  for (const pid of Object.keys(parsed.puzzles)) {
+    const ps = parsed.puzzles[pid];
+    if (!ps || typeof ps !== "object") continue;
+
+    if (typeof ps.completedHard !== "boolean") {
+      ps.completedHard = (typeof ps.bestStars === "number" && ps.bestStars > 0);
+    }
+  }
+}
+
 return parsed;
     } catch (e) {
       console.error("Failed to load profile", e);

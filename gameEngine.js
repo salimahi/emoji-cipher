@@ -99,6 +99,7 @@ return parsed;
       profile.puzzles[puzzleId] = {
         unlocked: false,
         completedEasy: false,
+        completedHard: false,
         bestScore: null,
         bestStars: 0,
         bestTimeSeconds: null,

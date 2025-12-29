@@ -373,6 +373,43 @@ hard.endedAtMs = Date.now();
     };
   }
 
+  function finalizeHardIfSolved(puzzleId) {
+  const puzzle = global.PuzzlesData.getPuzzleById(puzzleId);
+  const pState = ensurePuzzleProfile(puzzleId);
+  const hard = pState.savedHardState;
+
+  if (!puzzle || !hard) return { solved: false };
+  if (hard.failed) return { solved: false };
+
+  const solvedNow = isPuzzleSolved(puzzle, hard);
+  if (!solvedNow) return { solved: false };
+
+  // stop timer and lock elapsed time
+  tickHardTimer(hard);
+  hard.timerRunning = false;
+  hard.lastTickMs = null;
+
+  hard.endedAtMs = Date.now();
+  pState.hasIncompleteHard = false;
+
+  const elapsedSeconds = Math.max(0, Math.floor((hard.elapsedMs || 0) / 1000));
+  const scoreInfo = computeScoreAndStars(hard, elapsedSeconds);
+
+  updateBestHardStats(pState, hard, elapsedSeconds, scoreInfo);
+  unlockNextPuzzles(puzzleId);
+  saveProfile(profile);
+
+  return {
+    solved: true,
+    finalScore: scoreInfo.finalScore,
+    stars: scoreInfo.stars,
+    elapsedSeconds,
+    livesLeft: hard.livesLeft,
+    brutalMode: hard.brutalMode
+  };
+}
+
+
   function computeScoreAndStars(hard, timeSeconds) {
     const livesUsed = hard.livesStart + hard.livesGranted - hard.livesLeft;
     const effectiveLivesRemaining = Math.max(0, EFFECTIVE_LIVES_START - livesUsed);
@@ -511,6 +548,7 @@ hard.endedAtMs = Date.now();
     resumeHardRun,
     getHardViewState,
     submitGuessHard,
+    finalizeHardIfSolved,
     pauseHardRun,
     abandonHardPuzzle,
     grantExtraLife,

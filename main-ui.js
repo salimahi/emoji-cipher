@@ -662,25 +662,28 @@ hardBtn.addEventListener("click", () => {
       }
     });
 
-    if (phraseDone && allEqCorrect) {
-      // mark solved in GameEngine as Easy completion
-     if (currentMode !== MODES.HARD) {
-  GameEngine.completePuzzleEasy(currentPuzzle.id);
-}
-      if (winBox) {
-        winBox.style.display = "block";
-      }
-      if (!hasCelebrated) {
-        launchConfetti();
-      }
+if (phraseDone && allEqCorrect) {
 
-      updateProgressLabel();
-    } else {
-      if (winBox) {
-        winBox.style.display = "none";
-      }
+  if (currentMode === MODES.HARD) {
+    const result = GameEngine.finalizeHardIfSolved(currentPuzzle.id);
+
+    if (result.solved) {
+      console.log("Hard solved:", result.finalScore, result.stars);
     }
+  } else {
+    GameEngine.completePuzzleEasy(currentPuzzle.id);
   }
+
+  if (winBox) {
+    winBox.style.display = "block";
+  }
+
+  if (!hasCelebrated) {
+    launchConfetti();
+  }
+
+  updateProgressLabel();
+}
 
   // -----------------------
   // AUTOFILL IF SOLVED BEFORE

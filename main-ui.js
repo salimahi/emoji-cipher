@@ -183,6 +183,13 @@ function renderModeUI() {
   const el = document.getElementById("starsLabel");
   if (!el) return;
 
+    // Hide stars in Easy mode
+  if (currentMode === MODES.EASY) {
+    el.style.display = "none";
+    return;
+  }
+    el.style.display = "";
+    
   const ps = GameEngine.getProfile().puzzles[puzzleId] || {};
   const stars = Number(ps.bestStars || 0);
 

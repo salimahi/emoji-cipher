@@ -191,7 +191,8 @@ function renderModeUI() {
 
     // Hide stars in Easy mode
   if (currentMode === MODES.EASY) {
-    el.style.display = "none";
+    el.textContent = "";
+  el.style.display = "none";
     return;
   }
     el.style.display = "";

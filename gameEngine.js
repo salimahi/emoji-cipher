@@ -45,13 +45,16 @@
     if (all.length > 0) {
       puzzlesState[all[0].id] = { unlocked: true };
     }
-    return {
-      freeHintsRemaining: 3,
-      paidHintsBalance: 0,
-      selectedMode: "easy",
-      brutalModeOn: false,
-      puzzles: puzzlesState
-    };
+   return {
+  freeHintsRemaining: 3,
+  paidHintsBalance: 0,
+  // Hard lives refills. placeholder until ads/IAP
+  hardRefillsBalance: 1,
+
+  selectedMode: "easy",
+  brutalModeOn: false,
+  puzzles: puzzlesState
+};
   }
 
   function loadProfile() {
@@ -64,10 +67,13 @@
       }
       if (!parsed.puzzles) parsed.puzzles = {};
       if (typeof parsed.freeHintsRemaining !== "number") parsed.freeHintsRemaining = 3;
-      if (typeof parsed.paidHintsBalance !== "number") parsed.paidHintsBalance = 0;
-      if (!parsed.selectedMode) parsed.selectedMode = "easy";
-      if (typeof parsed.brutalModeOn !== "boolean") parsed.brutalModeOn = false;
-      return parsed;
+if (typeof parsed.paidHintsBalance !== "number") parsed.paidHintsBalance = 0;
+
+if (typeof parsed.hardRefillsBalance !== "number") parsed.hardRefillsBalance = 1;
+
+if (!parsed.selectedMode) parsed.selectedMode = "easy";
+if (typeof parsed.brutalModeOn !== "boolean") parsed.brutalModeOn = false;
+return parsed;
     } catch (e) {
       console.error("Failed to load profile", e);
       return getDefaultProfile();
@@ -99,7 +105,8 @@
         bestLivesLeft: null,
         bestWasBrutalMode: false,
         hasIncompleteHard: false,
-        savedHardState: null
+        savedHardState: null,
+savedEasyState: null
       };
     }
     return profile.puzzles[puzzleId];
@@ -488,6 +495,28 @@ hard.endedAtMs = Date.now();
     saveProfile(profile);
   }
 
+  function saveEasyState(puzzleId, easyState) {
+  const pState = ensurePuzzleProfile(puzzleId);
+  // easyState shape: { entries: { [emoji]: { letter, number, solved } } }
+  pState.savedEasyState = easyState && typeof easyState === "object" ? easyState : null;
+  saveProfile(profile);
+  return pState.savedEasyState;
+}
+
+function getEasyState(puzzleId) {
+  const pState = ensurePuzzleProfile(puzzleId);
+  return pState.savedEasyState ? JSON.parse(JSON.stringify(pState.savedEasyState)) : null;
+}
+
+// Hard refill placeholder. one “refill credit” consumes and allows a full restart (5 lives)
+function useHardRefillCredit() {
+  if ((profile.hardRefillsBalance || 0) <= 0) return { ok: false, balance: profile.hardRefillsBalance || 0 };
+  profile.hardRefillsBalance -= 1;
+  saveProfile(profile);
+  return { ok: true, balance: profile.hardRefillsBalance };
+}
+
+
   function useHint(puzzleId, params) {
     const kind = params.kind; // "letter" | "number" | "context"
     const emoji = params.emoji || null;
@@ -554,6 +583,10 @@ hard.endedAtMs = Date.now();
     grantExtraLife,
 
     completePuzzleEasy,
+
+    getEasyState,
+saveEasyState,
+useHardRefillCredit,
 
     useHint,
     addPaidHints,

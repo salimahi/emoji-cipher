@@ -285,6 +285,39 @@ hardBtn.addEventListener("click", () => {
     progressLabel.textContent = `Solved ${solvedCount} / ${total}`;
   }
 
+  function renderStarsForPuzzle(puzzleId) {
+  const el = document.getElementById("starsLabel");
+  if (!el) return;
+
+  const ps = GameEngine.getProfile().puzzles[puzzleId] || {};
+  const stars = Number(ps.bestStars || 0);
+
+  // filled: ⭐, empty: ☆
+  const out =
+    (stars >= 1 ? "⭐" : "☆") +
+    (stars >= 2 ? "⭐" : "☆") +
+    (stars >= 3 ? "⭐" : "☆");
+
+  el.textContent = out;
+}
+
+function persistEasyEntries() {
+  if (currentMode !== MODES.EASY) return;
+
+  const entries = {};
+  currentPuzzle.uniqueEmojis.forEach(em => {
+    const st = playerState[em];
+    entries[em] = {
+      letter: st?.letter || "",
+      number: st?.number || "",
+      solved: !!st?.solved
+    };
+  });
+
+  GameEngine.saveEasyState(currentPuzzle.id, { entries });
+}
+
+
   // -----------------------
   // PLAYER STATE
   // -----------------------
@@ -471,6 +504,22 @@ hardBtn.addEventListener("click", () => {
     return wordsSolved.join(" ");
   }
 
+  function persistEasyEntries() {
+  if (currentMode !== MODES.EASY) return;
+
+  const entries = {};
+  currentPuzzle.uniqueEmojis.forEach(em => {
+    const st = playerState[em] || {};
+    entries[em] = {
+      letter: st.letter || "",
+      number: st.number || "",
+      solved: !!st.solved
+    };
+  });
+
+  GameEngine.saveEasyState(currentPuzzle.id, { entries });
+}
+  
   // -----------------------
   // INPUT HANDLER
   // -----------------------
@@ -499,6 +548,16 @@ hardBtn.addEventListener("click", () => {
         e.target.value = n === "" ? "" : String(n);
         val = e.target.value;
       }
+          if (kind === "letter") {
+      ...
+    } else {
+      ...
+    }
+
+    if (currentMode === MODES.EASY) {
+      if (kind === "letter") playerState[em].letter = val || "";
+      if (kind === "number") playerState[em].number = val || "";
+      persistEasyEntries();
     }
 
      if (currentMode === MODES.HARD) {
@@ -515,27 +574,41 @@ hardBtn.addEventListener("click", () => {
   if (result && result.failed) {
   stopHardTimerUI();
 
+ const refill = GameEngine.useHardRefillCredit();
+
+if (!refill.ok) {
   showEndBox({
-    title: "Out of lives",
-    body: "Want to restart this puzzle?",
-    buttonText: "Restart",
+    title: "Out of Lives. Try Again!",
+    body: "You are out of refills. Next step is to watch an ad or buy lives to continue.",
+    buttonText: "OK",
     onButton: () => {
-      GameEngine.startHardRun(currentPuzzle.id);
-
-      initPlayerState();
-
-      renderPhrase();
-      renderEquations();
-      renderSolutionBox();
-      updateEquationsStatus();
-
-      renderLives();
-      updateHardHUD();
-
-      startHardTimerUI();
       hideEndBox();
     }
   });
+  return;
+}
+
+showEndBox({
+  title: "Out of Lives. Try Again!",
+  body: `Restarting uses 1 refill. Refills left: ${refill.balance}.`,
+  buttonText: "Restart",
+  onButton: () => {
+    GameEngine.startHardRun(currentPuzzle.id);
+
+    initPlayerState();
+    renderPhrase();
+    renderEquations();
+    renderSolutionBox();
+    updateEquationsStatus();
+
+    renderLives();
+    updateHardHUD();
+
+    startHardTimerUI();
+    hideEndBox();
+  }
+});
+
 
   return;
 }
@@ -555,13 +628,18 @@ hardBtn.addEventListener("click", () => {
       playerState[em].solved = true;
     }
 
-    if (playerState[em].solved) {
+       if (playerState[em].solved) {
       syncSolvedEmojiEverywhere(em);
       updateEquationsStatus();
       renderSolutionBox();
+
+      if (currentMode === MODES.EASY) {
+        persistEasyEntries();
+      }
     }
 
     checkWin();
+
   }
 
   // -----------------------
@@ -763,6 +841,7 @@ hardBtn.addEventListener("click", () => {
 
       if (result.solved) {
         console.log("Hard solved:", result.finalScore, result.stars);
+        renderStarsForPuzzle(currentPuzzle.id);
       }
     } else {
       GameEngine.completePuzzleEasy(currentPuzzle.id);
@@ -805,6 +884,49 @@ hardBtn.addEventListener("click", () => {
     renderSolutionBox();
     checkWin();
   }
+
+  function applyEasySavedStateToUI() {
+  const saved = GameEngine.getEasyState(currentPuzzle.id);
+  if (!saved || !saved.entries) return;
+
+  // restore into playerState first
+  currentPuzzle.uniqueEmojis.forEach(em => {
+    const ent = saved.entries[em];
+    if (!ent) return;
+
+    playerState[em].letter = String(ent.letter || "");
+    playerState[em].number = String(ent.number || "");
+    playerState[em].solved = !!ent.solved;
+  });
+
+  // push into inputs
+  currentPuzzle.uniqueEmojis.forEach(em => {
+    const st = playerState[em];
+
+    // letters
+    phraseArea
+      .querySelectorAll(`.char-stack[data-emoji="${em}"] .char-input`)
+      .forEach(inp => {
+        inp.value = st.letter || "";
+        inp.disabled = !!st.solved;
+      });
+
+    // numbers
+    equationsArea
+      .querySelectorAll(`.eq-stack[data-emoji="${em}"] .num-input`)
+      .forEach(inp => {
+        inp.value = st.number || "";
+        inp.disabled = !!st.solved;
+      });
+
+    // if solved, sync to enforce correct values everywhere
+    if (st.solved) syncSolvedEmojiEverywhere(em);
+  });
+
+  updateEquationsStatus();
+  renderSolutionBox();
+  checkWin();
+}
 
   function applyHardSavedStateToUI() {
   const view = GameEngine.getHardViewState(currentPuzzle.id);
@@ -881,6 +1003,9 @@ renderPhrase();
     renderSolutionBox();
     updateEquationsStatus();
     autofillIfSolved();
+    if (currentMode === MODES.EASY) {
+  applyEasySavedStateToUI();
+}
     if (currentMode === MODES.HARD) {
   applyHardSavedStateToUI();
 }
@@ -888,6 +1013,7 @@ renderPhrase();
       puzzleLabel.textContent = `Puzzle ${currentIndex + 1} / ${PUZZLES.length}`;
     }
     updateProgressLabel();
+    renderStarsForPuzzle(currentPuzzle.id);
   }
 
   // -----------------------

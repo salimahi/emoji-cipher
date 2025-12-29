@@ -32,15 +32,7 @@
   let currentPuzzle  = PUZZLES[currentIndex];
   let playerState    = {};  // per puzzle, emoji -> { letter, number, solved }
   let hasCelebrated  = false;
-  let TimerInterval = null;
-
-function formatTime(seconds) {
-  const s = Math.max(0, seconds | 0);
-  const mm = String(Math.floor(s / 60)).padStart(2, "0");
-  const ss = String(s % 60).padStart(2, "0");
-  return `${mm}:${ss}`;
-}
-
+  
 
   // DOM refs
   const phraseArea    = document.getElementById("phraseArea");
@@ -142,6 +134,29 @@ function renderModeUI() {
   livesIcons.textContent = out;
 }
 
+  function updateHardHUD() {
+  // timer label
+  const timerLabel = document.getElementById("timerLabel");
+  if (timerLabel) {
+    const hardView = GameEngine.getHardViewState(currentPuzzle.id);
+    const secs = hardView ? hardView.elapsedSeconds : 0;
+
+    const mm = String(Math.floor(secs / 60)).padStart(2, "0");
+    const ss = String(secs % 60).padStart(2, "0");
+    timerLabel.textContent = `Time: ${mm}:${ss}`;
+  }
+
+  // best label
+  const bestHardLabel = document.getElementById("bestHardLabel");
+  if (bestHardLabel) {
+    const ps = GameEngine.getProfile().puzzles[currentPuzzle.id] || {};
+    const best = (typeof ps.bestScore === "number") ? ps.bestScore : null;
+    const stars = (typeof ps.bestStars === "number") ? ps.bestStars : 0;
+    bestHardLabel.textContent = best === null ? "Best: ." : `Best: ${best} (${stars}★)`;
+  }
+}
+
+
   function stopHardTimerUI() {
   if (hardTimerInterval) {
     clearInterval(hardTimerInterval);
@@ -164,6 +179,59 @@ function startHardTimerUI() {
     // show elapsed even if not started yet (00:00)
     timeEl.textContent = `Time: ${formatTime(hv.elapsedSeconds)}`;
   }, 250);
+}
+
+  function showEndBox({ title, body, buttonText, onButton }) {
+  if (!winBox) return;
+
+  // Create inner UI once if it does not exist yet
+  let titleEl = winBox.querySelector("#endTitle");
+  let bodyEl = winBox.querySelector("#endBody");
+  let btnEl = winBox.querySelector("#endBtn");
+
+  if (!titleEl) {
+    titleEl = document.createElement("div");
+    titleEl.id = "endTitle";
+    titleEl.style.fontWeight = "700";
+    titleEl.style.fontSize = "20px";
+    titleEl.style.marginBottom = "8px";
+    winBox.appendChild(titleEl);
+  }
+
+  if (!bodyEl) {
+    bodyEl = document.createElement("div");
+    bodyEl.id = "endBody";
+    bodyEl.style.marginBottom = "12px";
+    winBox.appendChild(bodyEl);
+  }
+
+  if (!btnEl) {
+    btnEl = document.createElement("button");
+    btnEl.id = "endBtn";
+    btnEl.type = "button";
+    btnEl.style.padding = "10px 14px";
+    btnEl.style.borderRadius = "10px";
+    btnEl.style.border = "1px solid #36171D";
+    btnEl.style.cursor = "pointer";
+    winBox.appendChild(btnEl);
+  }
+
+  // Update content
+  titleEl.textContent = title || "";
+  bodyEl.textContent = body || "";
+  btnEl.textContent = buttonText || "OK";
+
+  // Replace previous click handler safely
+  btnEl.onclick = null;
+  btnEl.onclick = () => {
+    if (typeof onButton === "function") onButton();
+  };
+
+  winBox.style.display = "block";
+}
+
+function hideEndBox() {
+  if (winBox) winBox.style.display = "none";
 }
 
 
@@ -433,20 +501,46 @@ hardBtn.addEventListener("click", () => {
       }
     }
 
-        if (currentMode === MODES.HARD) {
-      const result = GameEngine.submitGuessHard(currentPuzzle.id, {
-        emoji: em,
-        kind,
-        value: val,
-        confirm: true
-      });
+     if (currentMode === MODES.HARD) {
+  const result = GameEngine.submitGuessHard(currentPuzzle.id, {
+    emoji: em,
+    kind,
+    value: val,
+    confirm: true
+  });
+
+  renderLives();
+  updateHardHUD();
+
+  if (result && result.failed) {
+  stopHardTimerUI();
+
+  showEndBox({
+    title: "Out of lives",
+    body: "Want to restart this puzzle?",
+    buttonText: "Restart",
+    onButton: () => {
+      GameEngine.startHardRun(currentPuzzle.id);
+
+      initPlayerState();
+
+      renderPhrase();
+      renderEquations();
+      renderSolutionBox();
+      updateEquationsStatus();
 
       renderLives();
+      updateHardHUD();
 
-      if (result && result.failed) {
-        return;
-      }
+      startHardTimerUI();
+      hideEndBox();
     }
+  });
+
+  return;
+}
+
+}
 
     const correctLetter = currentPuzzle.mapping[em].letter;
     const correctNumber = currentPuzzle.mapping[em].number.toString();
@@ -667,9 +761,12 @@ if (phraseDone && allEqCorrect) {
   if (currentMode === MODES.HARD) {
     const result = GameEngine.finalizeHardIfSolved(currentPuzzle.id);
 
-    if (result.solved) {
-      console.log("Hard solved:", result.finalScore, result.stars);
+        if (result.solved) {
+      alert(`Solved. Score: ${result.finalScore}. Stars: ${result.stars}★. Time: ${formatTime(result.elapsedSeconds)}. Lives left: ${result.livesLeft}.`);
+      updateHardHUD();       // refresh best score label immediately
+      stopHardTimerUI();     // stop the ticking once solved
     }
+
   } else {
     GameEngine.completePuzzleEasy(currentPuzzle.id);
   }
@@ -770,6 +867,7 @@ if (phraseDone && allEqCorrect) {
 if (currentMode === MODES.HARD) {
   GameEngine.resumeHardRun(currentPuzzle.id);
   renderLives();
+  updateHardHUD();
 } else {
   const livesIcons = document.getElementById("livesIcons");
   if (livesIcons) livesIcons.textContent = "";
